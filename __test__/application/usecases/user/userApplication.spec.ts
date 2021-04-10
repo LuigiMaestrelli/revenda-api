@@ -1,4 +1,4 @@
-import { Hasher } from '@/application/interfaces/hasher';
+import { Hasher } from '@/application/interfaces/cryptography';
 import { UserApplication } from '@/application/usecases/user/userApplication';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
 import { IAddUserRepository } from '@/domain/usecases/user/addUser';

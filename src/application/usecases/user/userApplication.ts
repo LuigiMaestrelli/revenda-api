@@ -1,6 +1,6 @@
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IAddUserApplication, IAddUserRepository } from '@/domain/usecases/user/addUser';
-import { Hasher } from '@/application/interfaces/hasher';
+import { Hasher } from '@/application/interfaces/cryptography';
 
 export class UserApplication implements IAddUserApplication {
     constructor(private readonly hasher: Hasher, private readonly addUserRepository: IAddUserRepository) {}
