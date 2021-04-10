@@ -1,4 +1,4 @@
-import { EmailValidatorAdapter } from '@/main/adapters/validators/emailValidatorAdapter';
+import { EmailValidatorAdapter } from '@/infra/adapters/validators/emailValidatorAdapter';
 
 const makeSut = (): EmailValidatorAdapter => {
     return new EmailValidatorAdapter();

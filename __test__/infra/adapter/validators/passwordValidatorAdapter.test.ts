@@ -1,4 +1,4 @@
-import { PasswordValidatorAdapter } from '@/main/adapters/validators/passwordValidatorAdapter';
+import { PasswordValidatorAdapter } from '@/infra/adapters/validators/passwordValidatorAdapter';
 
 const makeSut = (): PasswordValidatorAdapter => {
     return new PasswordValidatorAdapter();

@@ -1,5 +1,5 @@
-import { PasswordValidatorAdapter, PASSWORD_CONFIG } from '@/main/adapters/validators/PasswordValidatorAdapter';
 import validator from 'validator';
+import { PasswordValidatorAdapter, PASSWORD_CONFIG } from '@/infra/adapters/validators/PasswordValidatorAdapter';
 
 jest.mock('validator', () => ({
     isStrongPassword(): boolean {
