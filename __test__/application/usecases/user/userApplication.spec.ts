@@ -1,15 +1,15 @@
 import { Encrypter } from '@/application/interfaces/encrypter';
 import { UserApplication } from '@/application/usecases/user/userApplication';
-// import { UserModel } from '@/domain/models/user/User';
-import { AddUserModel } from '@/domain/usecases/user/addUser';
+import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
+import { IAddUserRepository } from '@/domain/usecases/user/addUser';
 
 type SutTypes = {
     encrypterStub: Encrypter;
-    //  addUserRepository: AddUserRepository;
+    addUserRepositoryStub: IAddUserRepository;
     sut: UserApplication;
 };
 
-const makeValidAddUserModel = (): AddUserModel => {
+const makeValidCreateUserAttributes = (): CreateUserAttributes => {
     return {
         name: 'valid name',
         email: 'valid email',
@@ -20,38 +20,36 @@ const makeValidAddUserModel = (): AddUserModel => {
 const makeEncrypter = (): Encrypter => {
     class EncrypterStub implements Encrypter {
         async encrypt(value: string): Promise<string> {
-            return 'encrypted password';
+            return 'hashed password';
         }
     }
 
     return new EncrypterStub();
 };
-/*
-const makeAddUserRepository = (): AddUserRepository => {
-    class AddUserRepositoryStub implements AddUserRepository {
-        async add(accountData: AddUserModel): Promise<UserModel> {
-            const fakeUser = {
+
+const makeAddUserRepository = (): IAddUserRepository => {
+    class AddUserRepositoryStub implements IAddUserRepository {
+        async add(accountData: CreateUserAttributes): Promise<UserAttributes> {
+            return {
                 id: 'valid id',
                 email: 'valid e-mail',
                 name: 'valid name',
                 passwordHash: 'hashed password'
             };
-
-            return fakeUser;
         }
     }
 
     return new AddUserRepositoryStub();
 };
-*/
+
 const makeSut = (): SutTypes => {
     const encrypterStub = makeEncrypter();
-    // const addUserRepository = makeAddUserRepository();
-    const sut = new UserApplication(encrypterStub);
+    const addUserRepositoryStub = makeAddUserRepository();
+    const sut = new UserApplication(encrypterStub, addUserRepositoryStub);
 
     return {
         encrypterStub,
-        //    addUserRepository,
+        addUserRepositoryStub,
         sut
     };
 };
@@ -61,7 +59,7 @@ describe('User Usecase', () => {
         const { sut, encrypterStub } = makeSut();
         const encryptSpy = jest.spyOn(encrypterStub, 'encrypt');
 
-        const accountData = makeValidAddUserModel();
+        const accountData = makeValidCreateUserAttributes();
 
         await sut.add(accountData);
 
@@ -75,26 +73,51 @@ describe('User Usecase', () => {
             throw new Error('Test throw');
         });
 
-        const accountData = makeValidAddUserModel();
+        const accountData = makeValidCreateUserAttributes();
 
         const addPromise = sut.add(accountData);
         await expect(addPromise).rejects.toThrow();
     });
-    /*
+
     test('should call AddUserRepository with correct values', async () => {
         const { sut, addUserRepositoryStub } = makeSut();
         const addUserRepositorySpy = jest.spyOn(addUserRepositoryStub, 'add');
 
-        const accountData = makeValidAddUserModel();
+        const userData = makeValidCreateUserAttributes();
 
-        await sut.add(accountData);
+        await sut.add(userData);
 
         expect(addUserRepositorySpy).toHaveBeenCalledWith({
             name: 'valid name',
             email: 'valid email',
-            password: 'encrypted password'
+            password: 'hashed password'
         });
     });
 
-    */
+    test('should return created user data', async () => {
+        const { sut } = makeSut();
+        const userData = makeValidCreateUserAttributes();
+
+        const user = await sut.add(userData);
+
+        expect(user).toEqual({
+            id: 'valid id',
+            name: 'valid name',
+            email: 'valid e-mail',
+            passwordHash: 'hashed password'
+        });
+    });
+
+    test('should throw if AddUserRepository throws', async () => {
+        const { sut, addUserRepositoryStub } = makeSut();
+
+        jest.spyOn(addUserRepositoryStub, 'add').mockImplementation(() => {
+            throw new Error('Test throw');
+        });
+
+        const accountData = makeValidCreateUserAttributes();
+
+        const addPromise = sut.add(accountData);
+        await expect(addPromise).rejects.toThrow();
+    });
 });

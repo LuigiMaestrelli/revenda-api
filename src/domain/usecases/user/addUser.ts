@@ -1,15 +1,9 @@
-import { UserModel } from '@/domain/models/user/User';
-
-export type AddUserModel = {
-    name: string;
-    email: string;
-    password: string;
-};
+import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 
 export interface IAddUserApplication {
-    add: (accountData: AddUserModel) => Promise<UserModel | null>;
+    add: (userData: CreateUserAttributes) => Promise<UserAttributes>;
 }
 
 export interface IAddUserRepository {
-    add: (accountData: AddUserModel) => Promise<UserModel>;
+    add: (userData: CreateUserAttributes) => Promise<UserAttributes>;
 }

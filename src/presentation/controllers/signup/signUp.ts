@@ -11,7 +11,7 @@ export class SignUpController implements Controller {
     constructor(
         private readonly emailValidator: EmailValidator,
         private readonly passwordValidator: PasswordValidator,
-        private readonly addUser: IAddUserApplication
+        private readonly addUserApplication: IAddUserApplication
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -46,7 +46,7 @@ export class SignUpController implements Controller {
                 return makeBadRequestResponse(new InvalidParamError('password is too week'));
             }
 
-            const user = await this.addUser.add({
+            const user = await this.addUserApplication.add({
                 name: body.name,
                 email: body.email,
                 password: body.password

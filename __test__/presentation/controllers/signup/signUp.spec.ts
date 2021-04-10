@@ -1,12 +1,12 @@
 import { SignUpController } from '@/presentation/controllers/signup/signUp';
 import { EmailValidator, PasswordValidator } from '@/presentation/interfaces';
-import { IAddUserApplication, AddUserModel } from '@/domain/usecases/user/addUser';
-import { UserModel } from '@/domain/models/user/User';
+import { IAddUserApplication } from '@/domain/usecases/user/addUser';
+import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 
 type SutTypes = {
     sut: SignUpController;
     emailValidationStub: EmailValidator;
-    addUserStub: IAddUserApplication;
+    addUserApplicationStub: IAddUserApplication;
     passwordValidationStub: PasswordValidator;
 };
 
@@ -30,34 +30,32 @@ const makePasswordValidator = (): PasswordValidator => {
     return new PasswordValidatorStub();
 };
 
-const makeAddUser = (): IAddUserApplication => {
-    class AddUserStub implements IAddUserApplication {
-        async add(user: AddUserModel): Promise<UserModel> {
-            const fakeUser = {
+const makeAddUserApplication = (): IAddUserApplication => {
+    class AddUserApplicationStub implements IAddUserApplication {
+        async add(user: CreateUserAttributes): Promise<UserAttributes> {
+            return {
                 id: 'valid_id',
                 name: 'valid name',
                 email: 'valid_email@email.com',
                 passwordHash: 'valid hash'
             };
-
-            return fakeUser;
         }
     }
 
-    return new AddUserStub();
+    return new AddUserApplicationStub();
 };
 
 const makeSut = (): SutTypes => {
     const emailValidationStub = makeEmailValidator();
     const passwordValidationStub = makePasswordValidator();
-    const addUserStub = makeAddUser();
-    const sut = new SignUpController(emailValidationStub, passwordValidationStub, addUserStub);
+    const addUserApplicationStub = makeAddUserApplication();
+    const sut = new SignUpController(emailValidationStub, passwordValidationStub, addUserApplicationStub);
 
     return {
         sut,
         emailValidationStub,
         passwordValidationStub,
-        addUserStub
+        addUserApplicationStub
     };
 };
 
@@ -234,9 +232,9 @@ describe('SignUp Controller', () => {
     });
 
     test('should call AddUser with correct values', async () => {
-        const { sut, addUserStub } = makeSut();
+        const { sut, addUserApplicationStub } = makeSut();
 
-        const addSpy = jest.spyOn(addUserStub, 'add');
+        const addSpy = jest.spyOn(addUserApplicationStub, 'add');
 
         const httpRequest = {
             body: {
@@ -256,9 +254,9 @@ describe('SignUp Controller', () => {
     });
 
     test('should return 500 if AddUser throws', async () => {
-        const { sut, addUserStub } = makeSut();
+        const { sut, addUserApplicationStub } = makeSut();
 
-        jest.spyOn(addUserStub, 'add').mockImplementation(() => {
+        jest.spyOn(addUserApplicationStub, 'add').mockImplementation(() => {
             throw new Error('Test throw');
         });
 
