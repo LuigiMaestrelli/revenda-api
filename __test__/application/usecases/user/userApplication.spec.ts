@@ -1,10 +1,10 @@
-import { Encrypter } from '@/application/interfaces/encrypter';
+import { Hasher } from '@/application/interfaces/hasher';
 import { UserApplication } from '@/application/usecases/user/userApplication';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
 import { IAddUserRepository } from '@/domain/usecases/user/addUser';
 
 type SutTypes = {
-    encrypterStub: Encrypter;
+    hasherStub: Hasher;
     addUserRepositoryStub: IAddUserRepository;
     sut: UserApplication;
 };
@@ -17,14 +17,14 @@ const makeValidCreateUserAttributes = (): CreateUserAttributes => {
     };
 };
 
-const makeEncrypter = (): Encrypter => {
-    class EncrypterStub implements Encrypter {
-        async encrypt(value: string): Promise<string> {
+const makeHasher = (): Hasher => {
+    class HasherStub implements Hasher {
+        async hash(value: string): Promise<string> {
             return 'hashed password';
         }
     }
 
-    return new EncrypterStub();
+    return new HasherStub();
 };
 
 const makeAddUserRepository = (): IAddUserRepository => {
@@ -43,12 +43,12 @@ const makeAddUserRepository = (): IAddUserRepository => {
 };
 
 const makeSut = (): SutTypes => {
-    const encrypterStub = makeEncrypter();
+    const hasherStub = makeHasher();
     const addUserRepositoryStub = makeAddUserRepository();
-    const sut = new UserApplication(encrypterStub, addUserRepositoryStub);
+    const sut = new UserApplication(hasherStub, addUserRepositoryStub);
 
     return {
-        encrypterStub,
+        hasherStub,
         addUserRepositoryStub,
         sut
     };
@@ -56,8 +56,8 @@ const makeSut = (): SutTypes => {
 
 describe('User Usecase', () => {
     test('should call Encrypter with correct value', async () => {
-        const { sut, encrypterStub } = makeSut();
-        const encryptSpy = jest.spyOn(encrypterStub, 'encrypt');
+        const { sut, hasherStub } = makeSut();
+        const encryptSpy = jest.spyOn(hasherStub, 'hash');
 
         const accountData = makeValidCreateUserAttributes();
 
@@ -67,9 +67,9 @@ describe('User Usecase', () => {
     });
 
     test('should throw if Encrypter throws', async () => {
-        const { sut, encrypterStub } = makeSut();
+        const { sut, hasherStub } = makeSut();
 
-        jest.spyOn(encrypterStub, 'encrypt').mockImplementation(() => {
+        jest.spyOn(hasherStub, 'hash').mockImplementation(() => {
             throw new Error('Test throw');
         });
 

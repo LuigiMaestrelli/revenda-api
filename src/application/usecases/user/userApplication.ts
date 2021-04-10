@@ -1,12 +1,12 @@
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IAddUserApplication, IAddUserRepository } from '@/domain/usecases/user/addUser';
-import { Encrypter } from '@/application/interfaces/encrypter';
+import { Hasher } from '@/application/interfaces/hasher';
 
 export class UserApplication implements IAddUserApplication {
-    constructor(private readonly encrypter: Encrypter, private readonly addUserRepository: IAddUserRepository) {}
+    constructor(private readonly hasher: Hasher, private readonly addUserRepository: IAddUserRepository) {}
 
     async add(userData: CreateUserAttributes): Promise<UserAttributes> {
-        userData.password = await this.encrypter.encrypt(userData.password);
+        userData.password = await this.hasher.hash(userData.password);
 
         const user = await this.addUserRepository.add(userData);
         return user;
