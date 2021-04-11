@@ -9,7 +9,9 @@ Sequelize.postgres.DECIMAL.parse = (value: any): number => parseFloat(value);
 /* @ts-expect-error */
 Sequelize.postgres.BIGINT.parse = (value: any): number => parseInt(value, 10);
 
-const connection = new Sequelize(dbConfig);
+const config = dbConfig.load();
+const connection = new Sequelize(config);
+
 const modelPath = path.join(__dirname, './model');
 
 const modelClasses = filesUtils.getFileList(modelPath).map(filePath => require(filePath));

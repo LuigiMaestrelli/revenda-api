@@ -1,21 +1,25 @@
 import dotenv from 'dotenv';
 
 export default {
-    load() {
+    load(): string {
+        const envFile = this.isTest() ? '.env.test' : '.env';
+
         dotenv.config({
-            path: this.isTest() ? '.env.test' : '.env'
+            path: envFile
         });
+
+        return envFile;
     },
 
-    isTest() {
+    isTest(): boolean {
         return process.env.NODE_ENV === 'test';
     },
 
-    isDev() {
+    isDev(): boolean {
         return process.env.NODE_ENV === 'dev';
     },
 
-    isProduction() {
+    isProduction(): boolean {
         return process.env.NODE_ENV === 'production';
     }
 };
