@@ -12,7 +12,7 @@ Sequelize.postgres.BIGINT.parse = (value: any): number => parseInt(value, 10);
 const connection = new Sequelize(dbConfig);
 const modelPath = path.join(__dirname, './model');
 
-const modelClasses = filesUtils.getFileList(modelPath, []).map(filePath => require(filePath));
+const modelClasses = filesUtils.getFileList(modelPath).map(filePath => require(filePath));
 modelClasses.forEach(Model => Model.default.initialize(connection));
 modelClasses.filter(p => !!p.associate).forEach(Model => Model.associate(connection.models));
 

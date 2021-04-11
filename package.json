@@ -14,7 +14,7 @@
         "test:ci": "yarn test --coverage --verbose",
         "prettier": "prettier --write \"**/*.ts\"",
         "lint": "eslint --ext .ts .",
-        "postinstall": "husky install"
+        "prepare": "husky install"
     },
     "engines": {
         "node": "15.x"

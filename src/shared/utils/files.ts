@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 export default {
-    getFileList(dir: string, excludes: string[]): string[] {
+    getFileList(dir: string, excludes: string[] = []): string[] {
         let files: string[] = [];
 
         fs.readdirSync(dir).forEach(file => {
