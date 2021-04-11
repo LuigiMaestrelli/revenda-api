@@ -1,14 +1,12 @@
-import { Model, Sequelize, DataTypes } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 import { UserAttributes } from '@/domain/models/user/user';
+import BaseModel from '../infra/basemodel';
 
-export default class UserModel extends Model<UserAttributes> implements UserAttributes {
+export default class UserModel extends BaseModel<UserAttributes> implements UserAttributes {
     public id!: string;
     public name!: string;
     public email!: string;
     public password!: string;
-
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
 
     static initialize(sequelize: Sequelize): void {
         UserModel.init(

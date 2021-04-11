@@ -1,8 +1,6 @@
 import { Sequelize } from 'sequelize';
 import database from '@/infra/db';
 
-// conexão
-// funcões de conversão
 describe('Database', () => {
     test('should connect to the test database', async () => {
         const autenticatePromise = database.authenticate();

@@ -14,7 +14,7 @@ const connection = new Sequelize(config);
 
 const modelPath = path.join(__dirname, './model');
 
-const modelClasses = filesUtils.getFileList(modelPath).map(filePath => require(filePath));
+const modelClasses = filesUtils.getFileList(modelPath, ['index.ts', 'basemodel.ts']).map(filePath => require(filePath));
 modelClasses.forEach(Model => Model.default.initialize(connection));
 modelClasses.filter(p => !!p.associate).forEach(Model => Model.associate(connection.models));
 
