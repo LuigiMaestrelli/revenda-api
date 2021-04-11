@@ -5,12 +5,10 @@ const SALT_CONFIG = 12;
 
 export class BcryptAdapter implements Hasher, HashCompare {
     async hash(value: string): Promise<string> {
-        const hash = await bcrypt.hash(value, SALT_CONFIG);
-        return hash;
+        return await bcrypt.hash(value, SALT_CONFIG);
     }
 
     async compare(value: string, hash: string): Promise<boolean> {
-        const isValid = await bcrypt.compare(value, hash);
-        return isValid;
+        return await bcrypt.compare(value, hash);
     }
 }

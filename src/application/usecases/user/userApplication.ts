@@ -8,7 +8,6 @@ export class UserApplication implements IAddUserApplication {
     async add(userData: CreateUserAttributes): Promise<UserAttributes> {
         userData.password = await this.hasher.hash(userData.password);
 
-        const user = await this.addUserRepository.add(userData);
-        return user;
+        return await this.addUserRepository.add(userData);
     }
 }

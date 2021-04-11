@@ -1,7 +1,7 @@
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IAddUserRepository } from '@/domain/usecases/user/addUser';
 import { IdGenerator } from '@/infra/interfaces/idGenerator';
-import UserModel from '@/infra/db/model/user/user';
+import UserModel from '@/infra/db/model/user/userModel';
 
 export class UserRepository implements IAddUserRepository {
     constructor(private readonly idGenerator: IdGenerator) {}
@@ -9,11 +9,9 @@ export class UserRepository implements IAddUserRepository {
     async add(userData: CreateUserAttributes): Promise<UserAttributes> {
         const id = await this.idGenerator.generate();
 
-        const user = await UserModel.create({
+        return await UserModel.create({
             id,
             ...userData
         });
-
-        return user;
     }
 }

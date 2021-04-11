@@ -1,3 +1,4 @@
 node_modules
 dist
-coverage
+__test__/coverage
+.scannerwork

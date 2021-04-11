@@ -9,25 +9,7 @@ export function makeBadRequestResponse(error: Error): HttpResponseError {
         }
     };
 }
-/*
-export function makeForbiddenResponse(error: Error): HttpResponseError {
-    return {
-        statusCode: 403,
-        body: {
-            message: error?.message || 'Forbidden'
-        }
-    };
-}
 
-export function makeUnauthorizedResponse(error?: Error): HttpResponseError {
-    return {
-        statusCode: 401,
-        body: {
-            message: error?.message || 'Unauthorized'
-        }
-    };
-}
-*/
 export function makeServerErrorResponse(error: ServerError): HttpResponseError {
     return {
         statusCode: 500,
