@@ -11,5 +11,7 @@ module.exports = {
     roots: ['<rootDir>/__test__'],
     moduleNameMapper: {
         '@/(.*)': '<rootDir>/src/$1'
-    }
+    },
+    setupFilesAfterEnv: ['<rootDir>/__test__/setup/setupFilesAfterEnv.ts'],
+    testResultsProcessor: 'jest-sonar-reporter'
 };

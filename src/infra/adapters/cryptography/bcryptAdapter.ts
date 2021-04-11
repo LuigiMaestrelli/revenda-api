@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Hasher, HashCompare } from '@/application/interfaces/cryptography';
+import { Hasher, HashCompare } from '@/infra/interfaces/cryptography';
 
 const SALT_CONFIG = 12;
 

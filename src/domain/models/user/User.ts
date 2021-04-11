@@ -2,7 +2,7 @@ export interface UserAttributes {
     id: string;
     name: string;
     email: string;
-    passwordHash: string;
+    password: string;
 
     createdAt?: Date;
     updatedAt?: Date;

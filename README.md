@@ -30,3 +30,29 @@ Pensando nisso, ele lhe contratou para desenvolver o sistema. Os pré-requisitos
 # Criar cadastro de Marca
 
 -   Codigo e descrição
+
+## Comandos para o sequelize
+
+-   yarn sequelize db:create
+    Cria um banco de dados no zero
+
+-   yarn sequelize migration:create --name=create-users
+    Cria um arquivo de migrations chamado create-users
+
+-   yarn sequelize db:migrate
+    Executa todas as migrações pendentes
+
+-   yarn sequelize db:migrate:undo
+    Desfaz a ultima migration executada
+
+-   yarn sequelize db:migrate:undo:all
+    Desfaz todas as migrations
+
+-   yarn sequelize seed:generate --name demo-user
+    Cria um arquivo de seeds para inserir dados
+
+-   yarn sequelize db:seed:all
+    Executa todos os seeds pendentes
+
+-   yarn sequelize db:seed:undo:all
+    Desfaz todos os seeds

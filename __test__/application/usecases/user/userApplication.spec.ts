@@ -1,4 +1,4 @@
-import { Hasher } from '@/application/interfaces/cryptography';
+import { Hasher } from '@/infra/interfaces/cryptography';
 import { UserApplication } from '@/application/usecases/user/userApplication';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
 import { IAddUserRepository } from '@/domain/usecases/user/addUser';
@@ -34,7 +34,7 @@ const makeAddUserRepository = (): IAddUserRepository => {
                 id: 'valid id',
                 email: 'valid e-mail',
                 name: 'valid name',
-                passwordHash: 'hashed password'
+                password: 'hashed password'
             };
         }
     }
@@ -104,7 +104,7 @@ describe('User Usecase', () => {
             id: 'valid id',
             name: 'valid name',
             email: 'valid e-mail',
-            passwordHash: 'hashed password'
+            password: 'hashed password'
         });
     });
 
