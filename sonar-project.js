@@ -15,7 +15,6 @@ sonarqubeScanner(
             'sonar.inclusions': '**',
             'sonar.exclusions': excludes.join(','),
             'sonar.test.inclusions': inclusions.join(','),
-            // 'sonar.cpd.exclusions': 'src/app/models/**/*.ts',
             'sonar.javascript.lcov.reportPaths': '__test__/coverage/lcov.info',
             'sonar.testExecutionReportPaths': '__test__/coverage/test-reporter.xml'
         }
