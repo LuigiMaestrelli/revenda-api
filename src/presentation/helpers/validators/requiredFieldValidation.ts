@@ -4,11 +4,9 @@ import { Validation } from '@/presentation/interfaces';
 export class RequiredFieldValidation implements Validation {
     constructor(private readonly fieldName: string) {}
 
-    validate(input: any): Error | null {
+    async validate(input: any): Promise<void> {
         if (!input[this.fieldName]) {
-            return new MissingParamError(this.fieldName);
+            throw new MissingParamError(this.fieldName);
         }
-
-        return null;
     }
 }

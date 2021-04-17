@@ -1,4 +1,4 @@
-import { ServerError } from '@/shared/errors';
+import { InvalidParamError, MissingParamError, ServerError } from '@/shared/errors';
 import { HttpResponse, HttpResponseError } from '../interfaces';
 
 export function makeBadRequestResponse(error: Error): HttpResponseError {
@@ -27,4 +27,16 @@ export function makeSuccessResponse(body?: any, headers?: any): HttpResponse {
         body,
         headers
     };
+}
+
+export function makeErrorResponse(error: Error): HttpResponseError {
+    if (error instanceof InvalidParamError) {
+        return makeBadRequestResponse(error);
+    }
+
+    if (error instanceof MissingParamError) {
+        return makeBadRequestResponse(error);
+    }
+
+    return makeServerErrorResponse(error);
 }

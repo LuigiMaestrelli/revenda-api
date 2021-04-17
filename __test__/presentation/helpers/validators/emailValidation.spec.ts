@@ -28,7 +28,7 @@ const makeSut = (): SutTypes => {
 };
 
 describe('Email Validation', () => {
-    test('should call EmailValidator with a valid email', () => {
+    test('should call EmailValidator with a valid email', async () => {
         const { sut, emailValidatorStub } = makeSut();
         const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid');
 
@@ -36,20 +36,20 @@ describe('Email Validation', () => {
             email: 'any_email@teste.com.br'
         };
 
-        sut.validate(input);
+        await sut.validate(input);
         expect(isValidSpy).toHaveBeenCalledWith('any_email@teste.com.br');
     });
 
-    test('should throw if email validator throws', () => {
+    test('should throw if email validator throws', async () => {
         const { sut, emailValidatorStub } = makeSut();
         jest.spyOn(emailValidatorStub, 'isValid').mockImplementation(() => {
             throw new Error('Test throw');
         });
 
-        expect(sut.validate).toThrow();
+        await expect(sut.validate).rejects.toThrow();
     });
 
-    test('should return an Error with EmailValidator returns false', () => {
+    test('should thrown an Error with EmailValidator returns false', async () => {
         const { sut, emailValidatorStub } = makeSut();
         jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false);
 
@@ -57,7 +57,19 @@ describe('Email Validation', () => {
             email: 'any_email@teste.com.br'
         };
 
-        const error = sut.validate(input);
-        expect(error).toEqual(new InvalidParamError('email'));
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).rejects.toThrow(new InvalidParamError('email'));
+    });
+
+    test('should not throw if validation succeeds', async () => {
+        const { sut } = makeSut();
+
+        const input = {
+            someField: 'any data',
+            otherField: 'any data'
+        };
+
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).resolves.not.toThrow();
     });
 });

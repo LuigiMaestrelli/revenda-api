@@ -1,10 +1,5 @@
 import { Controller, HttpRequest, HttpResponse, Validation } from '@/presentation/interfaces';
-import { ServerError } from '@/shared/errors';
-import {
-    makeBadRequestResponse,
-    makeSuccessResponse,
-    makeServerErrorResponse
-} from '@/presentation/helpers/httpHelper';
+import { makeSuccessResponse, makeErrorResponse } from '@/presentation/helpers/httpHelper';
 import { IAddUserApplication } from '@/domain/usecases/user/addUser';
 
 export class SignUpController implements Controller {
@@ -14,10 +9,7 @@ export class SignUpController implements Controller {
         try {
             const { body } = httpRequest;
 
-            const error = this.validation.validate(body);
-            if (error) {
-                return makeBadRequestResponse(error);
-            }
+            await this.validation.validate(body);
 
             const user = await this.addUserApplication.add({
                 name: body.name,
@@ -27,7 +19,7 @@ export class SignUpController implements Controller {
 
             return makeSuccessResponse(user);
         } catch (ex) {
-            return makeServerErrorResponse(new ServerError(ex.message, ex));
+            return makeErrorResponse(ex);
         }
     }
 }

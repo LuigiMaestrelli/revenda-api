@@ -1,4 +1,4 @@
-import { SignUpController } from '@/presentation/controllers/signup/signUp';
+import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { Validation } from '@/presentation/interfaces';
 import { IAddUserApplication } from '@/domain/usecases/user/addUser';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
@@ -11,9 +11,7 @@ type SutTypes = {
 
 const makeValidation = (): Validation => {
     class ValidationStub implements Validation {
-        validate(input: any): Error | null {
-            return null;
-        }
+        async validate(input: any): Promise<void> {}
     }
 
     return new ValidationStub();

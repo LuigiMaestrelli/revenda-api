@@ -2,7 +2,7 @@ import { InvalidParamError } from '@/shared/errors';
 import { CompareFieldsValidation } from '@/presentation/helpers/validators/compareFieldsValidation';
 
 describe('CompareFields Validation', () => {
-    test('should return a InvalidParamError if validation fails', () => {
+    test('should throw a InvalidParamError if validation fails', async () => {
         const sut = new CompareFieldsValidation('someField', 'otherField');
 
         const input = {
@@ -10,11 +10,11 @@ describe('CompareFields Validation', () => {
             otherField: 'other data'
         };
 
-        const error = sut.validate(input);
-        expect(error).toEqual(new InvalidParamError('otherField'));
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).rejects.toThrow(new InvalidParamError('otherField'));
     });
 
-    test('should not return if validation succeeds', () => {
+    test('should not throw if validation succeeds', async () => {
         const sut = new CompareFieldsValidation('someField', 'otherField');
 
         const input = {
@@ -22,7 +22,7 @@ describe('CompareFields Validation', () => {
             otherField: 'any data'
         };
 
-        const error = sut.validate(input);
-        expect(error).toBeFalsy();
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).resolves.not.toThrow();
     });
 });

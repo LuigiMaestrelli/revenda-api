@@ -9,9 +9,7 @@ interface SutTypes {
 
 const makeValidation = (): Validation => {
     class ValidationStub implements Validation {
-        validate(input: any): Error | null {
-            return null;
-        }
+        async validate(input: any): Promise<void> {}
     }
 
     return new ValidationStub();
@@ -28,38 +26,44 @@ const makeSut = (): SutTypes => {
 };
 
 describe('Validation Composite', () => {
-    test('should return an error if any validation fails', () => {
+    test('should thrown an error if any validation fails', async () => {
         const { sut, validationStubs } = makeSut();
-        jest.spyOn(validationStubs[0], 'validate').mockReturnValueOnce(new MissingParamError('someField'));
+        jest.spyOn(validationStubs[0], 'validate').mockImplementationOnce(() => {
+            throw new MissingParamError('someField');
+        });
 
         const input = {
             field: 'any value'
         };
 
-        const error = sut.validate(input);
-        expect(error).toEqual(new MissingParamError('someField'));
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).rejects.toThrow(new MissingParamError('someField'));
     });
 
-    test('should return the error if more than one validation fails', () => {
+    test('should return the error if more than one validation fails', async () => {
         const { sut, validationStubs } = makeSut();
-        jest.spyOn(validationStubs[0], 'validate').mockReturnValueOnce(new Error());
-        jest.spyOn(validationStubs[1], 'validate').mockReturnValueOnce(new MissingParamError('someField'));
+        jest.spyOn(validationStubs[0], 'validate').mockImplementationOnce(() => {
+            throw new Error();
+        });
+        jest.spyOn(validationStubs[1], 'validate').mockImplementationOnce(() => {
+            throw new MissingParamError('someField');
+        });
 
         const input = {
             field: 'any value'
         };
 
-        const error = sut.validate(input);
-        expect(error).toEqual(new Error());
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).rejects.toThrow(new Error());
     });
 
-    test('should not return if validation succeeds', () => {
+    test('should not throw if validation succeeds', async () => {
         const { sut } = makeSut();
         const input = {
             field: 'any value'
         };
 
-        const error = sut.validate(input);
-        expect(error).toBeFalsy();
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).resolves.not.toThrow();
     });
 });

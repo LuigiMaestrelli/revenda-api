@@ -28,7 +28,7 @@ const makeSut = (): SutTypes => {
 };
 
 describe('Password Validation', () => {
-    test('should call PasswordValidator with a strong password', () => {
+    test('should call PasswordValidator with a strong password', async () => {
         const { sut, passwordValidatorStub } = makeSut();
         const isStrongPasswordSpy = jest.spyOn(passwordValidatorStub, 'isStrongPassword');
 
@@ -36,20 +36,21 @@ describe('Password Validation', () => {
             password: 'Oao$@9wejWE90uasd723'
         };
 
-        sut.validate(input);
+        await sut.validate(input);
         expect(isStrongPasswordSpy).toHaveBeenCalledWith('Oao$@9wejWE90uasd723');
     });
 
-    test('should throw if password validator throws', () => {
+    test('should throw if password validator throws', async () => {
         const { sut, passwordValidatorStub } = makeSut();
-        jest.spyOn(passwordValidatorStub, 'isStrongPassword').mockImplementation(() => {
+        jest.spyOn(passwordValidatorStub, 'isStrongPassword').mockImplementationOnce(() => {
             throw new Error('Test throw');
         });
 
-        expect(sut.validate).toThrow();
+        const validatorPromise = sut.validate('Teste');
+        await expect(validatorPromise).rejects.toThrow();
     });
 
-    test('should return an Error with PasswordValidation returns false', () => {
+    test('should thrown an Error with PasswordValidation returns false', async () => {
         const { sut, passwordValidatorStub } = makeSut();
         jest.spyOn(passwordValidatorStub, 'isStrongPassword').mockReturnValueOnce(false);
 
@@ -57,7 +58,14 @@ describe('Password Validation', () => {
             password: 'password'
         };
 
-        const error = sut.validate(input);
-        expect(error).toEqual(new InvalidParamError('password is too week'));
+        const validatorPromise = sut.validate(input);
+        await expect(validatorPromise).rejects.toThrow(new InvalidParamError('password is too week'));
+    });
+
+    test('should not throw if validation succeeds', async () => {
+        const { sut } = makeSut();
+
+        const validatorPromise = sut.validate('teste');
+        await expect(validatorPromise).resolves.not.toThrow();
     });
 });
