@@ -1,6 +1,6 @@
 import { Controller, HttpRequest, HttpResponse, Validation } from '@/presentation/interfaces';
 import { makeSuccessResponse, makeErrorResponse } from '@/presentation/helpers/httpHelper';
-import { IAddUserApplication } from '@/domain/usecases/user/addUser';
+import { IAddUserApplication } from '@/domain/usecases/user/user';
 
 export class SignUpController implements Controller {
     constructor(private readonly validation: Validation, private readonly addUserApplication: IAddUserApplication) {}

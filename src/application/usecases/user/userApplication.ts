@@ -1,5 +1,6 @@
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
-import { IAddUserApplication, IAddUserRepository } from '@/domain/usecases/user/addUser';
+import { IAddUserApplication } from '@/domain/usecases/user/user';
+import { IAddUserRepository } from '@/domain/repository/user/user';
 import { Hasher } from '@/infra/interfaces/cryptography';
 
 export class UserApplication implements IAddUserApplication {

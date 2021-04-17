@@ -1,6 +1,6 @@
 import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { Validation } from '@/presentation/interfaces';
-import { IAddUserApplication } from '@/domain/usecases/user/addUser';
+import { IAddUserApplication } from '@/domain/usecases/user/user';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 
 type SutTypes = {
