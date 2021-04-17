@@ -1,7 +1,9 @@
 import { truncate } from '../../../utils/database';
 import request from 'supertest';
 import faker from 'faker';
+import { v4 as uuidv4 } from 'uuid';
 import app from '@/main/config/app';
+import UserModel from '@/infra/db/model/user/userModel';
 
 const STRONG_PASSWORD = '^znET!St5+.PXgtZ';
 
@@ -114,6 +116,29 @@ describe('Login Routes', () => {
 
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid param: password is too week');
+        });
+
+        test('should return 400 on signup if the e-mail is already in use', async () => {
+            const email = faker.internet.email();
+
+            await UserModel.create({
+                id: uuidv4(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: email,
+                password: 'xxxxxxxx'
+            });
+
+            const response = await request(app)
+                .post('/api/signup')
+                .send({
+                    name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                    email: email,
+                    password: STRONG_PASSWORD,
+                    passwordConfirmation: STRONG_PASSWORD
+                });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Invalid param: e-mail already in use');
         });
     });
 });

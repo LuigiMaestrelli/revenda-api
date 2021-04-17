@@ -5,5 +5,5 @@ import { makeUserRepository } from '@/main/factories/repository/user/userReposit
 export const makeUserApplication = (): UserApplication => {
     const hasher = new BcryptAdapter();
     const userRepository = makeUserRepository();
-    return new UserApplication(hasher, userRepository);
+    return new UserApplication(hasher, userRepository, userRepository);
 };

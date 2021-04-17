@@ -1,18 +1,20 @@
 import { Hasher } from '@/infra/interfaces/cryptography';
 import { UserApplication } from '@/application/usecases/user/userApplication';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
-import { IAddUserRepository } from '@/domain/repository/user/user';
+import { IAddUserRepository, IFindUserByEmailRepository } from '@/domain/repository/user/user';
+import { InvalidParamError } from '@/shared/errors';
 
 type SutTypes = {
     hasherStub: Hasher;
     addUserRepositoryStub: IAddUserRepository;
+    findUserByEmailRepositoryStub: IFindUserByEmailRepository;
     sut: UserApplication;
 };
 
 const makeValidCreateUserAttributes = (): CreateUserAttributes => {
     return {
         name: 'valid name',
-        email: 'valid email',
+        email: 'valid e-mail',
         password: 'valid password'
     };
 };
@@ -42,19 +44,31 @@ const makeAddUserRepository = (): IAddUserRepository => {
     return new AddUserRepositoryStub();
 };
 
+const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
+    class FindUserByEmailRepositoryStub implements IFindUserByEmailRepository {
+        async findUserByEmail(email: string): Promise<UserAttributes | null> {
+            return null;
+        }
+    }
+
+    return new FindUserByEmailRepositoryStub();
+};
+
 const makeSut = (): SutTypes => {
     const hasherStub = makeHasher();
     const addUserRepositoryStub = makeAddUserRepository();
-    const sut = new UserApplication(hasherStub, addUserRepositoryStub);
+    const findUserByEmailRepositoryStub = makeFindUserByEmailRepository();
+    const sut = new UserApplication(hasherStub, addUserRepositoryStub, findUserByEmailRepositoryStub);
 
     return {
         hasherStub,
         addUserRepositoryStub,
+        findUserByEmailRepositoryStub,
         sut
     };
 };
 
-describe('User Usecase', () => {
+describe('Add User Application', () => {
     test('should call Encrypter with correct value', async () => {
         const { sut, hasherStub } = makeSut();
         const encryptSpy = jest.spyOn(hasherStub, 'hash');
@@ -89,7 +103,7 @@ describe('User Usecase', () => {
 
         expect(addUserRepositorySpy).toHaveBeenCalledWith({
             name: 'valid name',
-            email: 'valid email',
+            email: 'valid e-mail',
             password: 'hashed password'
         });
     });
@@ -119,5 +133,48 @@ describe('User Usecase', () => {
 
         const addPromise = sut.add(accountData);
         await expect(addPromise).rejects.toThrow();
+    });
+
+    test('should throw if FindUserByEmailRepository throws', async () => {
+        const { sut, findUserByEmailRepositoryStub } = makeSut();
+
+        jest.spyOn(findUserByEmailRepositoryStub, 'findUserByEmail').mockImplementation(() => {
+            throw new Error('Test throw');
+        });
+
+        const accountData = makeValidCreateUserAttributes();
+
+        const addPromise = sut.add(accountData);
+        await expect(addPromise).rejects.toThrow();
+    });
+
+    test('should call FindUserByEmailRepository with correct value', async () => {
+        const { sut, findUserByEmailRepositoryStub } = makeSut();
+        const findUserByEmailRepositorySpy = jest.spyOn(findUserByEmailRepositoryStub, 'findUserByEmail');
+
+        const userData = makeValidCreateUserAttributes();
+
+        await sut.add(userData);
+
+        expect(findUserByEmailRepositorySpy).toHaveBeenCalledWith('valid e-mail');
+    });
+
+    test('should throw if e-mail already exists', async () => {
+        const { sut, findUserByEmailRepositoryStub } = makeSut();
+        jest.spyOn(findUserByEmailRepositoryStub, 'findUserByEmail').mockImplementationOnce(async () => {
+            return await new Promise(resolve =>
+                resolve({
+                    id: 'valid id',
+                    email: 'valid e-mail',
+                    name: 'valid name',
+                    password: 'hashed password'
+                })
+            );
+        });
+
+        const userData = makeValidCreateUserAttributes();
+
+        const addPromise = sut.add(userData);
+        await expect(addPromise).rejects.toThrow(new InvalidParamError('e-mail already in use'));
     });
 });

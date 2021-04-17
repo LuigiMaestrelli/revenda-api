@@ -10,6 +10,15 @@ type SutTypes = {
 jest.mock('@/infra/db/model/user/userModel', () => ({
     async create(data: UserAttributes): Promise<UserAttributes> {
         return data;
+    },
+
+    async findOne(): Promise<UserAttributes> {
+        return {
+            id: 'valid uuid',
+            email: 'valid e-mail',
+            name: 'valid name',
+            password: 'valid password'
+        };
     }
 }));
 
@@ -74,5 +83,14 @@ describe('User Repository', () => {
             name: 'valid name',
             password: 'valid password'
         });
+    });
+
+    test('should find user by e-mail and return', async () => {
+        const { sut } = makeSut();
+
+        const user = await sut.findUserByEmail('valid email');
+
+        expect(user).toBeTruthy();
+        expect(user?.id).toEqual('valid uuid');
     });
 });
