@@ -9,6 +9,7 @@
         "dev": "nodemon --config nodemon.json src/main/server.ts",
         "dev:debug": "nodemon --config nodemon.json --inspect-brk src/main/server.ts",
         "build": "rimraf ./dist && tsc -p tsconfig.build.json",
+        "pretest": "jest --clearCache",
         "test": "cross-env NODE_ENV=test jest --passWithNoTests --runInBand",
         "test:unit": "yarn test -c jest-unit.config.js",
         "test:integration": "yarn test -c jest-integration.config.js",

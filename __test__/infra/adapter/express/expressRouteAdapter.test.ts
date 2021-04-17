@@ -109,12 +109,11 @@ describe('Express Route Adapter', () => {
 
         jest.spyOn(controller, 'handle').mockImplementationOnce(async () => {
             return await new Promise(resolve => {
-                resolve(
-                    makeSuccessResponse(null, {
-                        someHeader: 10,
-                        otherheader: 'test'
-                    })
-                );
+                const response = makeSuccessResponse(null, {
+                    someHeader: 10,
+                    otherheader: 'test'
+                });
+                resolve(response);
             });
         });
 

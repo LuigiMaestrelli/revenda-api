@@ -21,10 +21,10 @@ export function makeServerErrorResponse(error: ServerError): HttpResponseError {
     };
 }
 
-export function makeSuccessResponse(body?: any, header?: any): HttpResponse {
+export function makeSuccessResponse(body?: any, headers?: any): HttpResponse {
     return {
         statusCode: 200,
         body,
-        header
+        headers
     };
 }

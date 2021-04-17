@@ -1,5 +1,6 @@
 module.exports = {
-    collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+    clearMocks: true,
+    collectCoverageFrom: ['<rootDir>/src/**'],
     coverageProvider: 'v8',
     coverageReporters: ['json', 'text', 'lcov', 'clover'],
     testEnvironment: 'node',

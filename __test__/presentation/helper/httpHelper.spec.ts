@@ -18,7 +18,7 @@ describe('Http Helper', () => {
 
     test('should return the headers on success response', () => {
         const response = makeSuccessResponse(null, { someheader: 10 });
-        expect(response.header).toEqual({ someheader: 10 });
+        expect(response.headers).toEqual({ someheader: 10 });
     });
 
     test('should return statusCode 400 on bad response', () => {

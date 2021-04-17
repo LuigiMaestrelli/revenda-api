@@ -6,7 +6,7 @@ export type HttpRequest = {
 export type HttpResponse = {
     statusCode: number;
     body?: any;
-    header?: any;
+    headers?: any;
 };
 
 export type HttpResponseError = {
