@@ -1,7 +1,12 @@
 // eslint-disable-next-line
 const sonarqubeScanner = require('sonarqube-scanner');
 
-const excludes = ['src/main/config/**/*', 'src/infra/db/migrations/**/*', 'src/infra/db/seeders/**/*'];
+const excludes = [
+    'src/main/server.ts',
+    'src/main/config/**/*',
+    'src/infra/db/migrations/**/*',
+    'src/infra/db/seeders/**/*'
+];
 const inclusions = ['__test__/**/*.test.ts', '__test__/**/*.spec.ts'];
 
 sonarqubeScanner(
