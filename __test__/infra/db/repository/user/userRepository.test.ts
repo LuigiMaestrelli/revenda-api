@@ -1,5 +1,5 @@
 import { truncate } from '../../../../utils/database';
-import { UserRepository } from '@/infra/db/repository/user/user';
+import { UserRepository } from '@/infra/db/repository/user/userRepository';
 import { IdGenerator } from '@/infra/interfaces/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';
 
