@@ -5,7 +5,7 @@ module.exports = {
     coverageReporters: ['json', 'text', 'lcov', 'clover'],
     testEnvironment: 'node',
     transform: {
-        '.+\\.ts$': 'ts-jest'
+        '^.+\\.(ts)$': 'ts-jest'
     },
     roots: ['<rootDir>/__test__'],
     moduleNameMapper: {
@@ -14,5 +14,11 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/__test__/setup/setupFilesAfterEnv.ts'],
     testResultsProcessor: 'jest-sonar-reporter',
     coverageDirectory: '__test__/coverage',
-    coveragePathIgnorePatterns: ['\\\\node_modules\\\\', 'src/main/config']
+    coveragePathIgnorePatterns: ['\\\\node_modules\\\\', 'src/main/config'],
+    globals: {
+        'ts-jest': {
+            diagnostics: false,
+            tsconfig: 'tsconfig.json'
+        }
+    }
 };

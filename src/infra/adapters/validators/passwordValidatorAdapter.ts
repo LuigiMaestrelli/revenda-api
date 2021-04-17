@@ -1,4 +1,4 @@
-import { PasswordValidator } from '@/presentation/interfaces/validators';
+import { PasswordValidator } from '@/presentation/interfaces/passwordValidator';
 import validator from 'validator';
 
 export const PASSWORD_CONFIG = {

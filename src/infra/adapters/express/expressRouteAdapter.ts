@@ -10,10 +10,8 @@ export const adaptRoute = (controller: Controller): RequestHandler => {
 
         const response = await controller.handle(httpResquest);
 
-        if (response.headers) {
-            for (const headerName in response.headers) {
-                res.header(headerName, response.headers[headerName]);
-            }
+        for (const headerName in response.headers || {}) {
+            res.header(headerName, response.headers[headerName]);
         }
 
         res.status(response.statusCode).json(response.body);

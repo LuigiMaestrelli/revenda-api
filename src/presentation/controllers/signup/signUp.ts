@@ -1,5 +1,5 @@
-import { Controller, HttpRequest, HttpResponse, EmailValidator, PasswordValidator } from '@/presentation/interfaces';
-import { InvalidParamError, MissingParamError, ServerError } from '@/shared/errors';
+import { Controller, HttpRequest, HttpResponse, Validation } from '@/presentation/interfaces';
+import { ServerError } from '@/shared/errors';
 import {
     makeBadRequestResponse,
     makeSuccessResponse,
@@ -8,42 +8,15 @@ import {
 import { IAddUserApplication } from '@/domain/usecases/user/addUser';
 
 export class SignUpController implements Controller {
-    constructor(
-        private readonly emailValidator: EmailValidator,
-        private readonly passwordValidator: PasswordValidator,
-        private readonly addUserApplication: IAddUserApplication
-    ) {}
+    constructor(private readonly validation: Validation, private readonly addUserApplication: IAddUserApplication) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {
             const { body } = httpRequest;
 
-            if (!body.name) {
-                return makeBadRequestResponse(new MissingParamError('name'));
-            }
-
-            if (!body.email) {
-                return makeBadRequestResponse(new MissingParamError('email'));
-            }
-
-            if (!body.password) {
-                return makeBadRequestResponse(new MissingParamError('password'));
-            }
-
-            if (!body.passwordConfirmation) {
-                return makeBadRequestResponse(new MissingParamError('passwordConfirmation'));
-            }
-
-            if (body.password !== body.passwordConfirmation) {
-                return makeBadRequestResponse(new InvalidParamError('password'));
-            }
-
-            if (!this.emailValidator.isValid(body.email)) {
-                return makeBadRequestResponse(new InvalidParamError('email'));
-            }
-
-            if (!this.passwordValidator.isStrongPassword(body.password)) {
-                return makeBadRequestResponse(new InvalidParamError('password is too week'));
+            const error = this.validation.validate(body);
+            if (error) {
+                return makeBadRequestResponse(error);
             }
 
             const user = await this.addUserApplication.add({

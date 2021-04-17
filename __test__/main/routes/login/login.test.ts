@@ -85,7 +85,7 @@ describe('Login Routes', () => {
                 });
 
             expect(response.status).toBe(400);
-            expect(response.body.message).toBe('Invalid param: password');
+            expect(response.body.message).toBe('Invalid param: passwordConfirmation');
         });
 
         test('should return 400 on signup if an invalid e-mail is provided', async () => {
