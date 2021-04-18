@@ -1,8 +1,7 @@
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 
 const makeSut = (): BcryptAdapter => {
-    const sut = new BcryptAdapter();
-    return sut;
+    return new BcryptAdapter();
 };
 
 describe('Bcrypt Adapter', () => {
