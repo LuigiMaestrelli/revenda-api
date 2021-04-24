@@ -7,11 +7,12 @@ jest.mock('jsonwebtoken', () => ({
     }
 }));
 
-const SECRET_KEY = 'xxasdasd';
+const SECRET_TOKEN_KEY = 'xxasdasd';
+const SECRET_REFRESHTOKEN_KEY = 'q234ewrw849';
 const EXPIRES_IN = '2';
 
 const makeSut = (): JwtAdapter => {
-    return new JwtAdapter(SECRET_KEY, parseInt(EXPIRES_IN));
+    return new JwtAdapter(SECRET_TOKEN_KEY, SECRET_REFRESHTOKEN_KEY, parseInt(EXPIRES_IN));
 };
 
 describe('JSONWebToken Adapter', () => {
@@ -20,7 +21,7 @@ describe('JSONWebToken Adapter', () => {
         const signSpy = jest.spyOn(jwt, 'sign');
 
         await sut.sign({ userId: 'valid id' });
-        expect(signSpy).toHaveBeenCalledWith({ userId: 'valid id' }, SECRET_KEY, {
+        expect(signSpy).toHaveBeenCalledWith({ userId: 'valid id' }, SECRET_TOKEN_KEY, {
             algorithm: 'HS256',
             expiresIn: `${EXPIRES_IN}h`
         });

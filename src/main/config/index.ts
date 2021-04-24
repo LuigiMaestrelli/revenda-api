@@ -27,6 +27,10 @@ export default {
         return process.env.APP_SECRET ?? '';
     },
 
+    getTokenSecretRefreshTokenKey(): string {
+        return process.env.APP_SECRET_REFRESH ?? '';
+    },
+
     getTokenSecretExpires(): number {
         return parseInt(process.env.APP_SECRET_EXPIRES ?? '1');
     }

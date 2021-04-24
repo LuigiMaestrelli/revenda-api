@@ -65,6 +65,12 @@ describe('Main config functions', () => {
         expect(config.getTokenSecretTokenKey()).toBe(process.env.APP_SECRET);
     });
 
+    test('should return correct app secret key for refreshtoken', () => {
+        config.load();
+
+        expect(config.getTokenSecretRefreshTokenKey()).toBe(process.env.APP_SECRET_REFRESH);
+    });
+
     test('should return correct expires time', () => {
         config.load();
 
