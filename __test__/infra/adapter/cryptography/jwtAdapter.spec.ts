@@ -4,6 +4,12 @@ import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
 jest.mock('jsonwebtoken', () => ({
     sign(): String {
         return 'token';
+    },
+
+    verify(token: string, key: string): object {
+        return {
+            userId: 'valid user id'
+        };
     }
 }));
 
@@ -37,7 +43,7 @@ describe('JSONWebToken Adapter', () => {
         expect(result).toEqual({ token: 'token', refreshToken: 'token', expiresIn: expiresInSeconds });
     });
 
-    test('should throw if jsonwebtoken throws', async () => {
+    test('should throw if jsonwebtoken throws on sign', async () => {
         const sut = makeSut();
         jest.spyOn(jwt, 'sign').mockImplementationOnce(() => {
             throw new Error('Test throw');
@@ -45,5 +51,39 @@ describe('JSONWebToken Adapter', () => {
 
         const signPromise = sut.sign({ userId: 'valid id' });
         await expect(signPromise).rejects.toThrow(new Error('Test throw'));
+    });
+
+    test('should throw if jsonwebtoken throws on validateToken', async () => {
+        const sut = makeSut();
+        jest.spyOn(jwt, 'verify').mockImplementationOnce(() => {
+            throw new Error('Test throw');
+        });
+
+        const signPromise = sut.validateToken('token');
+        await expect(signPromise).rejects.toThrow(new Error('Test throw'));
+    });
+
+    test('should throw if jsonwebtoken throws on validateRefreshToken', async () => {
+        const sut = makeSut();
+        jest.spyOn(jwt, 'verify').mockImplementationOnce(() => {
+            throw new Error('Test throw');
+        });
+
+        const signPromise = sut.validateRefreshToken('refreshtoken');
+        await expect(signPromise).rejects.toThrow(new Error('Test throw'));
+    });
+
+    test('should return decoded token data', async () => {
+        const sut = makeSut();
+
+        const result = await sut.validateToken('valid token');
+        expect(result).toEqual({ userId: 'valid user id' });
+    });
+
+    test('should return decoded refreshtoken data', async () => {
+        const sut = makeSut();
+
+        const result = await sut.validateRefreshToken('valid token');
+        expect(result).toEqual({ userId: 'valid user id' });
     });
 });

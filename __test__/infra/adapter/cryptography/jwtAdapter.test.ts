@@ -20,4 +20,38 @@ describe('JSONWebToken Adapter', () => {
         expect(authData.refreshToken).toBeTruthy();
         expect(authData.expiresIn).toBe(7200);
     });
+
+    test('should validade and decode a valid token', async () => {
+        const sut = makeSut();
+
+        const payload = { userId: 'xxxx' };
+        const authData = await sut.sign(payload);
+
+        const tokenReturn = await sut.validateToken(authData.token);
+        expect(tokenReturn).toEqual({ userId: 'xxxx' });
+    });
+
+    test('should validade and decode a valid refreshtoken', async () => {
+        const sut = makeSut();
+
+        const payload = { userId: 'xxxx' };
+        const authData = await sut.sign(payload);
+
+        const refreshTokenReturn = await sut.validateRefreshToken(authData.refreshToken);
+        expect(refreshTokenReturn).toEqual({ userId: 'xxxx' });
+    });
+
+    test('should throw an error if decoding an invalid token', async () => {
+        const sut = makeSut();
+
+        const validatePromise = sut.validateToken('aosidjaoisdjaoidsjoiajsidoj');
+        await expect(validatePromise).rejects.toThrow();
+    });
+
+    test('should throw an error if decoding an invalid refreshtoken', async () => {
+        const sut = makeSut();
+
+        const validatePromise = sut.validateRefreshToken('fhs0d9fs8dfj98duj');
+        await expect(validatePromise).rejects.toThrow();
+    });
 });
