@@ -27,7 +27,7 @@
         "@test": "__test__"
     },
     "jestSonar": {
-        "reportFile": "./__test__/coverage/test-reporter.xml",
+        "reportFile": "./coverage/test-reporter.xml",
         "indent": 4
     },
     "dependencies": {

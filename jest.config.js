@@ -15,7 +15,7 @@ module.exports = {
     },
     setupFilesAfterEnv: ['<rootDir>/__test__/setup/setupFilesAfterEnv.ts'],
     testResultsProcessor: 'jest-sonar-reporter',
-    coverageDirectory: '__test__/coverage',
+    coverageDirectory: '<rootDir>/coverage',
     coveragePathIgnorePatterns: ['\\\\node_modules\\\\', 'src/main/config'],
     globals: {
         'ts-jest': {
