@@ -26,10 +26,6 @@
         "@": "src",
         "@test": "__test__"
     },
-    "jestSonar": {
-        "reportFile": "./coverage/test-reporter.xml",
-        "indent": 4
-    },
     "dependencies": {
         "bcrypt": "^5.0.1",
         "body-parser": "^1.19.0",
