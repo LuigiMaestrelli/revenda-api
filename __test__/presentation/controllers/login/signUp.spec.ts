@@ -1,7 +1,7 @@
 import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { Validation } from '@/presentation/interfaces';
 import { IAddUserApplication } from '@/domain/usecases/user/user';
-import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
+import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
 
 type SutTypes = {
     sut: SignUpController;
@@ -19,12 +19,14 @@ const makeValidation = (): Validation => {
 
 const makeAddUserApplication = (): IAddUserApplication => {
     class AddUserApplicationStub implements IAddUserApplication {
-        async add(user: CreateUserAttributes): Promise<UserAttributes> {
+        async add(user: CreateUserAttributes): Promise<UserWithAuthAttributes> {
             return {
                 id: 'valid_id',
                 name: 'valid name',
                 email: 'valid_email@email.com',
-                password: 'valid hash'
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 100
             };
         }
     }
@@ -79,7 +81,9 @@ describe('SignUp Controller', () => {
             id: 'valid_id',
             name: 'valid name',
             email: 'valid_email@email.com',
-            password: 'valid hash'
+            token: 'valid token',
+            refreshToken: 'valid refreshtoken',
+            expiresIn: 100
         });
     });
 

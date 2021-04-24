@@ -3,11 +3,14 @@ import { UserApplication } from '@/application/usecases/user/userApplication';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
 import { IAddUserRepository, IFindUserByEmailRepository } from '@/domain/repository/user/user';
 import { InvalidParamError } from '@/shared/errors';
+import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
+import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 
 type SutTypes = {
     hasherStub: Hasher;
     addUserRepositoryStub: IAddUserRepository;
     findUserByEmailRepositoryStub: IFindUserByEmailRepository;
+    gerenerateAuthApplicationStub: IGenerateAuthApplication;
     sut: UserApplication;
 };
 
@@ -54,16 +57,38 @@ const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
     return new FindUserByEmailRepositoryStub();
 };
 
+const makeGerenerateAuthApplication = (): IGenerateAuthApplication => {
+    class GerenerateAuthApplicationStub implements IGenerateAuthApplication {
+        async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
+            return {
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 100
+            };
+        }
+    }
+
+    return new GerenerateAuthApplicationStub();
+};
+
 const makeSut = (): SutTypes => {
     const hasherStub = makeHasher();
     const addUserRepositoryStub = makeAddUserRepository();
     const findUserByEmailRepositoryStub = makeFindUserByEmailRepository();
-    const sut = new UserApplication(hasherStub, addUserRepositoryStub, findUserByEmailRepositoryStub);
+    const gerenerateAuthApplicationStub = makeGerenerateAuthApplication();
+
+    const sut = new UserApplication(
+        hasherStub,
+        addUserRepositoryStub,
+        findUserByEmailRepositoryStub,
+        gerenerateAuthApplicationStub
+    );
 
     return {
         hasherStub,
         addUserRepositoryStub,
         findUserByEmailRepositoryStub,
+        gerenerateAuthApplicationStub,
         sut
     };
 };
@@ -108,7 +133,7 @@ describe('Add User Application', () => {
         });
     });
 
-    test('should return created user data', async () => {
+    test('should return created user data with authentication data', async () => {
         const { sut } = makeSut();
         const userData = makeValidCreateUserAttributes();
 
@@ -118,7 +143,9 @@ describe('Add User Application', () => {
             id: 'valid id',
             name: 'valid name',
             email: 'valid e-mail',
-            password: 'hashed password'
+            token: 'valid token',
+            refreshToken: 'valid refreshtoken',
+            expiresIn: 100
         });
     });
 
@@ -176,5 +203,32 @@ describe('Add User Application', () => {
 
         const addPromise = sut.add(userData);
         await expect(addPromise).rejects.toThrow(new InvalidParamError('e-mail already in use'));
+    });
+
+    test('should call GenerateAuthApplication with correct values', async () => {
+        const { sut, gerenerateAuthApplicationStub } = makeSut();
+        const gerenerateAuthApplicationSpy = jest.spyOn(gerenerateAuthApplicationStub, 'auth');
+
+        const userData = makeValidCreateUserAttributes();
+
+        await sut.add(userData);
+
+        expect(gerenerateAuthApplicationSpy).toHaveBeenCalledWith({
+            email: 'valid e-mail',
+            password: 'valid password'
+        });
+    });
+
+    test('should throw if GenerateAuthApplication throws', async () => {
+        const { sut, gerenerateAuthApplicationStub } = makeSut();
+        jest.spyOn(gerenerateAuthApplicationStub, 'auth').mockImplementationOnce(() => {
+            throw new Error('Test throw');
+        });
+
+        const userData = makeValidCreateUserAttributes();
+
+        const addPromise = sut.add(userData);
+
+        await expect(addPromise).rejects.toThrow(new Error('Test throw'));
     });
 });

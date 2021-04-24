@@ -21,5 +21,13 @@ export default {
 
     isProduction(): boolean {
         return process.env.NODE_ENV === 'production';
+    },
+
+    getTokenSecretKey(): string {
+        return process.env.APP_SECRET ?? '';
+    },
+
+    getTokenSecretExpires(): number {
+        return parseInt(process.env.APP_SECRET_EXPIRES ?? '1');
     }
 };

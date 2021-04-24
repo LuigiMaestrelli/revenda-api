@@ -1,5 +1,5 @@
-import { AuthenticationData, TokenPayload } from '@/domain/models/auth/authentication';
+import { AuthenticationResult, TokenPayload } from '@/domain/models/auth/authentication';
 
 export interface TokenSigner {
-    sign: (payload: TokenPayload) => Promise<AuthenticationData>;
+    sign: (payload: TokenPayload) => Promise<AuthenticationResult>;
 }

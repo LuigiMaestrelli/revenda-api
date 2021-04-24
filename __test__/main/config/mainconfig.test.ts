@@ -58,4 +58,16 @@ describe('Main config functions', () => {
 
         expect(readdedFile).toBe('.env');
     });
+
+    test('should return correct app secret key for token', () => {
+        config.load();
+
+        expect(config.getTokenSecretKey()).toBe(process.env.APP_SECRET);
+    });
+
+    test('should return correct expires time', () => {
+        config.load();
+
+        expect(config.getTokenSecretExpires()).toBe(parseInt(process.env.APP_SECRET_EXPIRES ?? '0'));
+    });
 });

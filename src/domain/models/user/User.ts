@@ -13,3 +13,13 @@ export type CreateUserAttributes = {
     email: string;
     password: string;
 };
+
+export interface UserWithAuthAttributes {
+    id: string;
+    name: string;
+    email: string;
+
+    token: string;
+    refreshToken: string;
+    expiresIn: number;
+}
