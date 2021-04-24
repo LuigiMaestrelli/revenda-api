@@ -15,7 +15,8 @@
         "emitDecoratorMetadata": true,
         "sourceMap": true,
         "paths": {
-            "@/*": ["*"]
+            "@/*": ["*"],
+            "@test/*": ["../__test__/*"]
         },
         "typeRoots": ["node_modules/@types"]
     },

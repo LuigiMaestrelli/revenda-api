@@ -1,5 +1,5 @@
 import faker from 'faker';
-import { truncate } from '../../../../utils/database';
+import { truncate } from '@test/utils/database';
 import { UserRepository } from '@/infra/db/repository/user/userRepository';
 import { IdGenerator } from '@/infra/interfaces/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';

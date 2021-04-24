@@ -23,7 +23,8 @@
         "node": "16.x"
     },
     "_moduleAliases": {
-        "@": "src"
+        "@": "src",
+        "@test": "__test__"
     },
     "jestSonar": {
         "reportFile": "./__test__/coverage/test-reporter.xml",

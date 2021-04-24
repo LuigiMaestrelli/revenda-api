@@ -1,4 +1,4 @@
-import database from '../../src/infra/db';
+import database from '@/infra/db';
 
 beforeAll(async () => {
     await database.sync({ force: true });
