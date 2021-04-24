@@ -7,7 +7,7 @@ import config from '@/main/config';
 export const makeAuthApplication = (): AuthApplication => {
     const hasher = new BcryptAdapter();
     const userRepository = makeUserRepository();
-    const tokenSigner = new JwtAdapter(config.getTokenSecretKey(), config.getTokenSecretExpires());
+    const tokenSigner = new JwtAdapter(config.getTokenSecretTokenKey(), config.getTokenSecretExpires());
 
     return new AuthApplication(tokenSigner, hasher, userRepository);
 };

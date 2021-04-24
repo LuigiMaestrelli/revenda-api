@@ -23,7 +23,7 @@ export default {
         return process.env.NODE_ENV === 'production';
     },
 
-    getTokenSecretKey(): string {
+    getTokenSecretTokenKey(): string {
         return process.env.APP_SECRET ?? '';
     },
 
