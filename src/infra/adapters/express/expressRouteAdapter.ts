@@ -5,13 +5,15 @@ export const adaptRoute = (controller: Controller): RequestHandler => {
     return async (req: Request, res: Response) => {
         const httpResquest: HttpRequest = {
             body: req.body,
-            query: req.query
+            query: req.query,
+            /* @ts-expect-error */
+            auth: req.auth
         };
 
         const response = await controller.handle(httpResquest);
-
-        for (const headerName in response.headers || {}) {
-            res.header(headerName, response.headers[headerName]);
+        const headers = response.headers ?? {};
+        for (const headerName in headers) {
+            res.header(headerName, headers[headerName]);
         }
 
         res.status(response.statusCode).json(response.body);

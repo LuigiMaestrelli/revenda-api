@@ -17,9 +17,14 @@ type SutTypes = {
 
 class TestControllerStub implements Controller {
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-        return makeSuccessResponse({
-            test: true
-        });
+        return makeSuccessResponse(
+            {
+                test: true
+            },
+            {
+                myHeader: 'some data'
+            }
+        );
     }
 }
 

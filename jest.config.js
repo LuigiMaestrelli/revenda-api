@@ -7,6 +7,7 @@ module.exports = {
     transform: {
         '^.+\\.(ts)$': 'ts-jest'
     },
+    preset: 'ts-jest',
     roots: ['<rootDir>/__test__'],
     moduleNameMapper: {
         '@/(.*)': '<rootDir>/src/$1'
@@ -17,8 +18,6 @@ module.exports = {
     coveragePathIgnorePatterns: ['\\\\node_modules\\\\', 'src/main/config'],
     globals: {
         'ts-jest': {
-            diagnostics: false,
-            tsconfig: 'tsconfig.json'
         }
     }
 };

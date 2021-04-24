@@ -1,9 +1,18 @@
-import { InvalidParamError, MissingParamError, ServerError } from '@/shared/errors';
+import { InvalidParamError, MissingParamError, ServerError, UnauthorizedError } from '@/shared/errors';
 import { HttpResponse, HttpResponseError } from '../interfaces';
 
 export function makeBadRequestResponse(error: Error): HttpResponseError {
     return {
         statusCode: 400,
+        body: {
+            message: error.message
+        }
+    };
+}
+
+export function makeUnauthorizedResponse(error: Error): HttpResponseError {
+    return {
+        statusCode: 401,
         body: {
             message: error.message
         }
@@ -36,6 +45,10 @@ export function makeErrorResponse(error: Error): HttpResponseError {
 
     if (error instanceof MissingParamError) {
         return makeBadRequestResponse(error);
+    }
+
+    if (error instanceof UnauthorizedError) {
+        return makeUnauthorizedResponse(error);
     }
 
     return makeServerErrorResponse(error);
