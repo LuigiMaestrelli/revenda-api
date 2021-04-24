@@ -24,10 +24,8 @@ export class AuthApplication implements IGenerateAuthApplication {
             throw new InvalidParamError('Invalid e-mail or password');
         }
 
-        const signResult = await this.tokenSigner.sign({
+        return await this.tokenSigner.sign({
             userId: user.id
         });
-
-        return signResult;
     }
 }
