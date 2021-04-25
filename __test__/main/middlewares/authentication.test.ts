@@ -1,6 +1,6 @@
 import request from 'supertest';
 import app from '@/main/config/app';
-import { makeAuthenticationMiddleware } from '@/main/factories/middleware/authentication';
+import { makeAuthenticationMiddleware } from '@/main/factories/middleware/authenticationFactory';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
 import config from '@/main/config';
 
