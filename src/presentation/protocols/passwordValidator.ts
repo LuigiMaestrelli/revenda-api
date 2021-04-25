@@ -1,3 +1,3 @@
-export interface PasswordValidator {
+export interface IPasswordValidator {
     isStrongPassword: (email: string) => boolean;
 }

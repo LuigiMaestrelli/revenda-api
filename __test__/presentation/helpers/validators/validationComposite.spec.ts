@@ -1,14 +1,14 @@
 import { MissingParamError } from '@/shared/errors';
-import { Validation } from '@/presentation/interfaces/validation';
+import { IValidation } from '@/presentation/protocols/validation';
 import { ValidationComposite } from '@/presentation/helpers/validators/validationComposite';
 
 interface SutTypes {
-    validationStubs: Validation[];
+    validationStubs: IValidation[];
     sut: ValidationComposite;
 }
 
-const makeValidation = (): Validation => {
-    class ValidationStub implements Validation {
+const makeValidation = (): IValidation => {
+    class ValidationStub implements IValidation {
         async validate(input: any): Promise<void> {}
     }
 

@@ -1,16 +1,16 @@
 import { SignUpController } from '@/presentation/controllers/login/signUp';
-import { Validation } from '@/presentation/interfaces';
+import { IValidation } from '@/presentation/protocols';
 import { IAddUserApplication } from '@/domain/usecases/user/user';
 import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
 
 type SutTypes = {
     sut: SignUpController;
-    validationStub: Validation;
+    validationStub: IValidation;
     addUserApplicationStub: IAddUserApplication;
 };
 
-const makeValidation = (): Validation => {
-    class ValidationStub implements Validation {
+const makeValidation = (): IValidation => {
+    class ValidationStub implements IValidation {
         async validate(input: any): Promise<void> {}
     }
 

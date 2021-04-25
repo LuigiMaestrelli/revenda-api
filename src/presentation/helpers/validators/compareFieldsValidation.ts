@@ -1,7 +1,7 @@
 import { InvalidParamError } from '@/shared/errors';
-import { Validation } from '@/presentation/interfaces/validation';
+import { IValidation } from '@/presentation/protocols/validation';
 
-export class CompareFieldsValidation implements Validation {
+export class CompareFieldsValidation implements IValidation {
     constructor(private readonly fieldName: string, private readonly fieldToCompareName: string) {}
 
     async validate(input: any): Promise<void> {

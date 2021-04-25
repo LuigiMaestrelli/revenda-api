@@ -6,14 +6,14 @@ import {
     EmailValidation,
     StrongPasswordValidation
 } from '@/presentation/helpers/validators';
-import { Validation } from '@/presentation/interfaces/validation';
-import { EmailValidator } from '@/presentation/interfaces/emailValidator';
-import { PasswordValidator } from '@/presentation/interfaces/passwordValidator';
+import { IValidation } from '@/presentation/protocols/validation';
+import { IEmailValidator } from '@/presentation/protocols/emailValidator';
+import { IPasswordValidator } from '@/presentation/protocols/passwordValidator';
 
 jest.mock('@/presentation/helpers/validators/validationComposite');
 
-const makeEmailValidator = (): EmailValidator => {
-    class EmailValidatorStub implements EmailValidator {
+const makeEmailValidator = (): IEmailValidator => {
+    class EmailValidatorStub implements IEmailValidator {
         isValid(email: string): boolean {
             return true;
         }
@@ -22,8 +22,8 @@ const makeEmailValidator = (): EmailValidator => {
     return new EmailValidatorStub();
 };
 
-const makePasswordValidator = (): PasswordValidator => {
-    class PasswordValidatorStub implements PasswordValidator {
+const makePasswordValidator = (): IPasswordValidator => {
+    class PasswordValidatorStub implements IPasswordValidator {
         isStrongPassword(email: string): boolean {
             return true;
         }
@@ -36,7 +36,7 @@ describe('SignUpValidation Factory', () => {
     test('should call ValidationComposite with all validations', async () => {
         makeSignUpValidation();
 
-        const validations: Validation[] = [];
+        const validations: IValidation[] = [];
 
         for (const field of ['name', 'email', 'password', 'passwordConfirmation']) {
             validations.push(new RequiredFieldValidation(field));

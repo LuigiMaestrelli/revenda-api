@@ -1,7 +1,7 @@
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
+import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import { makeSuccessResponse, makeServerErrorResponse } from '@/shared/utils/http';
 
-export class ServerHealthController implements Controller {
+export class ServerHealthController implements IController {
     getProcessUpTime(): number {
         return process.uptime();
     }

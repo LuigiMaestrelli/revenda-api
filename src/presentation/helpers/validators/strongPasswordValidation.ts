@@ -1,8 +1,8 @@
 import { InvalidParamError } from '@/shared/errors';
-import { Validation, PasswordValidator } from '@/presentation/interfaces';
+import { IValidation, IPasswordValidator } from '@/presentation/protocols';
 
-export class StrongPasswordValidation implements Validation {
-    constructor(private readonly fieldName: string, private readonly passwordValidator: PasswordValidator) {}
+export class StrongPasswordValidation implements IValidation {
+    constructor(private readonly fieldName: string, private readonly passwordValidator: IPasswordValidator) {}
 
     async validate(input: any): Promise<void> {
         if (!this.passwordValidator.isStrongPassword(input[this.fieldName])) {

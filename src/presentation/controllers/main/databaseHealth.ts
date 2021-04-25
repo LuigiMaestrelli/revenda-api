@@ -1,8 +1,8 @@
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
+import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import { makeSuccessResponse, makeServerErrorResponse } from '@/shared/utils/http';
 import database from '@/infra/db';
 
-export class DatabaseHealthController implements Controller {
+export class DatabaseHealthController implements IController {
     async connectDatabase(): Promise<void> {
         await database.authenticate();
     }

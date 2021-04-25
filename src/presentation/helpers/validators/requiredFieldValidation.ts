@@ -1,7 +1,7 @@
 import { MissingParamError } from '@/shared/errors';
-import { Validation } from '@/presentation/interfaces';
+import { IValidation } from '@/presentation/protocols';
 
-export class RequiredFieldValidation implements Validation {
+export class RequiredFieldValidation implements IValidation {
     constructor(private readonly fieldName: string) {}
 
     async validate(input: any): Promise<void> {

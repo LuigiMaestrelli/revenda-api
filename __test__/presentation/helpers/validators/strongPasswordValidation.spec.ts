@@ -1,14 +1,14 @@
 import { InvalidParamError } from '@/shared/errors';
 import { StrongPasswordValidation } from '@/presentation/helpers/validators/strongPasswordValidation';
-import { PasswordValidator } from '@/presentation/interfaces/passwordValidator';
+import { IPasswordValidator } from '@/presentation/protocols/passwordValidator';
 
 interface SutTypes {
     sut: StrongPasswordValidation;
-    passwordValidatorStub: PasswordValidator;
+    passwordValidatorStub: IPasswordValidator;
 }
 
-const makePasswordValidator = (): PasswordValidator => {
-    class PasswordValidatorStub implements PasswordValidator {
+const makePasswordValidator = (): IPasswordValidator => {
+    class PasswordValidatorStub implements IPasswordValidator {
         isStrongPassword(email: string): boolean {
             return true;
         }

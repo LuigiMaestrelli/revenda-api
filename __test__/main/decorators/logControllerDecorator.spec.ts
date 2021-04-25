@@ -1,4 +1,4 @@
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
+import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import { LogControllerDecorator } from '@/main/decorators/logControllerDecorator';
 import { ServerError } from '@/shared/errors';
 import { IAddErrorLogRepository } from '@/domain/repository/log/errorLog';
@@ -6,13 +6,13 @@ import { CreateErrorLogAttributes, ErrorLogAttributes } from '@/domain/models/lo
 import { makeServerErrorResponse } from '@/shared/utils/http';
 
 interface SutTypes {
-    controllerStub: Controller;
+    controllerStub: IController;
     sut: LogControllerDecorator;
     logErrorRepositoryStub: IAddErrorLogRepository;
 }
 
-const makeController = (): Controller => {
-    class ControllerStub implements Controller {
+const makeController = (): IController => {
+    class ControllerStub implements IController {
         async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
             const httpResponse = {
                 statusCode: 200,

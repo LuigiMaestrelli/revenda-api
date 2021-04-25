@@ -1,4 +1,4 @@
-import { PasswordValidator } from '@/presentation/interfaces/passwordValidator';
+import { IPasswordValidator } from '@/presentation/protocols/passwordValidator';
 import validator from 'validator';
 
 export const PASSWORD_CONFIG = {
@@ -10,7 +10,7 @@ export const PASSWORD_CONFIG = {
     returnScore: false
 };
 
-export class PasswordValidatorAdapter implements PasswordValidator {
+export class PasswordValidatorAdapter implements IPasswordValidator {
     isStrongPassword(password: string): boolean {
         return validator.isStrongPassword(password, PASSWORD_CONFIG);
     }

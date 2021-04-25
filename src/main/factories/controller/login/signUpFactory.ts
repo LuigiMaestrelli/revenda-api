@@ -1,10 +1,10 @@
-import { Controller } from '@/presentation/interfaces';
+import { IController } from '@/presentation/protocols';
 import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { makeUserApplication } from '@/main/factories/application/user/userApplicationFactory';
 import { makeSignUpValidation } from './signupValidationFactory';
 import { makeLogControllerDecorator } from '@/main/factories/decorators/logControllerFactory';
 
-export const makeSignUpController = (): Controller => {
+export const makeSignUpController = (): IController => {
     const signUpValidation = makeSignUpValidation();
     const userApplication = makeUserApplication();
 

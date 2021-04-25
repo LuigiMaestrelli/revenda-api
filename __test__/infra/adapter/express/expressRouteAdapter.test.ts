@@ -2,16 +2,16 @@ import { RequestHandler } from 'express';
 import request from 'supertest';
 import { adaptRoute } from '@/infra/adapters/express/expressRouteAdapter';
 import { makeBadRequestResponse, makeServerErrorResponse, makeSuccessResponse } from '@/shared/utils/http';
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
+import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import app from '@/main/config/app';
 import { ServerError } from '@/shared/errors';
 
 type SutTypes = {
-    controller: Controller;
+    controller: IController;
     sut: RequestHandler;
 };
 
-class TestControllerStub implements Controller {
+class TestControllerStub implements IController {
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         return makeSuccessResponse(
             {

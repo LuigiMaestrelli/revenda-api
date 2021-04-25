@@ -1,9 +1,9 @@
-import { Controller, HttpRequest, HttpResponse, Validation } from '@/presentation/interfaces';
+import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
 import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
 import { IAddUserApplication } from '@/domain/usecases/user/user';
 
-export class SignUpController implements Controller {
-    constructor(private readonly validation: Validation, private readonly addUserApplication: IAddUserApplication) {}
+export class SignUpController implements IController {
+    constructor(private readonly validation: IValidation, private readonly addUserApplication: IAddUserApplication) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {

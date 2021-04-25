@@ -1,9 +1,9 @@
-import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
+import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import { IAddErrorLogRepository } from '@/domain/repository/log/errorLog';
 
-export class LogControllerDecorator implements Controller {
+export class LogControllerDecorator implements IController {
     constructor(
-        private readonly controller: Controller,
+        private readonly controller: IController,
         private readonly addErrorLogRepository: IAddErrorLogRepository
     ) {}
 

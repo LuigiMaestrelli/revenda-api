@@ -5,12 +5,12 @@ import {
     ValidationComposite,
     StrongPasswordValidation
 } from '@/presentation/helpers/validators';
-import { Validation } from '@/presentation/interfaces/validation';
+import { IValidation } from '@/presentation/protocols/validation';
 import { EmailValidatorAdapter } from '@/infra/adapters/validators/emailValidatorAdapter';
 import { PasswordValidatorAdapter } from '@/infra/adapters/validators/passwordValidatorAdapter';
 
 export const makeSignUpValidation = (): ValidationComposite => {
-    const validations: Validation[] = [];
+    const validations: IValidation[] = [];
 
     for (const field of ['name', 'email', 'password', 'passwordConfirmation']) {
         validations.push(new RequiredFieldValidation(field));

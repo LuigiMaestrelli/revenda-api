@@ -1,14 +1,14 @@
 import { InvalidParamError } from '@/shared/errors';
 import { EmailValidation } from '@/presentation/helpers/validators/emailValidation';
-import { EmailValidator } from '@/presentation/interfaces/emailValidator';
+import { IEmailValidator } from '@/presentation/protocols/emailValidator';
 
 interface SutTypes {
     sut: EmailValidation;
-    emailValidatorStub: EmailValidator;
+    emailValidatorStub: IEmailValidator;
 }
 
-const makeEmailValidator = (): EmailValidator => {
-    class EmailValidatorStub implements EmailValidator {
+const makeEmailValidator = (): IEmailValidator => {
+    class EmailValidatorStub implements IEmailValidator {
         isValid(email: string): boolean {
             return true;
         }

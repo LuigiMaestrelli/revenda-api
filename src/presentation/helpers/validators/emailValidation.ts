@@ -1,8 +1,8 @@
 import { InvalidParamError } from '@/shared/errors';
-import { Validation, EmailValidator } from '@/presentation/interfaces';
+import { IValidation, IEmailValidator } from '@/presentation/protocols';
 
-export class EmailValidation implements Validation {
-    constructor(private readonly fieldName: string, private readonly emailValidator: EmailValidator) {}
+export class EmailValidation implements IValidation {
+    constructor(private readonly fieldName: string, private readonly emailValidator: IEmailValidator) {}
 
     async validate(input: any): Promise<void> {
         if (!this.emailValidator.isValid(input[this.fieldName])) {
