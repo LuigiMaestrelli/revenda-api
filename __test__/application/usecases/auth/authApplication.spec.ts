@@ -2,19 +2,19 @@ import { AuthApplication } from '@/application/usecases/auth/authApplication';
 import { TokenPayload, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { UserAttributes } from '@/domain/models/user/user';
 import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
-import { TokenSigner } from '@/infra/interfaces/tokenSigner';
-import { HashCompare } from '@/infra/interfaces/cryptography';
+import { ITokenSigner } from '@/infra/protocols/tokenSigner';
+import { IHashCompare } from '@/infra/protocols/cryptography';
 import { InvalidParamError } from '@/shared/errors';
 
 type SutTypes = {
     sut: AuthApplication;
-    tokenSigner: TokenSigner;
-    hasherCompare: HashCompare;
+    tokenSigner: ITokenSigner;
+    hasherCompare: IHashCompare;
     findUserByEmailRepository: IFindUserByEmailRepository;
 };
 
-const makeTokenSigner = (): TokenSigner => {
-    class TokenSignerStub implements TokenSigner {
+const makeTokenSigner = (): ITokenSigner => {
+    class TokenSignerStub implements ITokenSigner {
         async sign(payload: TokenPayload): Promise<AuthenticationResult> {
             return {
                 token: 'valid token',
@@ -27,8 +27,8 @@ const makeTokenSigner = (): TokenSigner => {
     return new TokenSignerStub();
 };
 
-const makeHashCompare = (): HashCompare => {
-    class HashCompareStub implements HashCompare {
+const makeHashCompare = (): IHashCompare => {
+    class HashCompareStub implements IHashCompare {
         async compare(value: string, hash: string): Promise<boolean> {
             return true;
         }

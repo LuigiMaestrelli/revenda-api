@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
-import { Hasher, HashCompare } from '@/infra/interfaces/cryptography';
+import { IHasher, IHashCompare } from '@/infra/protocols/cryptography';
 
 const SALT_CONFIG = 12;
 
-export class BcryptAdapter implements Hasher, HashCompare {
+export class BcryptAdapter implements IHasher, IHashCompare {
     async hash(value: string): Promise<string> {
         return await bcrypt.hash(value, SALT_CONFIG);
     }

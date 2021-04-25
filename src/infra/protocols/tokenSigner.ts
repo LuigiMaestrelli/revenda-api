@@ -1,5 +1,5 @@
 import { AuthenticationResult, TokenPayload } from '@/domain/models/auth/authentication';
 
-export interface TokenSigner {
+export interface ITokenSigner {
     sign: (payload: TokenPayload) => Promise<AuthenticationResult>;
 }

@@ -1,10 +1,10 @@
 import { UserAttributes } from '@/domain/models/user/user';
 import { UserRepository } from '@/infra/db/repository/user/userRepository';
-import { IdGenerator } from '@/infra/interfaces/idGenerator';
+import { IIdGenerator } from '@/infra/protocols/idGenerator';
 
 type SutTypes = {
     sut: UserRepository;
-    idGeneratorStub: IdGenerator;
+    idGeneratorStub: IIdGenerator;
 };
 
 jest.mock('@/infra/db/model/user/userModel', () => ({
@@ -22,8 +22,8 @@ jest.mock('@/infra/db/model/user/userModel', () => ({
     }
 }));
 
-const makeIdGenerator = (): IdGenerator => {
-    class IdGeneratorStub implements IdGenerator {
+const makeIdGenerator = (): IIdGenerator => {
+    class IdGeneratorStub implements IIdGenerator {
         async generate(): Promise<string> {
             return 'valid uuid';
         }

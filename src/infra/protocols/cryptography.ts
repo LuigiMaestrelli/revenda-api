@@ -1,7 +1,7 @@
-export interface Hasher {
+export interface IHasher {
     hash: (value: string) => Promise<string>;
 }
 
-export interface HashCompare {
+export interface IHashCompare {
     compare: (value: string, hash: string) => Promise<boolean>;
 }

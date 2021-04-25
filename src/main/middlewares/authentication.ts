@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { TokenValidation } from '@/infra/interfaces/tokenValidation';
+import { ITokenValidation } from '@/infra/protocols/tokenValidation';
 
 export class AuthenticationMiddleware {
-    constructor(private readonly tokenValidation: TokenValidation) {}
+    constructor(private readonly tokenValidation: ITokenValidation) {}
 
     makeMiddleware(): Function {
         return async (req: Request, res: Response, next: NextFunction): Promise<any> => {

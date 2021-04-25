@@ -1,14 +1,14 @@
 import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
 import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
-import { HashCompare } from '@/infra/interfaces/cryptography';
-import { TokenSigner } from '@/infra/interfaces/tokenSigner';
+import { IHashCompare } from '@/infra/protocols/cryptography';
+import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { InvalidParamError } from '@/shared/errors';
 
 export class AuthApplication implements IGenerateAuthApplication {
     constructor(
-        private readonly tokenSigner: TokenSigner,
-        private readonly hasherCompare: HashCompare,
+        private readonly tokenSigner: ITokenSigner,
+        private readonly hasherCompare: IHashCompare,
         private readonly findUserByEmailRepository: IFindUserByEmailRepository
     ) {}
 

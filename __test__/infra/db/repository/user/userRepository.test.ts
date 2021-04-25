@@ -1,16 +1,16 @@
 import faker from 'faker';
 import { truncate } from '@test/utils/database';
 import { UserRepository } from '@/infra/db/repository/user/userRepository';
-import { IdGenerator } from '@/infra/interfaces/idGenerator';
+import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';
 import UserModel from '@/infra/db/model/user/userModel';
 
 type SutTypes = {
     sut: UserRepository;
-    idGenerator: IdGenerator;
+    idGenerator: IIdGenerator;
 };
 
-const makeIdGenerator = (): IdGenerator => {
+const makeIdGenerator = (): IIdGenerator => {
     return new UUIDAdapter();
 };
 

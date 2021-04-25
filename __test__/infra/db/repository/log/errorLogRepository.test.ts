@@ -1,15 +1,15 @@
 import faker from 'faker';
 import { ErrorLogRepository } from '@/infra/db/repository/log/errorLogRepository';
-import { IdGenerator } from '@/infra/interfaces/idGenerator';
+import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';
 import { truncate } from '@test/utils/database';
 
 type SutTypes = {
     sut: ErrorLogRepository;
-    idGeneratorStub: IdGenerator;
+    idGeneratorStub: IIdGenerator;
 };
 
-const makeIdGenerator = (): IdGenerator => {
+const makeIdGenerator = (): IIdGenerator => {
     return new UUIDAdapter();
 };
 

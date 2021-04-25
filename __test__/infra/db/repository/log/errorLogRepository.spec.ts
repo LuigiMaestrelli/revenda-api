@@ -1,10 +1,10 @@
 import { ErrorLogAttributes } from '@/domain/models/log/errorLog';
 import { ErrorLogRepository } from '@/infra/db/repository/log/errorLogRepository';
-import { IdGenerator } from '@/infra/interfaces/idGenerator';
+import { IIdGenerator } from '@/infra/protocols/idGenerator';
 
 type SutTypes = {
     sut: ErrorLogRepository;
-    idGeneratorStub: IdGenerator;
+    idGeneratorStub: IIdGenerator;
 };
 
 jest.mock('@/infra/db/model/log/errorLogModel', () => ({
@@ -13,8 +13,8 @@ jest.mock('@/infra/db/model/log/errorLogModel', () => ({
     }
 }));
 
-const makeIdGenerator = (): IdGenerator => {
-    class IdGeneratorStub implements IdGenerator {
+const makeIdGenerator = (): IIdGenerator => {
+    class IdGeneratorStub implements IIdGenerator {
         async generate(): Promise<string> {
             return 'valid uuid';
         }

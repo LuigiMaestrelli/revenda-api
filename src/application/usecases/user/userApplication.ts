@@ -1,13 +1,13 @@
 import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
 import { IAddUserApplication } from '@/domain/usecases/user/user';
 import { IAddUserRepository, IFindUserByEmailRepository } from '@/domain/repository/user/user';
-import { Hasher } from '@/infra/interfaces/cryptography';
+import { IHasher } from '@/infra/protocols/cryptography';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
 
 export class UserApplication implements IAddUserApplication {
     constructor(
-        private readonly hasher: Hasher,
+        private readonly hasher: IHasher,
         private readonly addUserRepository: IAddUserRepository,
         private readonly findUserByEmailRepository: IFindUserByEmailRepository,
         private readonly authApplication: IGenerateAuthApplication

@@ -1,4 +1,4 @@
-import { Hasher } from '@/infra/interfaces/cryptography';
+import { IHasher } from '@/infra/protocols/cryptography';
 import { UserApplication } from '@/application/usecases/user/userApplication';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
 import { IAddUserRepository, IFindUserByEmailRepository } from '@/domain/repository/user/user';
@@ -7,7 +7,7 @@ import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication'
 import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 
 type SutTypes = {
-    hasherStub: Hasher;
+    hasherStub: IHasher;
     addUserRepositoryStub: IAddUserRepository;
     findUserByEmailRepositoryStub: IFindUserByEmailRepository;
     gerenerateAuthApplicationStub: IGenerateAuthApplication;
@@ -22,8 +22,8 @@ const makeValidCreateUserAttributes = (): CreateUserAttributes => {
     };
 };
 
-const makeHasher = (): Hasher => {
-    class HasherStub implements Hasher {
+const makeHasher = (): IHasher => {
+    class HasherStub implements IHasher {
         async hash(value: string): Promise<string> {
             return 'hashed password';
         }
