@@ -19,6 +19,10 @@
         "prepare": "husky install",
         "sonar": "node sonar-project.js"
     },
+    "jestSonar": {
+        "reportFile": "./coverage/sonar-test-reporter.xml",
+        "indent": 4
+    },
     "engines": {
         "node": "16.x"
     },

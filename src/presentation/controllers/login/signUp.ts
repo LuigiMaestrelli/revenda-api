@@ -1,5 +1,5 @@
 import { Controller, HttpRequest, HttpResponse, Validation } from '@/presentation/interfaces';
-import { makeSuccessResponse, makeErrorResponse } from '@/presentation/helpers/httpHelper';
+import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
 import { IAddUserApplication } from '@/domain/usecases/user/user';
 
 export class SignUpController implements Controller {

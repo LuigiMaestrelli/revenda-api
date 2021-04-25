@@ -4,7 +4,7 @@ import {
     makeServerErrorResponse,
     makeUnauthorizedResponse,
     makeErrorResponse
-} from '@/presentation/helpers/httpHelper';
+} from '@/shared/utils/http';
 import { InvalidParamError, MissingParamError, ServerError, UnauthorizedError } from '@/shared/errors';
 
 describe('Http Helper', () => {

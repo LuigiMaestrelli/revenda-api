@@ -1,11 +1,7 @@
 import { RequestHandler } from 'express';
 import request from 'supertest';
 import { adaptRoute } from '@/infra/adapters/express/expressRouteAdapter';
-import {
-    makeBadRequestResponse,
-    makeServerErrorResponse,
-    makeSuccessResponse
-} from '@/presentation/helpers/httpHelper';
+import { makeBadRequestResponse, makeServerErrorResponse, makeSuccessResponse } from '@/shared/utils/http';
 import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
 import app from '@/main/config/app';
 import { ServerError } from '@/shared/errors';

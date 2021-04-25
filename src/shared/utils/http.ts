@@ -1,5 +1,5 @@
 import { InvalidParamError, MissingParamError, ServerError, UnauthorizedError } from '@/shared/errors';
-import { HttpResponse, HttpResponseError } from '../interfaces';
+import { HttpResponse, HttpResponseError } from '../../presentation/interfaces';
 
 export function makeBadRequestResponse(error: Error): HttpResponseError {
     return {

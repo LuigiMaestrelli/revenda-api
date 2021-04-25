@@ -1,5 +1,5 @@
 import { Controller, HttpRequest, HttpResponse } from '@/presentation/interfaces';
-import { makeSuccessResponse, makeServerErrorResponse } from '@/presentation/helpers/httpHelper';
+import { makeSuccessResponse, makeServerErrorResponse } from '@/shared/utils/http';
 import database from '@/infra/db';
 
 export class DatabaseHealthController implements Controller {
