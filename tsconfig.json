@@ -7,18 +7,26 @@
         "outDir": "./dist",
         "rootDir": "./",
         "baseUrl": "./src",
-        "strict": true,
+        "strict": false,
         "noImplicitAny": true,
         "noUnusedLocals": true,
         "esModuleInterop": true,
+        "noImplicitReturns": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
         "sourceMap": true,
+        "downlevelIteration": true,
+        "allowUnreachableCode": false,
         "paths": {
             "@/*": ["*"],
             "@test/*": ["../__test__/*"]
         },
         "typeRoots": ["node_modules/@types"]
+    },
+    "typeAcquisition": {
+        "include": ["jest", "node", "express"]
     },
     "include": ["./src", "./__test__"]
 }

@@ -1,13 +1,10 @@
 module.exports = {
+    preset: 'ts-jest',
+    testEnvironment: 'node',
     clearMocks: true,
     collectCoverageFrom: ['<rootDir>/src/**'],
     coverageProvider: 'v8',
     coverageReporters: ['json', 'text', 'lcov', 'clover'],
-    testEnvironment: 'node',
-    transform: {
-        '^.+\\.(ts)$': 'ts-jest'
-    },
-    preset: 'ts-jest',
     roots: ['<rootDir>/__test__'],
     moduleNameMapper: {
         '@/(.*)': '<rootDir>/src/$1',
