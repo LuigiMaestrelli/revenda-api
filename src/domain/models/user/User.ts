@@ -1,3 +1,5 @@
+import { AuthenticationResult } from '@/domain/models/auth/authentication';
+
 export interface UserAttributes {
     id: string;
     name: string;
@@ -15,11 +17,6 @@ export type CreateUserAttributes = {
 };
 
 export interface UserWithAuthAttributes {
-    id: string;
-    name: string;
-    email: string;
-
-    token: string;
-    refreshToken: string;
-    expiresIn: number;
+    user: UserAttributes;
+    auth: AuthenticationResult;
 }

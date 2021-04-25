@@ -14,7 +14,6 @@ export class AuthApplication implements IGenerateAuthApplication {
 
     async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
         const user = await this.findUserByEmailRepository.findUserByEmail(autentication.email);
-
         if (!user) {
             throw new InvalidParamError('Invalid e-mail or password');
         }

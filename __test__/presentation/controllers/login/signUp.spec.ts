@@ -21,12 +21,17 @@ const makeAddUserApplication = (): IAddUserApplication => {
     class AddUserApplicationStub implements IAddUserApplication {
         async add(user: CreateUserAttributes): Promise<UserWithAuthAttributes> {
             return {
-                id: 'valid_id',
-                name: 'valid name',
-                email: 'valid_email@email.com',
-                token: 'valid token',
-                refreshToken: 'valid refreshtoken',
-                expiresIn: 100
+                user: {
+                    id: 'valid_id',
+                    name: 'valid name',
+                    email: 'valid_email@email.com',
+                    password: 'hashed password'
+                },
+                auth: {
+                    token: 'valid token',
+                    refreshToken: 'valid refreshtoken',
+                    expiresIn: 100
+                }
             };
         }
     }
@@ -78,12 +83,17 @@ describe('SignUp Controller', () => {
         const httpResponse = await sut.handle(httpRequest);
         expect(httpResponse.statusCode).toBe(200);
         expect(httpResponse.body).toEqual({
-            id: 'valid_id',
-            name: 'valid name',
-            email: 'valid_email@email.com',
-            token: 'valid token',
-            refreshToken: 'valid refreshtoken',
-            expiresIn: 100
+            user: {
+                id: 'valid_id',
+                name: 'valid name',
+                email: 'valid_email@email.com',
+                password: 'hashed password'
+            },
+            auth: {
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 100
+            }
         });
     });
 

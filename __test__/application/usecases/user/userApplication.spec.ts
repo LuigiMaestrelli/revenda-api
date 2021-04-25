@@ -140,12 +140,17 @@ describe('Add User Application', () => {
         const user = await sut.add(userData);
 
         expect(user).toEqual({
-            id: 'valid id',
-            name: 'valid name',
-            email: 'valid e-mail',
-            token: 'valid token',
-            refreshToken: 'valid refreshtoken',
-            expiresIn: 100
+            user: {
+                id: 'valid id',
+                name: 'valid name',
+                email: 'valid e-mail',
+                password: 'hashed password'
+            },
+            auth: {
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 100
+            }
         });
     });
 

@@ -15,7 +15,6 @@ export class UserApplication implements IAddUserApplication {
 
     async add(userData: CreateUserAttributes): Promise<UserWithAuthAttributes> {
         const userWithEmail = await this.findUserByEmailRepository.findUserByEmail(userData.email);
-
         if (userWithEmail) {
             throw new InvalidParamError('e-mail already in use');
         }
@@ -24,16 +23,11 @@ export class UserApplication implements IAddUserApplication {
         userData.password = await this.hasher.hash(passwordOriginal);
 
         const user = await this.addUserRepository.add(userData);
-
         const authData = await this.authApplication.auth({ email: userData.email, password: passwordOriginal });
 
         return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            token: authData.token,
-            refreshToken: authData.refreshToken,
-            expiresIn: authData.expiresIn
+            user: user,
+            auth: authData
         };
     }
 }
