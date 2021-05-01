@@ -70,7 +70,7 @@ describe('Http Helper', () => {
     test('should return statusCode 401 on generic UnauthorizedError with makeErrorResponse', () => {
         const response = makeErrorResponse(new UnauthorizedError('Message'));
         expect(response.statusCode).toBe(401);
-        expect(response.body.message).toBe('Message');
+        expect(response.body.message).toBe('Unauthorized: Message');
     });
 
     test('should return statusCode 500 on generic Error with makeErrorResponse', () => {

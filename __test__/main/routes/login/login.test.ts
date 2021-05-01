@@ -2,6 +2,7 @@ import { truncate } from '@test/utils/database';
 import request from 'supertest';
 import faker from 'faker';
 import { v4 as uuidv4 } from 'uuid';
+import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 import app from '@/main/config/app';
 import UserModel from '@/infra/db/model/user/userModel';
 
@@ -139,6 +140,87 @@ describe('Login Routes', () => {
 
             expect(response.status).toBe(400);
             expect(response.body.message).toBe('Invalid param: e-mail already in use');
+        });
+    });
+
+    describe('POST /signin', () => {
+        test('should return 200 on signin', async () => {
+            const email = faker.internet.email();
+            const bcryptAdapter = new BcryptAdapter();
+            const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
+
+            await UserModel.create({
+                id: uuidv4(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: email,
+                password: hashedPassword
+            });
+
+            const response = await request(app).post('/api/signin').send({
+                email: email,
+                password: STRONG_PASSWORD
+            });
+
+            expect(response.status).toBe(200);
+        });
+
+        test('should return 400 on signin if no email is provided', async () => {
+            const response = await request(app).post('/api/signin').send({
+                password: STRONG_PASSWORD
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Missing param: email');
+        });
+
+        test('should return 400 on signin if no password is provided', async () => {
+            const response = await request(app).post('/api/signin').send({
+                email: faker.internet.email()
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Missing param: password');
+        });
+
+        test('should return 400 if invalid password is provided', async () => {
+            const email = faker.internet.email();
+            const bcryptAdapter = new BcryptAdapter();
+            const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
+
+            await UserModel.create({
+                id: uuidv4(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: email,
+                password: hashedPassword
+            });
+
+            const response = await request(app).post('/api/signin').send({
+                email: email,
+                password: 'adasdasdasd'
+            });
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toBe('Unauthorized: Invalid e-mail or password');
+        });
+
+        test('should return 400 if invalid email is provided', async () => {
+            const bcryptAdapter = new BcryptAdapter();
+            const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
+
+            await UserModel.create({
+                id: uuidv4(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: hashedPassword
+            });
+
+            const response = await request(app).post('/api/signin').send({
+                email: faker.internet.email(),
+                password: hashedPassword
+            });
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toBe('Unauthorized: Invalid e-mail or password');
         });
     });
 });

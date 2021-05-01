@@ -4,7 +4,7 @@ import { UserAttributes } from '@/domain/models/user/user';
 import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { IHashCompare } from '@/infra/protocols/cryptography';
-import { InvalidParamError } from '@/shared/errors';
+import { UnauthorizedError } from '@/shared/errors';
 
 type SutTypes = {
     sut: AuthApplication;
@@ -101,7 +101,7 @@ describe('Auth application', () => {
         const authDto = { email: 'invalid email', password: 'valid password' };
         const authPromise = sut.auth(authDto);
 
-        await expect(authPromise).rejects.toThrow(new InvalidParamError('Invalid e-mail or password'));
+        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
     });
 
     test('should throw if tokenSigner throws', async () => {
@@ -162,6 +162,6 @@ describe('Auth application', () => {
         const authDto = { email: 'valid email', password: 'invalid password' };
         const authPromise = sut.auth(authDto);
 
-        await expect(authPromise).rejects.toThrow(new InvalidParamError('Invalid e-mail or password'));
+        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
     });
 });

@@ -19,6 +19,15 @@ jest.mock('@/infra/db/model/user/userModel', () => ({
             name: 'valid name',
             password: 'valid password'
         };
+    },
+
+    async findByPk(): Promise<UserAttributes> {
+        return {
+            id: 'valid uuid',
+            email: 'valid e-mail',
+            name: 'valid name',
+            password: 'valid password'
+        };
     }
 }));
 
@@ -39,58 +48,73 @@ const makeSut = (): SutTypes => {
 };
 
 describe('User Repository', () => {
-    test('should call IdGenerator', async () => {
-        const { sut, idGeneratorStub } = makeSut();
-        const idGeneratorStubSpy = jest.spyOn(idGeneratorStub, 'generate');
+    describe('Add user', () => {
+        test('should call IdGenerator', async () => {
+            const { sut, idGeneratorStub } = makeSut();
+            const idGeneratorStubSpy = jest.spyOn(idGeneratorStub, 'generate');
 
-        await sut.add({
-            email: 'valid e-mail',
-            name: 'valid name',
-            password: 'valid password'
+            await sut.add({
+                email: 'valid e-mail',
+                name: 'valid name',
+                password: 'valid password'
+            });
+
+            expect(idGeneratorStubSpy).toHaveBeenCalled();
         });
 
-        expect(idGeneratorStubSpy).toHaveBeenCalled();
+        test('should throw if IdGenerator throws', async () => {
+            const { sut, idGeneratorStub } = makeSut();
+
+            jest.spyOn(idGeneratorStub, 'generate').mockImplementation(() => {
+                throw new Error('Test throw');
+            });
+
+            const addPromise = sut.add({
+                email: 'valid e-mail',
+                name: 'valid name',
+                password: 'valid password'
+            });
+
+            await expect(addPromise).rejects.toThrow();
+        });
+
+        test('should return valid user attributes', async () => {
+            const { sut } = makeSut();
+
+            const userAttr = await sut.add({
+                email: 'valid e-mail',
+                name: 'valid name',
+                password: 'valid password'
+            });
+
+            expect(userAttr).toEqual({
+                id: 'valid uuid',
+                email: 'valid e-mail',
+                name: 'valid name',
+                password: 'valid password'
+            });
+        });
     });
 
-    test('should throw if IdGenerator throws', async () => {
-        const { sut, idGeneratorStub } = makeSut();
+    describe('Find user by e-mail', () => {
+        test('should find user by e-mail and return', async () => {
+            const { sut } = makeSut();
 
-        jest.spyOn(idGeneratorStub, 'generate').mockImplementation(() => {
-            throw new Error('Test throw');
-        });
+            const user = await sut.findUserByEmail('valid email');
 
-        const addPromise = sut.add({
-            email: 'valid e-mail',
-            name: 'valid name',
-            password: 'valid password'
-        });
-
-        await expect(addPromise).rejects.toThrow();
-    });
-
-    test('should return valid user attributes', async () => {
-        const { sut } = makeSut();
-
-        const userAttr = await sut.add({
-            email: 'valid e-mail',
-            name: 'valid name',
-            password: 'valid password'
-        });
-
-        expect(userAttr).toEqual({
-            id: 'valid uuid',
-            email: 'valid e-mail',
-            name: 'valid name',
-            password: 'valid password'
+            expect(user).toBeTruthy();
+            expect(user?.id).toEqual('valid uuid');
         });
     });
 
-    test('should find user by e-mail and return', async () => {
-        const { sut } = makeSut();
+    describe('Find user by id', () => {
+        test('should find user by id and return', async () => {
+            const { sut } = makeSut();
 
-        const user = await sut.findUserByEmail('valid email');
+            const user = await sut.findById('valid id');
 
-        expect(user).toBeTruthy();
-        expect(user?.id).toEqual('valid uuid');
+            expect(user).toBeTruthy();
+            expect(user?.id).toEqual('valid uuid');
+        });
     });
 });

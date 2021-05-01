@@ -54,4 +54,20 @@ describe('User Repository', () => {
 
         expect(user?.id).toBe(id);
     });
+
+    test('should find user by id', async () => {
+        const { sut, idGenerator } = makeSut();
+
+        const id = await idGenerator.generate();
+        await UserModel.create({
+            id: id,
+            email: faker.internet.email(),
+            name: faker.name.firstName(),
+            password: faker.internet.password()
+        });
+
+        const user = await sut.findById(id);
+
+        expect(user?.id).toBe(id);
+    });
 });

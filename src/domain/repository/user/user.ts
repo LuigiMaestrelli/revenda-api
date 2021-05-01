@@ -5,5 +5,9 @@ export interface IAddUserRepository {
 }
 
 export interface IFindUserByEmailRepository {
-    findUserByEmail: (email: string) => Promise<UserAttributes | null>;
+    findUserByEmail: (email: string) => Promise<UserAttributes>;
+}
+
+export interface IFindUserByIdRepository {
+    findById: (id: string) => Promise<UserAttributes>;
 }
