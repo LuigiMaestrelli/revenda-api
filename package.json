@@ -78,6 +78,7 @@
         "lint-staged": "^10.5.4",
         "nodemon": "^2.0.7",
         "prettier": "^2.2.1",
+        "pretty-quick": "^3.1.0",
         "rimraf": "^3.0.2",
         "sequelize-cli": "^6.2.0",
         "sonarqube-scanner": "^2.8.0",
