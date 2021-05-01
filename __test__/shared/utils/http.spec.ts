@@ -78,4 +78,10 @@ describe('Http Helper', () => {
         expect(response.statusCode).toBe(500);
         expect(response.body.message).toBe('Message');
     });
+
+    test('should return statusCode 500 on ServerError with makeErrorResponse', () => {
+        const response = makeErrorResponse(new ServerError('Message'));
+        expect(response.statusCode).toBe(500);
+        expect(response.body.message).toBe('Message');
+    });
 });

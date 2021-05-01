@@ -32,28 +32,20 @@ export class JwtAdapter implements ITokenSigner, ITokenValidation {
     }
 
     async validateToken(token: string): Promise<TokenPayload> {
-        return await new Promise((resolve, reject) => {
-            try {
-                const decoded: any = jwt.verify(token, this.secretTokenKey);
-                resolve({
-                    userId: decoded.userId
-                });
-            } catch (err) {
-                reject(err);
-            }
+        return await new Promise(resolve => {
+            const decoded: any = jwt.verify(token, this.secretTokenKey);
+            resolve({
+                userId: decoded.userId
+            });
         });
     }
 
     async validateRefreshToken(token: string): Promise<TokenPayload> {
-        return await new Promise((resolve, reject) => {
-            try {
-                const decoded: any = jwt.verify(token, this.secretRefreshTokenKey);
-                resolve({
-                    userId: decoded.userId
-                });
-            } catch (err) {
-                reject(err);
-            }
+        return await new Promise(resolve => {
+            const decoded: any = jwt.verify(token, this.secretRefreshTokenKey);
+            resolve({
+                userId: decoded.userId
+            });
         });
     }
 }

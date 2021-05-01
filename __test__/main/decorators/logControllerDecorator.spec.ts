@@ -59,7 +59,7 @@ describe('LogController Decorator', () => {
     test('should call parrent controller handle', async () => {
         const { controllerStub, sut } = makeSut();
 
-        const handleSpy = jest.spyOn(controllerStub, 'handle');
+        const controllerHandleSpy = jest.spyOn(controllerStub, 'handle');
 
         const httpRequest = {
             body: {
@@ -68,7 +68,7 @@ describe('LogController Decorator', () => {
         };
 
         await sut.handle(httpRequest);
-        expect(handleSpy).toHaveBeenCalledWith(httpRequest);
+        expect(controllerHandleSpy).toHaveBeenCalledWith(httpRequest);
     });
 
     test('should return the same result as parent controller', async () => {
@@ -80,8 +80,8 @@ describe('LogController Decorator', () => {
             }
         };
 
-        const responst = await sut.handle(httpRequest);
-        expect(responst).toEqual({
+        const response = await sut.handle(httpRequest);
+        expect(response).toEqual({
             statusCode: 200,
             body: {
                 data: 'some data'
