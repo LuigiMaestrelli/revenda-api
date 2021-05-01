@@ -54,4 +54,24 @@ describe('JSONWebToken Adapter', () => {
         const validatePromise = sut.validateRefreshToken('fhs0d9fs8dfj98duj');
         await expect(validatePromise).rejects.toThrow();
     });
+
+    test('should not validade and decode a valid token with refreshtoken', async () => {
+        const sut = makeSut();
+
+        const payload = { userId: 'xxxx' };
+        const authData = await sut.sign(payload);
+
+        const validatePromise = sut.validateToken(authData.refreshToken);
+        await expect(validatePromise).rejects.toThrow();
+    });
+
+    test('should not validade and decode a valid refreshtoken with token', async () => {
+        const sut = makeSut();
+
+        const payload = { userId: 'xxxx' };
+        const authData = await sut.sign(payload);
+
+        const validatePromise = sut.validateRefreshToken(authData.token);
+        await expect(validatePromise).rejects.toThrow();
+    });
 });

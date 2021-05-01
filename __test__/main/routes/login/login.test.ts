@@ -3,6 +3,8 @@ import request from 'supertest';
 import faker from 'faker';
 import { v4 as uuidv4 } from 'uuid';
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
+import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
+import config from '@/main/config';
 import app from '@/main/config/app';
 import UserModel from '@/infra/db/model/user/userModel';
 
@@ -162,6 +164,43 @@ describe('Login Routes', () => {
             });
 
             expect(response.status).toBe(200);
+        });
+
+        test('should return valid token and refreshtoken on signin', async () => {
+            const email = faker.internet.email();
+            const bcryptAdapter = new BcryptAdapter();
+            const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
+            const userId = uuidv4();
+
+            await UserModel.create({
+                id: userId,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: email,
+                password: hashedPassword
+            });
+
+            const response = await request(app).post('/api/signin').send({
+                email: email,
+                password: STRONG_PASSWORD
+            });
+
+            expect(response.status).toBe(200);
+
+            const jwtAdapter = new JwtAdapter(
+                config.getTokenSecretTokenKey(),
+                config.getTokenSecretRefreshTokenKey(),
+                config.getTokenSecretExpires()
+            );
+
+            const tokenData = await jwtAdapter.validateToken(response.body.token);
+            expect(tokenData).toEqual({
+                userId
+            });
+
+            const refreshTokenData = await jwtAdapter.validateRefreshToken(response.body.refreshToken);
+            expect(refreshTokenData).toEqual({
+                userId
+            });
         });
 
         test('should return 400 on signin if no email is provided', async () => {
