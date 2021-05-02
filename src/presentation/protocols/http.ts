@@ -2,6 +2,7 @@ import { TokenPayload } from '@/domain/models/auth/authentication';
 
 export type HttpRequest = {
     body?: any;
+    params?: any;
     query?: any;
     auth?: TokenPayload;
 };

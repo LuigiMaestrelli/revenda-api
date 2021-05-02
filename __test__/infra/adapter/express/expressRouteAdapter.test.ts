@@ -43,10 +43,12 @@ describe('Express Route Adapter', () => {
         });
 
         expect(controllerSpy).toBeCalledWith({
+            auth: undefined,
             body: {
                 data: true
             },
-            query: {}
+            query: {},
+            params: {}
         });
     });
 
@@ -59,12 +61,32 @@ describe('Express Route Adapter', () => {
         await request(app).get('/testRouteAdapter?a=1&b=2&c=qweasd').send();
 
         expect(controllerSpy).toBeCalledWith({
+            auth: undefined,
             body: {},
+            params: {},
             query: {
                 a: '1',
                 b: '2',
                 c: 'qweasd'
             }
+        });
+    });
+
+    test('should call controller with correct param values', async () => {
+        const { sut, controller } = makeSut();
+        app.get('/testRouteAdapter/:id', sut);
+
+        const controllerSpy = jest.spyOn(controller, 'handle');
+
+        await request(app).get('/testRouteAdapter/valid-id').send();
+
+        expect(controllerSpy).toBeCalledWith({
+            auth: undefined,
+            body: {},
+            params: {
+                id: 'valid-id'
+            },
+            query: {}
         });
     });
 

@@ -1,5 +1,6 @@
 import { InvalidParamError, MissingParamError, ServerError, UnauthorizedError } from '@/shared/errors';
 import { HttpResponse, HttpResponseError } from '../../presentation/protocols';
+import { NotFoundError } from '../errors/notFoundError';
 
 export function makeBadRequestResponse(error: Error): HttpResponseError {
     return {
@@ -13,6 +14,15 @@ export function makeBadRequestResponse(error: Error): HttpResponseError {
 export function makeUnauthorizedResponse(error: Error): HttpResponseError {
     return {
         statusCode: 401,
+        body: {
+            message: error.message
+        }
+    };
+}
+
+export function makeNotFoundResponse(error: Error): HttpResponseError {
+    return {
+        statusCode: 404,
         body: {
             message: error.message
         }
@@ -49,6 +59,10 @@ export function makeErrorResponse(error: Error): HttpResponseError {
 
     if (error instanceof UnauthorizedError) {
         return makeUnauthorizedResponse(error);
+    }
+
+    if (error instanceof NotFoundError) {
+        return makeNotFoundResponse(error);
     }
 
     return makeServerErrorResponse(error);

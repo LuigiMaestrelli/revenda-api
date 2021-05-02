@@ -6,6 +6,7 @@ export const adaptRoute = (controller: IController): RequestHandler => {
         const httpResquest: HttpRequest = {
             body: req.body,
             query: req.query,
+            params: req.params,
             /* @ts-expect-error */
             auth: req.auth
         };

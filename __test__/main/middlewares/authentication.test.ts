@@ -76,4 +76,47 @@ describe('Authentication Middleware', () => {
         expect(response.status).toBe(200);
         expect(response.body.userId).toBe('valid id');
     });
+
+    test('should validate authorization header with case insensitive', async () => {
+        const middleware = makeAuthenticationMiddleware();
+
+        app.post('/testAuthenticationTokenValidTokenHeader', middleware, (req, res) => {
+            /* @ts-expect-error */
+            res.send(req.auth);
+        });
+
+        const jwtAdapter = new JwtAdapter(
+            config.getTokenSecretTokenKey(),
+            config.getTokenSecretRefreshTokenKey(),
+            config.getTokenSecretExpires()
+        );
+
+        const authData = await jwtAdapter.sign({
+            userId: 'valid id'
+        });
+
+        const response = await request(app)
+            .post('/testAuthenticationTokenValidTokenHeader')
+            .set('Authorization', `Bearer ${authData.token}`)
+            .send({});
+
+        expect(response.status).toBe(200);
+        expect(response.body.userId).toBe('valid id');
+
+        const response2 = await request(app)
+            .post('/testAuthenticationTokenValidTokenHeader')
+            .set('authorization', `Bearer ${authData.token}`)
+            .send({});
+
+        expect(response2.status).toBe(200);
+        expect(response2.body.userId).toBe('valid id');
+
+        const response3 = await request(app)
+            .post('/testAuthenticationTokenValidTokenHeader')
+            .set('AUTHORIZATION', `Bearer ${authData.token}`)
+            .send({});
+
+        expect(response3.status).toBe(200);
+        expect(response3.body.userId).toBe('valid id');
+    });
 });

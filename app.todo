@@ -1,6 +1,6 @@
 - Usuário
     [x] criar
     [x] autenticar
-    [] recuperar
+    [x] recuperar por id
     [] editar
     [] inativar
