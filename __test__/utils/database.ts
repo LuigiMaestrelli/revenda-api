@@ -1,15 +1,13 @@
 import database from '@/infra/db';
 
 export async function truncate(): Promise<void> {
-    await Promise.all(
-        Object.keys(database.models).map((key: string) => {
-            if (['sequelize', 'Sequelize'].includes(key)) return null;
+    for (const key in database.models) {
+        if (['sequelize', 'Sequelize'].includes(key)) continue;
 
-            return database.models[key].destroy({
-                where: {},
-                force: true,
-                cascade: true
-            });
-        })
-    );
+        await database.models[key].destroy({
+            where: {},
+            force: true,
+            cascade: true
+        });
+    }
 }
