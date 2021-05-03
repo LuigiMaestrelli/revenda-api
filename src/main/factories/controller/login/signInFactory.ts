@@ -2,12 +2,12 @@ import { IController } from '@/presentation/protocols';
 import { SignInController } from '@/presentation/controllers/login/signIn';
 import { makeSignInValidation } from './signInValidationFactory';
 import { makeLogControllerDecorator } from '@/main/factories/decorators/logControllerFactory';
-import { makeAuthApplication } from '@/main/factories/application/auth/authApplicationFactory';
+import { makeAuthenticationUseCase } from '@/main/factories/application/auth/authFactory';
 
 export const makeSignInController = (): IController => {
     const signInValidation = makeSignInValidation();
-    const authApplication = makeAuthApplication();
+    const authUseCase = makeAuthenticationUseCase();
 
-    const controller = new SignInController(signInValidation, authApplication);
+    const controller = new SignInController(signInValidation, authUseCase);
     return makeLogControllerDecorator(controller);
 };

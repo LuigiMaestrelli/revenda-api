@@ -1,10 +1,10 @@
-import { AuthApplication } from '@/application/usecases/auth/authApplication';
+import { AuthenticationUseCase } from '@/application/usecases/auth/auth';
 import { makeUserRepository } from '@/main/factories/repository/user/userRepositoryFactory';
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
 import config from '@/main/config';
 
-export const makeAuthApplication = (): AuthApplication => {
+export const makeAuthenticationUseCase = (): AuthenticationUseCase => {
     const hasher = new BcryptAdapter();
     const userRepository = makeUserRepository();
     const tokenSigner = new JwtAdapter(
@@ -13,5 +13,5 @@ export const makeAuthApplication = (): AuthApplication => {
         config.getTokenSecretExpires()
     );
 
-    return new AuthApplication(tokenSigner, hasher, userRepository);
+    return new AuthenticationUseCase(tokenSigner, hasher, userRepository);
 };

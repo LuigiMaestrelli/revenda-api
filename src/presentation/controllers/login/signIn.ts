@@ -1,9 +1,9 @@
 import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
 import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
-import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
+import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 
 export class SignInController implements IController {
-    constructor(private readonly validation: IValidation, private readonly generateAuth: IGenerateAuthApplication) {}
+    constructor(private readonly validation: IValidation, private readonly generateAuth: IGenerateAuthentication) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {

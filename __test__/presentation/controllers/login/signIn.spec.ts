@@ -1,5 +1,5 @@
 import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
-import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
+import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { SignInController } from '@/presentation/controllers/login/signIn';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
@@ -7,7 +7,7 @@ import { MissingParamError } from '@/shared/errors';
 type SutTypes = {
     sut: SignInController;
     validationStub: IValidation;
-    generateAuthStub: IGenerateAuthApplication;
+    generateAuthStub: IGenerateAuthentication;
 };
 
 const makeValidation = (): IValidation => {
@@ -18,8 +18,8 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
-const makeGenerateAuth = (): IGenerateAuthApplication => {
-    class GenerateAuthApplicationStub implements IGenerateAuthApplication {
+const makeGenerateAuth = (): IGenerateAuthentication => {
+    class GenerateAuthenticationStub implements IGenerateAuthentication {
         async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
             return {
                 token: 'valid token',
@@ -29,7 +29,7 @@ const makeGenerateAuth = (): IGenerateAuthApplication => {
         }
     }
 
-    return new GenerateAuthApplicationStub();
+    return new GenerateAuthenticationStub();
 };
 
 const makeSut = (): SutTypes => {

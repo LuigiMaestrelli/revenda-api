@@ -1,11 +1,11 @@
 import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
-import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
+import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { IHashCompare } from '@/infra/protocols/cryptography';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { UnauthorizedError } from '@/shared/errors';
 
-export class AuthApplication implements IGenerateAuthApplication {
+export class AuthenticationUseCase implements IGenerateAuthentication {
     constructor(
         private readonly tokenSigner: ITokenSigner,
         private readonly hasherCompare: IHashCompare,

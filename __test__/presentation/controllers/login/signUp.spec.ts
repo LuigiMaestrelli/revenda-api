@@ -1,12 +1,12 @@
 import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { IValidation } from '@/presentation/protocols';
-import { IAddUserApplication } from '@/domain/usecases/user/user';
+import { IAddUser } from '@/domain/usecases/user/user';
 import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
 
 type SutTypes = {
     sut: SignUpController;
     validationStub: IValidation;
-    addUserApplicationStub: IAddUserApplication;
+    addUserUseCaseStub: IAddUser;
 };
 
 const makeValidation = (): IValidation => {
@@ -17,8 +17,8 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
-const makeAddUserApplication = (): IAddUserApplication => {
-    class AddUserApplicationStub implements IAddUserApplication {
+const makeAddUserUseCase = (): IAddUser => {
+    class AddUserUseCaseStub implements IAddUser {
         async add(user: CreateUserAttributes): Promise<UserWithAuthAttributes> {
             return {
                 user: {
@@ -36,18 +36,18 @@ const makeAddUserApplication = (): IAddUserApplication => {
         }
     }
 
-    return new AddUserApplicationStub();
+    return new AddUserUseCaseStub();
 };
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const addUserApplicationStub = makeAddUserApplication();
-    const sut = new SignUpController(validationStub, addUserApplicationStub);
+    const addUserUseCaseStub = makeAddUserUseCase();
+    const sut = new SignUpController(validationStub, addUserUseCaseStub);
 
     return {
         sut,
         validationStub,
-        addUserApplicationStub
+        addUserUseCaseStub
     };
 };
 
@@ -98,9 +98,9 @@ describe('SignUp Controller', () => {
     });
 
     test('should call AddUser with correct values', async () => {
-        const { sut, addUserApplicationStub } = makeSut();
+        const { sut, addUserUseCaseStub } = makeSut();
 
-        const addSpy = jest.spyOn(addUserApplicationStub, 'add');
+        const addSpy = jest.spyOn(addUserUseCaseStub, 'add');
 
         const httpRequest = {
             body: {
@@ -120,9 +120,9 @@ describe('SignUp Controller', () => {
     });
 
     test('should return 500 if AddUser throws', async () => {
-        const { sut, addUserApplicationStub } = makeSut();
+        const { sut, addUserUseCaseStub } = makeSut();
 
-        jest.spyOn(addUserApplicationStub, 'add').mockImplementation(async () => {
+        jest.spyOn(addUserUseCaseStub, 'add').mockImplementation(async () => {
             return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 

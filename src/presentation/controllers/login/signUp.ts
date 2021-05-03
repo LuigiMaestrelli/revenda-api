@@ -1,9 +1,9 @@
 import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
 import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
-import { IAddUserApplication } from '@/domain/usecases/user/user';
+import { IAddUser } from '@/domain/usecases/user/user';
 
 export class SignUpController implements IController {
-    constructor(private readonly validation: IValidation, private readonly addUserApplication: IAddUserApplication) {}
+    constructor(private readonly validation: IValidation, private readonly addUserUseCase: IAddUser) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {
@@ -11,7 +11,7 @@ export class SignUpController implements IController {
 
             await this.validation.validate(body);
 
-            const user = await this.addUserApplication.add({
+            const user = await this.addUserUseCase.add({
                 name: body.name,
                 email: body.email,
                 password: body.password

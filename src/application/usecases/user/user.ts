@@ -1,16 +1,16 @@
 import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
-import { IAddUserApplication } from '@/domain/usecases/user/user';
+import { IAddUser } from '@/domain/usecases/user/user';
 import { IAddUserRepository, IFindUserByEmailRepository } from '@/domain/repository/user/user';
 import { IHasher } from '@/infra/protocols/cryptography';
 import { InvalidParamError } from '@/shared/errors';
-import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
+import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 
-export class UserApplication implements IAddUserApplication {
+export class UserUseCase implements IAddUser {
     constructor(
         private readonly hasher: IHasher,
         private readonly addUserRepository: IAddUserRepository,
         private readonly findUserByEmailRepository: IFindUserByEmailRepository,
-        private readonly authApplication: IGenerateAuthApplication
+        private readonly generateAuthentication: IGenerateAuthentication
     ) {}
 
     async add(userData: CreateUserAttributes): Promise<UserWithAuthAttributes> {
@@ -23,7 +23,7 @@ export class UserApplication implements IAddUserApplication {
         userData.password = await this.hasher.hash(passwordOriginal);
 
         const user = await this.addUserRepository.add(userData);
-        const authData = await this.authApplication.auth({ email: userData.email, password: passwordOriginal });
+        const authData = await this.generateAuthentication.auth({ email: userData.email, password: passwordOriginal });
 
         return {
             user: user,

@@ -1,17 +1,17 @@
 import { IHasher } from '@/infra/protocols/cryptography';
-import { UserApplication } from '@/application/usecases/user/userApplication';
+import { UserUseCase } from '@/application/usecases/user/user';
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/User';
 import { IAddUserRepository, IFindUserByEmailRepository } from '@/domain/repository/user/user';
 import { InvalidParamError } from '@/shared/errors';
-import { IGenerateAuthApplication } from '@/domain/usecases/auth/authentication';
+import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 
 type SutTypes = {
     hasherStub: IHasher;
     addUserRepositoryStub: IAddUserRepository;
     findUserByEmailRepositoryStub: IFindUserByEmailRepository;
-    gerenerateAuthApplicationStub: IGenerateAuthApplication;
-    sut: UserApplication;
+    gerenerateAuthenticationStub: IGenerateAuthentication;
+    sut: UserUseCase;
 };
 
 const makeValidCreateUserAttributes = (): CreateUserAttributes => {
@@ -57,8 +57,8 @@ const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
     return new FindUserByEmailRepositoryStub();
 };
 
-const makeGerenerateAuthApplication = (): IGenerateAuthApplication => {
-    class GerenerateAuthApplicationStub implements IGenerateAuthApplication {
+const makeGerenerateAuthentication = (): IGenerateAuthentication => {
+    class GerenerateAuthenticationStub implements IGenerateAuthentication {
         async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
             return {
                 token: 'valid token',
@@ -68,32 +68,32 @@ const makeGerenerateAuthApplication = (): IGenerateAuthApplication => {
         }
     }
 
-    return new GerenerateAuthApplicationStub();
+    return new GerenerateAuthenticationStub();
 };
 
 const makeSut = (): SutTypes => {
     const hasherStub = makeHasher();
     const addUserRepositoryStub = makeAddUserRepository();
     const findUserByEmailRepositoryStub = makeFindUserByEmailRepository();
-    const gerenerateAuthApplicationStub = makeGerenerateAuthApplication();
+    const gerenerateAuthenticationStub = makeGerenerateAuthentication();
 
-    const sut = new UserApplication(
+    const sut = new UserUseCase(
         hasherStub,
         addUserRepositoryStub,
         findUserByEmailRepositoryStub,
-        gerenerateAuthApplicationStub
+        gerenerateAuthenticationStub
     );
 
     return {
         hasherStub,
         addUserRepositoryStub,
         findUserByEmailRepositoryStub,
-        gerenerateAuthApplicationStub,
+        gerenerateAuthenticationStub,
         sut
     };
 };
 
-describe('Add User Application', () => {
+describe('Add User UseCase', () => {
     test('should call Encrypter with correct value', async () => {
         const { sut, hasherStub } = makeSut();
         const encryptSpy = jest.spyOn(hasherStub, 'hash');
@@ -210,23 +210,23 @@ describe('Add User Application', () => {
         await expect(addPromise).rejects.toThrow(new InvalidParamError('e-mail already in use'));
     });
 
-    test('should call GenerateAuthApplication with correct values', async () => {
-        const { sut, gerenerateAuthApplicationStub } = makeSut();
-        const gerenerateAuthApplicationSpy = jest.spyOn(gerenerateAuthApplicationStub, 'auth');
+    test('should call GerenerateAuthentication with correct values', async () => {
+        const { sut, gerenerateAuthenticationStub } = makeSut();
+        const gerenerateAuthenticationSpy = jest.spyOn(gerenerateAuthenticationStub, 'auth');
 
         const userData = makeValidCreateUserAttributes();
 
         await sut.add(userData);
 
-        expect(gerenerateAuthApplicationSpy).toHaveBeenCalledWith({
+        expect(gerenerateAuthenticationSpy).toHaveBeenCalledWith({
             email: 'valid e-mail',
             password: 'valid password'
         });
     });
 
-    test('should throw if GenerateAuthApplication throws', async () => {
-        const { sut, gerenerateAuthApplicationStub } = makeSut();
-        jest.spyOn(gerenerateAuthApplicationStub, 'auth').mockImplementationOnce(() => {
+    test('should throw if GerenerateAuthentication throws', async () => {
+        const { sut, gerenerateAuthenticationStub } = makeSut();
+        jest.spyOn(gerenerateAuthenticationStub, 'auth').mockImplementationOnce(() => {
             throw new Error('Test throw');
         });
 

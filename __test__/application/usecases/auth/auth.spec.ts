@@ -1,4 +1,4 @@
-import { AuthApplication } from '@/application/usecases/auth/authApplication';
+import { AuthenticationUseCase } from '@/application/usecases/auth/auth';
 import { TokenPayload, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { UserAttributes } from '@/domain/models/user/user';
 import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
@@ -7,7 +7,7 @@ import { IHashCompare } from '@/infra/protocols/cryptography';
 import { UnauthorizedError } from '@/shared/errors';
 
 type SutTypes = {
-    sut: AuthApplication;
+    sut: AuthenticationUseCase;
     tokenSigner: ITokenSigner;
     hasherCompare: IHashCompare;
     findUserByEmailRepository: IFindUserByEmailRepository;
@@ -56,7 +56,7 @@ const makeSut = (): SutTypes => {
     const tokenSigner = makeTokenSigner();
     const hasherCompare = makeHashCompare();
     const findUserByEmailRepository = makeFindUserByEmailRepository();
-    const sut = new AuthApplication(tokenSigner, hasherCompare, findUserByEmailRepository);
+    const sut = new AuthenticationUseCase(tokenSigner, hasherCompare, findUserByEmailRepository);
 
     return {
         sut,
@@ -66,7 +66,7 @@ const makeSut = (): SutTypes => {
     };
 };
 
-describe('Auth application', () => {
+describe('Auth UseCase', () => {
     test('should call findUserByEmailRepository with correct values', async () => {
         const { sut, findUserByEmailRepository } = makeSut();
 
