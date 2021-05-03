@@ -1,5 +1,5 @@
 import { UserAttributes } from '@/domain/models/user/user';
-import { UserRepository } from '@/infra/db/repository/user/userRepository';
+import { UserRepository } from '@/infra/db/repository/user/user';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 
 type SutTypes = {

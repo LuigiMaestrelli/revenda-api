@@ -8,7 +8,7 @@ import { makeServerErrorResponse } from '@/shared/utils/http';
 interface SutTypes {
     controllerStub: IController;
     sut: LogControllerDecorator;
-    logErrorRepositoryStub: IAddErrorLogRepository;
+    errorLogRepositoryStub: IAddErrorLogRepository;
 }
 
 const makeController = (): IController => {
@@ -28,8 +28,8 @@ const makeController = (): IController => {
     return new ControllerStub();
 };
 
-const makeLogErrorRepository = (): IAddErrorLogRepository => {
-    class LogErrorRepositoryStub implements IAddErrorLogRepository {
+const makeErrorLogRepository = (): IAddErrorLogRepository => {
+    class ErrorLogRepositoryStub implements IAddErrorLogRepository {
         async add(errorData: CreateErrorLogAttributes): Promise<ErrorLogAttributes> {
             return {
                 id: 'valid id',
@@ -40,17 +40,17 @@ const makeLogErrorRepository = (): IAddErrorLogRepository => {
         }
     }
 
-    return new LogErrorRepositoryStub();
+    return new ErrorLogRepositoryStub();
 };
 
 const makeSut = (): SutTypes => {
-    const logErrorRepositoryStub = makeLogErrorRepository();
+    const errorLogRepositoryStub = makeErrorLogRepository();
     const controllerStub = makeController();
-    const sut = new LogControllerDecorator(controllerStub, logErrorRepositoryStub);
+    const sut = new LogControllerDecorator(controllerStub, errorLogRepositoryStub);
 
     return {
         controllerStub,
-        logErrorRepositoryStub,
+        errorLogRepositoryStub,
         sut
     };
 };
@@ -90,9 +90,9 @@ describe('LogController Decorator', () => {
     });
 
     test('should call AddErrorLogRepository with correct error if controller returns a server error', async () => {
-        const { sut, controllerStub, logErrorRepositoryStub } = makeSut();
+        const { sut, controllerStub, errorLogRepositoryStub } = makeSut();
 
-        const logSpy = jest.spyOn(logErrorRepositoryStub, 'add');
+        const logSpy = jest.spyOn(errorLogRepositoryStub, 'add');
         const customServerError = new ServerError('Some message');
 
         jest.spyOn(controllerStub, 'handle').mockReturnValueOnce(
@@ -114,9 +114,9 @@ describe('LogController Decorator', () => {
     });
 
     test('should call AddErrorLogRepository with correct error if controller returns a server error with parent', async () => {
-        const { sut, controllerStub, logErrorRepositoryStub } = makeSut();
+        const { sut, controllerStub, errorLogRepositoryStub } = makeSut();
 
-        const logSpy = jest.spyOn(logErrorRepositoryStub, 'add');
+        const logSpy = jest.spyOn(errorLogRepositoryStub, 'add');
 
         jest.spyOn(controllerStub, 'handle').mockReturnValueOnce(
             new Promise(resolve => {
@@ -143,9 +143,9 @@ describe('LogController Decorator', () => {
     });
 
     test('should not call AddErrorLogRepository if controller does not return a server error', async () => {
-        const { sut, logErrorRepositoryStub } = makeSut();
+        const { sut, errorLogRepositoryStub } = makeSut();
 
-        const logSpy = jest.spyOn(logErrorRepositoryStub, 'add');
+        const logSpy = jest.spyOn(errorLogRepositoryStub, 'add');
 
         const httpRequest = {
             body: {

@@ -1,5 +1,5 @@
 import { ErrorLogAttributes } from '@/domain/models/log/errorLog';
-import { ErrorLogRepository } from '@/infra/db/repository/log/errorLogRepository';
+import { ErrorLogRepository } from '@/infra/db/repository/log/errorLog';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 
 type SutTypes = {
