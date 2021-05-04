@@ -3,7 +3,7 @@ import request from 'supertest';
 import faker from 'faker';
 import { v4 as uuidv4 } from 'uuid';
 import app from '@/main/config/app';
-import UserModel from '@/infra/db/model/user/userModel';
+import UserModel from '@/infra/db/model/user/user';
 import { generateValidUserData } from '@test/utils/user';
 
 describe('User Routes', () => {

@@ -1,7 +1,7 @@
 import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IAddUserRepository, IFindUserByEmailRepository, IFindUserByIdRepository } from '@/domain/repository/user/user';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
-import UserModel from '@/infra/db/model/user/userModel';
+import UserModel from '@/infra/db/model/user/user';
 
 export class UserRepository implements IAddUserRepository, IFindUserByEmailRepository, IFindUserByIdRepository {
     constructor(private readonly idGenerator: IIdGenerator) {}

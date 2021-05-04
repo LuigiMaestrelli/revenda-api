@@ -1,7 +1,7 @@
 import { CreateErrorLogAttributes, ErrorLogAttributes } from '@/domain/models/log/errorLog';
 import { IAddErrorLogRepository } from '@/domain/repository/log/errorLog';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
-import ErrorLogModel from '@/infra/db/model/log/errorLogModel';
+import ErrorLogModel from '@/infra/db/model/log/errorLog';
 
 export class ErrorLogRepository implements IAddErrorLogRepository {
     constructor(private readonly idGenerator: IIdGenerator) {}

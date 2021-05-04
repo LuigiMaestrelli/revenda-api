@@ -7,7 +7,7 @@ type SutTypes = {
     idGeneratorStub: IIdGenerator;
 };
 
-jest.mock('@/infra/db/model/log/errorLogModel', () => ({
+jest.mock('@/infra/db/model/log/errorLog', () => ({
     async create(data: ErrorLogAttributes): Promise<ErrorLogAttributes> {
         return data;
     }
