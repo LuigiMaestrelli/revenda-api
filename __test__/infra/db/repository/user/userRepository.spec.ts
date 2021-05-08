@@ -21,12 +21,19 @@ jest.mock('@/infra/db/model/user/user', () => ({
         };
     },
 
-    async findByPk(): Promise<UserAttributes> {
+    async findByPk(): Promise<UserAttributes | any> {
         return {
             id: 'valid uuid',
             email: 'valid e-mail',
             name: 'valid name',
-            password: 'valid password'
+            password: 'valid password',
+
+            update: (data: any) => {
+                return {
+                    id: 'valid uuid',
+                    ...data
+                };
+            }
         };
     }
 }));
@@ -115,6 +122,18 @@ describe('User Repository', () => {
 
             expect(user).toBeTruthy();
             expect(user?.id).toEqual('valid uuid');
+        });
+    });
+
+    describe('Update user by id', () => {
+        test('should update user by id and return', async () => {
+            const { sut } = makeSut();
+
+            const user = await sut.update('valid id', { name: 'valid new name' });
+
+            expect(user).toBeTruthy();
+            expect(user?.id).toEqual('valid uuid');
+            expect(user?.name).toEqual('valid new name');
         });
     });
 });

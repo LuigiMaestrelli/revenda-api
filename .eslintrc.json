@@ -5,8 +5,8 @@
     },
     "rules": {
         "semi": "off",
-        "indent": ["error", 4],
-        "@typescript-eslint/indent": ["error", 4],
+        "indent": "off",
+        "@typescript-eslint/indent": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",
         "@typescript-eslint/semi": ["error", "always"],
         "@typescript-eslint/space-before-function-paren": "off",

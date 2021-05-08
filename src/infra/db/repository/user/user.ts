@@ -1,9 +1,16 @@
-import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
-import { IAddUserRepository, IFindUserByEmailRepository, IFindUserByIdRepository } from '@/domain/repository/user/user';
+import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
+import {
+    IAddUserRepository,
+    IFindUserByEmailRepository,
+    IFindUserByIdRepository,
+    IUpdateUserRepository
+} from '@/domain/repository/user/user';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import UserModel from '@/infra/db/model/user/user';
+import { NotFoundError } from '@/shared/errors/notFoundError';
 
-export class UserRepository implements IAddUserRepository, IFindUserByEmailRepository, IFindUserByIdRepository {
+export class UserRepository
+    implements IAddUserRepository, IFindUserByEmailRepository, IFindUserByIdRepository, IUpdateUserRepository {
     constructor(private readonly idGenerator: IIdGenerator) {}
 
     async add(userData: CreateUserAttributes): Promise<UserAttributes> {
@@ -21,5 +28,14 @@ export class UserRepository implements IAddUserRepository, IFindUserByEmailRepos
 
     async findById(id: string): Promise<UserAttributes> {
         return await UserModel.findByPk(id);
+    }
+
+    async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
+        const item = await UserModel.findByPk(id);
+        if (!item) {
+            throw new NotFoundError('Data not found');
+        }
+
+        return await item.update(userData);
     }
 }

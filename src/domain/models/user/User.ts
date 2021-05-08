@@ -20,3 +20,7 @@ export interface UserWithAuthAttributes {
     user: UserAttributes;
     auth: AuthenticationResult;
 }
+
+export type UpdateUserAttributes = {
+    name: string;
+};

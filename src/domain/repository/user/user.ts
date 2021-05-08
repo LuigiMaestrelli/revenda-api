@@ -1,4 +1,4 @@
-import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
+import { CreateUserAttributes, UserAttributes, UpdateUserAttributes } from '@/domain/models/user/user';
 
 export interface IAddUserRepository {
     add: (userData: CreateUserAttributes) => Promise<UserAttributes>;
@@ -10,4 +10,8 @@ export interface IFindUserByEmailRepository {
 
 export interface IFindUserByIdRepository {
     findById: (id: string) => Promise<UserAttributes>;
+}
+
+export interface IUpdateUserRepository {
+    update: (id: string, userData: UpdateUserAttributes) => Promise<UserAttributes>;
 }
