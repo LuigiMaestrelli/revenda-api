@@ -35,7 +35,7 @@ export function makeServerErrorResponse(error: ServerError): HttpResponseError {
         body: {
             message: error.message,
             parentMessage: error.parentError?.message,
-            details: error.parentError ? error.parentError.stack : error.stack
+            details: error.parentError?.stack ?? error.stack
         }
     };
 }

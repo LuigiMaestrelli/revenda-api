@@ -31,6 +31,12 @@ describe('Http Helper', () => {
         expect(response.body.message).toBe('The message');
     });
 
+    test('should return statusCode 401 on unauthorized response', () => {
+        const response = makeUnauthorizedResponse(new Error('Message'));
+        expect(response.statusCode).toBe(401);
+        expect(response.body.message).toBe('Message');
+    });
+
     test('should return statusCode 404 on not found', () => {
         const response = makeNotFoundResponse(new Error('The message'));
         expect(response.statusCode).toBe(404);
@@ -41,18 +47,14 @@ describe('Http Helper', () => {
         const response = makeServerErrorResponse(new ServerError('Message'));
         expect(response.statusCode).toBe(500);
         expect(response.body.message).toBe('Message');
-    });
-
-    test('should return statusCode 401 on unauthorized response', () => {
-        const response = makeUnauthorizedResponse(new Error('Message'));
-        expect(response.statusCode).toBe(401);
-        expect(response.body.message).toBe('Message');
+        expect(response.body.details).toBeTruthy();
     });
 
     test('should return the correct detailed message on server error', () => {
         const response = makeServerErrorResponse(new ServerError('Message', new Error('The inner message')));
         expect(response.body.message).toBe('Message');
         expect(response.body.parentMessage).toBe('The inner message');
+        expect(response.body.details).toBeTruthy();
     });
 
     test('should return statusCode 400 on generic InvalidParamError with makeErrorResponse', () => {
@@ -73,6 +75,12 @@ describe('Http Helper', () => {
         expect(response.body.message).toBe('Unauthorized: Message');
     });
 
+    test('should return statusCode 404 on generic NotFoundError with makeErrorResponse', () => {
+        const response = makeErrorResponse(new NotFoundError('Message'));
+        expect(response.statusCode).toBe(404);
+        expect(response.body.message).toBe('Not found: Message');
+    });
+
     test('should return statusCode 500 on generic Error with makeErrorResponse', () => {
         const response = makeErrorResponse(new Error('Message'));
         expect(response.statusCode).toBe(500);
@@ -80,14 +88,8 @@ describe('Http Helper', () => {
     });
 
     test('should return statusCode 500 on ServerError with makeErrorResponse', () => {
-        const response = makeErrorResponse(new ServerError('Message'));
+        const response = makeErrorResponse(new ServerError('Message', new Error('Test error')));
         expect(response.statusCode).toBe(500);
         expect(response.body.message).toBe('Message');
-    });
-
-    test('should return statusCode 404 on generic NotFoundError with makeErrorResponse', () => {
-        const response = makeErrorResponse(new NotFoundError('Message'));
-        expect(response.statusCode).toBe(404);
-        expect(response.body.message).toBe('Not found: Message');
     });
 });
