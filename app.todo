@@ -2,8 +2,9 @@
     [x] criar
     [x] autenticar
     [x] recuperar por id
-    [] editar
+    [x] editar
     [] inativar
+    [] ativar
 
 - Login
     [] Log de acessos

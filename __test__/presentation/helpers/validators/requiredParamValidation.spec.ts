@@ -3,27 +3,27 @@ import { RequiredParamValidation } from '@/presentation/helpers/validators/requi
 
 describe('RequiredParam Validation', () => {
     test('should throw a MissingParamError if validation fails', async () => {
-        const sut = new RequiredParamValidation('someParam');
-
         const httpRequest = {
             params: {
                 otherParam: 1
-            }
+            },
+            body: {}
         };
 
+        const sut = new RequiredParamValidation('someParam');
         const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).rejects.toThrow(new MissingParamError('someParam'));
     });
 
     test('should not throw if validation succeeds', async () => {
-        const sut = new RequiredParamValidation('someParam');
-
         const httpRequest = {
             params: {
                 someParam: 1
-            }
+            },
+            body: {}
         };
 
+        const sut = new RequiredParamValidation('someParam');
         const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).resolves.not.toThrow();
     });

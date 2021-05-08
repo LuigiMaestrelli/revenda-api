@@ -33,6 +33,23 @@ describe('Authentication Middleware', () => {
         expect(response.status).toBe(401);
     });
 
+    test('should return 401 if invalid token bearer type is provided', async () => {
+        const middleware = makeAuthenticationMiddleware();
+
+        app.post('/testAuthenticationTokenInvalidBearer', middleware, (req, res) => {
+            res.send(req.body);
+        });
+
+        const token = 'Basic aosidjas09dajsd09ajsd09asjd0a9sjd';
+
+        const response = await request(app)
+            .post('/testAuthenticationTokenInvalidBearer')
+            .set('Authorization', token)
+            .send({});
+
+        expect(response.status).toBe(401);
+    });
+
     test('should return 401 if invalid token is provided', async () => {
         const middleware = makeAuthenticationMiddleware();
 
