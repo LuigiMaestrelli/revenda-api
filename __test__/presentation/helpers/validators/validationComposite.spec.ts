@@ -32,11 +32,13 @@ describe('Validation Composite', () => {
             throw new MissingParamError('someField');
         });
 
-        const input = {
-            field: 'any value'
+        const httpRequest = {
+            body: {
+                field: 'any value'
+            }
         };
 
-        const validatorPromise = sut.validate(input);
+        const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).rejects.toThrow(new MissingParamError('someField'));
     });
 
@@ -49,21 +51,26 @@ describe('Validation Composite', () => {
             throw new MissingParamError('someField');
         });
 
-        const input = {
-            field: 'any value'
+        const httpRequest = {
+            body: {
+                field: 'any value'
+            }
         };
 
-        const validatorPromise = sut.validate(input);
+        const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).rejects.toThrow(new Error());
     });
 
     test('should not throw if validation succeeds', async () => {
         const { sut } = makeSut();
-        const input = {
-            field: 'any value'
+
+        const httpRequest = {
+            body: {
+                field: 'any value'
+            }
         };
 
-        const validatorPromise = sut.validate(input);
+        const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).resolves.not.toThrow();
     });
 });

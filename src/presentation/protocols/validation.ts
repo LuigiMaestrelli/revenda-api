@@ -1,3 +1,5 @@
+import { HttpRequest } from './http';
+
 export interface IValidation {
-    validate: (input: any) => Promise<void>;
+    validate: (httpRequest: HttpRequest) => Promise<void>;
 }

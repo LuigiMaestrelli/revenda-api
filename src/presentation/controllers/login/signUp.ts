@@ -7,10 +7,9 @@ export class SignUpController implements IController {
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {
+            await this.validation.validate(httpRequest);
+
             const { body } = httpRequest;
-
-            await this.validation.validate(body);
-
             const user = await this.addUserUseCase.add({
                 name: body.name,
                 email: body.email,

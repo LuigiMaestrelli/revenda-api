@@ -1,26 +1,26 @@
 import { MissingParamError } from '@/shared/errors';
-import { RequiredFieldValidation } from '@/presentation/helpers/validators/requiredFieldValidation';
+import { RequiredParamValidation } from '@/presentation/helpers/validators/requiredParamValidation';
 
-describe('RequiredField Validation', () => {
+describe('RequiredParam Validation', () => {
     test('should throw a MissingParamError if validation fails', async () => {
-        const sut = new RequiredFieldValidation('someField');
+        const sut = new RequiredParamValidation('someParam');
 
         const httpRequest = {
-            body: {
-                otherField: 'any data'
+            params: {
+                otherParam: 1
             }
         };
 
         const validatorPromise = sut.validate(httpRequest);
-        await expect(validatorPromise).rejects.toThrow(new MissingParamError('someField'));
+        await expect(validatorPromise).rejects.toThrow(new MissingParamError('someParam'));
     });
 
     test('should not throw if validation succeeds', async () => {
-        const sut = new RequiredFieldValidation('someField');
+        const sut = new RequiredParamValidation('someParam');
 
         const httpRequest = {
-            body: {
-                someField: 'any data'
+            params: {
+                someParam: 1
             }
         };
 

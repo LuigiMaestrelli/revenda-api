@@ -7,10 +7,9 @@ export class SignInController implements IController {
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {
+            await this.validation.validate(httpRequest);
+
             const { body } = httpRequest;
-
-            await this.validation.validate(body);
-
             const authData = await this.generateAuth.auth(body);
 
             return makeSuccessResponse(authData);

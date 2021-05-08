@@ -45,7 +45,7 @@ const makeSut = (): SutTypes => {
 };
 
 describe('SignIn Controller', () => {
-    test('should call validation with correct valus', async () => {
+    test('should call validation with correct values', async () => {
         const { sut, validationStub } = makeSut();
         const validationSpy = jest.spyOn(validationStub, 'validate');
 
@@ -59,8 +59,10 @@ describe('SignIn Controller', () => {
         await sut.handle(httpRequest);
 
         expect(validationSpy).toBeCalledWith({
-            email: 'valid_email@email.com',
-            password: 'any password'
+            body: {
+                email: 'valid_email@email.com',
+                password: 'any password'
+            }
         });
     });
 

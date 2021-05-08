@@ -1,11 +1,11 @@
 import { MissingParamError } from '@/shared/errors';
-import { IValidation } from '@/presentation/protocols';
+import { HttpRequest, IValidation } from '@/presentation/protocols';
 
 export class RequiredFieldValidation implements IValidation {
     constructor(private readonly fieldName: string) {}
 
-    async validate(input: any): Promise<void> {
-        if (!input[this.fieldName]) {
+    async validate(httpRequest: HttpRequest): Promise<void> {
+        if (!httpRequest.body[this.fieldName]) {
             throw new MissingParamError(this.fieldName);
         }
     }

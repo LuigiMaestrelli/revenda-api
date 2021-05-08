@@ -32,11 +32,13 @@ describe('Email Validation', () => {
         const { sut, emailValidatorStub } = makeSut();
         const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid');
 
-        const input = {
-            email: 'any_email@teste.com.br'
+        const httpRequest = {
+            body: {
+                email: 'any_email@teste.com.br'
+            }
         };
 
-        await sut.validate(input);
+        await sut.validate(httpRequest);
         expect(isValidSpy).toHaveBeenCalledWith('any_email@teste.com.br');
     });
 
@@ -53,23 +55,27 @@ describe('Email Validation', () => {
         const { sut, emailValidatorStub } = makeSut();
         jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false);
 
-        const input = {
-            email: 'any_email@teste.com.br'
+        const httpRequest = {
+            body: {
+                email: 'any_email@teste.com.br'
+            }
         };
 
-        const validatorPromise = sut.validate(input);
+        const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).rejects.toThrow(new InvalidParamError('email'));
     });
 
     test('should not throw if validation succeeds', async () => {
         const { sut } = makeSut();
 
-        const input = {
-            someField: 'any data',
-            otherField: 'any data'
+        const httpRequest = {
+            body: {
+                someField: 'any data',
+                otherField: 'any data'
+            }
         };
 
-        const validatorPromise = sut.validate(input);
+        const validatorPromise = sut.validate(httpRequest);
         await expect(validatorPromise).resolves.not.toThrow();
     });
 });

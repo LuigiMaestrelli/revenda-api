@@ -1,13 +1,13 @@
-import { GetUserByIdController } from '@/presentation/controllers/user/getUserById';
-import { IFindUserByIdRepository } from '@/domain/repository/user/user';
-import { UserAttributes } from '@/domain/models/user/user';
+import { UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
+import { IUpdateUser } from '@/domain/usecases/user/user';
+import { UpdateUserController } from '@/presentation/controllers/user/updateUser';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
-    sut: GetUserByIdController;
+    sut: UpdateUserController;
     validationStub: IValidation;
-    findUserByIdRepositoryStub: IFindUserByIdRepository;
+    updateUserStub: IUpdateUser;
 };
 
 const makeValidation = (): IValidation => {
@@ -18,34 +18,34 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
-const makeFindUserByIdRepository = (): IFindUserByIdRepository => {
-    class FindUserByIdRepositoryStub implements IFindUserByIdRepository {
-        async findById(id: string): Promise<UserAttributes> {
+const makeUpdateUser = (): IUpdateUser => {
+    class UpdateUserStub implements IUpdateUser {
+        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
             return {
                 id: id,
-                name: 'valid name',
                 email: 'valid email',
-                password: 'valid password'
+                password: 'hashed password',
+                ...userData
             };
         }
     }
 
-    return new FindUserByIdRepositoryStub();
+    return new UpdateUserStub();
 };
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const findUserByIdRepositoryStub = makeFindUserByIdRepository();
-    const sut = new GetUserByIdController(validationStub, findUserByIdRepositoryStub);
+    const updateUserStub = makeUpdateUser();
+    const sut = new UpdateUserController(validationStub, updateUserStub);
 
     return {
         sut,
-        findUserByIdRepositoryStub,
-        validationStub
+        validationStub,
+        updateUserStub
     };
 };
 
-describe('GetUserById Controller', () => {
+describe('UpdateUser Controller', () => {
     test('should call validation with correct values', async () => {
         const { sut, validationStub } = makeSut();
 
@@ -54,6 +54,9 @@ describe('GetUserById Controller', () => {
         const httpRequest = {
             params: {
                 id: 'valid id'
+            },
+            body: {
+                name: 'new name'
             }
         };
 
@@ -62,6 +65,9 @@ describe('GetUserById Controller', () => {
         expect(validationSpy).toBeCalledWith({
             params: {
                 id: 'valid id'
+            },
+            body: {
+                name: 'new name'
             }
         });
     });
@@ -76,6 +82,9 @@ describe('GetUserById Controller', () => {
         const httpRequest = {
             params: {
                 id: 'valid id'
+            },
+            body: {
+                name: 'invalid name'
             }
         };
 
@@ -84,64 +93,60 @@ describe('GetUserById Controller', () => {
         expect(httpResponse.body.message).toBe('Missing param: Test throw');
     });
 
-    test('should return 200 and valid user data', async () => {
+    test('should return 200 if valid data is sent', async () => {
         const { sut } = makeSut();
 
         const httpRequest = {
             params: {
-                id: 'xxxx-xxxx-xxxx'
+                id: 'valid id'
+            },
+            body: {
+                name: 'valid name'
             }
         };
 
         const httpResponse = await sut.handle(httpRequest);
         expect(httpResponse.statusCode).toBe(200);
-        expect(httpResponse.body.id).toBe('xxxx-xxxx-xxxx');
     });
 
-    test('should call FindUserById with correct value', async () => {
-        const { sut, findUserByIdRepositoryStub } = makeSut();
+    test('should call UpdateUser with correct values', async () => {
+        const { sut, updateUserStub } = makeSut();
 
-        const addSpy = jest.spyOn(findUserByIdRepositoryStub, 'findById');
+        const updateSpy = jest.spyOn(updateUserStub, 'update');
 
         const httpRequest = {
             params: {
                 id: 'valid id'
+            },
+            body: {
+                name: 'new name'
             }
         };
 
         await sut.handle(httpRequest);
-        expect(addSpy).toBeCalledWith('valid id');
+        expect(updateSpy).toBeCalledWith('valid id', {
+            name: 'new name'
+        });
     });
 
-    test('should return 404 if no user whas found', async () => {
-        const { sut, findUserByIdRepositoryStub } = makeSut();
+    test('should return 500 if UpdateUser throws', async () => {
+        const { sut, updateUserStub } = makeSut();
 
-        jest.spyOn(findUserByIdRepositoryStub, 'findById').mockReturnValueOnce(null);
-
-        const httpRequest = {
-            params: {
-                id: 'valid id'
-            }
-        };
-
-        const response = await sut.handle(httpRequest);
-        expect(response.statusCode).toBe(404);
-    });
-
-    test('should return 500 if FindUserById throws', async () => {
-        const { sut, findUserByIdRepositoryStub } = makeSut();
-
-        jest.spyOn(findUserByIdRepositoryStub, 'findById').mockImplementationOnce(() => {
-            throw new Error('Test throw');
+        jest.spyOn(updateUserStub, 'update').mockImplementation(async () => {
+            return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 
         const httpRequest = {
             params: {
                 id: 'valid id'
+            },
+            body: {
+                name: 'any name'
             }
         };
 
-        const response = await sut.handle(httpRequest);
-        expect(response.statusCode).toBe(500);
+        const httpResponse = await sut.handle(httpRequest);
+        expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body.message).toBe('Test throw');
     });
 });

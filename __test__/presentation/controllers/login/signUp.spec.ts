@@ -2,6 +2,7 @@ import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { IValidation } from '@/presentation/protocols';
 import { IAddUser } from '@/domain/usecases/user/user';
 import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
+import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
     sut: SignUpController;
@@ -52,6 +53,52 @@ const makeSut = (): SutTypes => {
 };
 
 describe('SignUp Controller', () => {
+    test('should call validation with correct values', async () => {
+        const { sut, validationStub } = makeSut();
+        const validationSpy = jest.spyOn(validationStub, 'validate');
+
+        const httpRequest = {
+            body: {
+                name: 'Any name',
+                email: 'valid_email@email.com',
+                password: 'any password',
+                passwordConfirmation: 'any password'
+            }
+        };
+
+        await sut.handle(httpRequest);
+
+        expect(validationSpy).toBeCalledWith({
+            body: {
+                name: 'Any name',
+                email: 'valid_email@email.com',
+                password: 'any password',
+                passwordConfirmation: 'any password'
+            }
+        });
+    });
+
+    test('should return 400 if validation throws', async () => {
+        const { sut, validationStub } = makeSut();
+
+        jest.spyOn(validationStub, 'validate').mockImplementation(async () => {
+            return await new Promise((resolve, reject) => reject(new MissingParamError('Test throw')));
+        });
+
+        const httpRequest = {
+            body: {
+                name: 'Any name',
+                email: 'valid_email@email.com',
+                password: 'any password',
+                passwordConfirmation: 'any password'
+            }
+        };
+
+        const httpResponse = await sut.handle(httpRequest);
+        expect(httpResponse.statusCode).toBe(400);
+        expect(httpResponse.body.message).toBe('Missing param: Test throw');
+    });
+
     test('should return 200 if valid data is sent', async () => {
         const { sut } = makeSut();
 
