@@ -26,100 +26,108 @@ describe('User Repository', () => {
         await truncate();
     });
 
-    test('should create user', async () => {
-        const { sut } = makeSut();
+    describe('Create user', () => {
+        test('should create user', async () => {
+            const { sut } = makeSut();
 
-        const user = await sut.add({
-            email: faker.internet.email(),
-            name: faker.name.firstName(),
-            password: faker.internet.password()
+            const user = await sut.add({
+                email: faker.internet.email(),
+                name: faker.name.firstName(),
+                password: faker.internet.password()
+            });
+
+            expect(user.id).toBeTruthy();
         });
-
-        expect(user.id).toBeTruthy();
     });
 
-    test('should find user by e-mail', async () => {
-        const { sut, idGenerator } = makeSut();
+    describe('Find user by e-mail', () => {
+        test('should find user by e-mail', async () => {
+            const { sut, idGenerator } = makeSut();
 
-        const id = await idGenerator.generate();
-        const email = faker.internet.email();
+            const id = await idGenerator.generate();
+            const email = faker.internet.email();
 
-        await UserModel.create({
-            id: id,
-            email: email,
-            name: faker.name.firstName(),
-            password: faker.internet.password()
+            await UserModel.create({
+                id: id,
+                email: email,
+                name: faker.name.firstName(),
+                password: faker.internet.password()
+            });
+
+            const user = await sut.findUserByEmail(email);
+
+            expect(user?.id).toBe(id);
         });
 
-        const user = await sut.findUserByEmail(email);
+        test('should return null if no user was found with an e-mail', async () => {
+            const { sut } = makeSut();
 
-        expect(user?.id).toBe(id);
+            const email = faker.internet.email();
+            const user = await sut.findUserByEmail(email);
+
+            expect(user).toBeFalsy();
+        });
     });
 
-    test('should return null if no user was found with an e-mail', async () => {
-        const { sut } = makeSut();
+    describe('Find user by id', () => {
+        test('should find user by id', async () => {
+            const { sut, idGenerator } = makeSut();
 
-        const email = faker.internet.email();
-        const user = await sut.findUserByEmail(email);
+            const id = await idGenerator.generate();
+            await UserModel.create({
+                id: id,
+                email: faker.internet.email(),
+                name: faker.name.firstName(),
+                password: faker.internet.password()
+            });
 
-        expect(user).toBeFalsy();
-    });
+            const user = await sut.findById(id);
 
-    test('should find user by id', async () => {
-        const { sut, idGenerator } = makeSut();
-
-        const id = await idGenerator.generate();
-        await UserModel.create({
-            id: id,
-            email: faker.internet.email(),
-            name: faker.name.firstName(),
-            password: faker.internet.password()
+            expect(user?.id).toBe(id);
         });
 
-        const user = await sut.findById(id);
+        test('should return null if no user was found with id', async () => {
+            const { sut, idGenerator } = makeSut();
 
-        expect(user?.id).toBe(id);
+            const id = await idGenerator.generate();
+            const user = await sut.findById(id);
+
+            expect(user).toBeFalsy();
+        });
     });
 
-    test('should return null if no user was found with id', async () => {
-        const { sut, idGenerator } = makeSut();
+    describe('Update user', () => {
+        test('should update user', async () => {
+            const { sut, idGenerator } = makeSut();
 
-        const id = await idGenerator.generate();
-        const user = await sut.findById(id);
+            const id = await idGenerator.generate();
 
-        expect(user).toBeFalsy();
-    });
+            await UserModel.create({
+                id: id,
+                email: faker.internet.email(),
+                name: faker.name.firstName(),
+                password: faker.internet.password()
+            });
 
-    test('should find update user', async () => {
-        const { sut, idGenerator } = makeSut();
+            const user = await sut.update(id, {
+                name: 'new name'
+            });
 
-        const id = await idGenerator.generate();
+            const userFind = await sut.findById(id);
 
-        await UserModel.create({
-            id: id,
-            email: faker.internet.email(),
-            name: faker.name.firstName(),
-            password: faker.internet.password()
+            expect(user.name).toBe('new name');
+            expect(userFind.name).toBe('new name');
         });
 
-        const user = await sut.update(id, {
-            name: 'new name'
+        test('should throw if no user was found', async () => {
+            const { sut, idGenerator } = makeSut();
+
+            const id = await idGenerator.generate();
+            const updatePromise = sut.update(id, {
+                name: 'new name'
+            });
+
+            await expect(updatePromise).rejects.toThrow(new NotFoundError('Data not found'));
         });
-
-        const userFind = await sut.findById(id);
-
-        expect(user.name).toBe('new name');
-        expect(userFind.name).toBe('new name');
-    });
-
-    test('should throw if no user was found', async () => {
-        const { sut, idGenerator } = makeSut();
-
-        const id = await idGenerator.generate();
-        const updatePromise = sut.update(id, {
-            name: 'new name'
-        });
-
-        await expect(updatePromise).rejects.toThrow(new NotFoundError('Data not found'));
     });
 });
