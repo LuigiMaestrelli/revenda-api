@@ -61,4 +61,74 @@ describe('User Routes', () => {
             expect(response.status).toBe(401);
         });
     });
+
+    describe('PUT /user/id', () => {
+        test('should return 404 on put user/id with unknown id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const response = await request(app)
+                .put(`/api/user/${id}`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({
+                    name: 'new name'
+                });
+
+            expect(response.status).toBe(404);
+        });
+
+        test('should return 200 on put user/id with known id and valid data', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxxxxx'
+            });
+
+            const response = await request(app)
+                .put(`/api/user/${id}`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({
+                    name: 'new name'
+                });
+
+            expect(response.status).toBe(200);
+            expect(response.body.id).toBe(id);
+            expect(response.body.name).toBe('new name');
+        });
+
+        test('should return 500 on put user/id with invalid id', async () => {
+            const userData = await generateValidUserData();
+
+            const response = await request(app)
+                .put('/api/user/xxxxxx-xxxxx-xxxxx')
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({
+                    name: 'name'
+                });
+            expect(response.status).toBe(500);
+        });
+
+        test('should return 401 on get user/id without valid token', async () => {
+            const id = uuidv4();
+            const response = await request(app).get(`/api/user/${id}`).send();
+
+            expect(response.status).toBe(401);
+        });
+
+        test('should return 400 on put user/id with no name', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const response = await request(app)
+                .put(`/api/user/${id}`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({});
+
+            expect(response.status).toBe(400);
+        });
+    });
 });

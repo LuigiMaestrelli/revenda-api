@@ -149,4 +149,21 @@ describe('UpdateUser Controller', () => {
         expect(httpResponse.statusCode).toBe(500);
         expect(httpResponse.body.message).toBe('Test throw');
     });
+
+    test('should return updated user data', async () => {
+        const { sut } = makeSut();
+
+        const httpRequest = {
+            params: {
+                id: 'valid id'
+            },
+            body: {
+                name: 'valid name'
+            }
+        };
+
+        const httpResponse = await sut.handle(httpRequest);
+        expect(httpResponse.body.id).toBe('valid id');
+        expect(httpResponse.body.name).toBe('valid name');
+    });
 });

@@ -10,9 +10,9 @@ export class UpdateUserController implements IController {
             const { body, params } = httpRequest;
 
             await this.validation.validate(httpRequest);
-            await this.updateUser.update(params.id, body);
+            const user = await this.updateUser.update(params.id, body);
 
-            return makeSuccessResponse();
+            return makeSuccessResponse(user);
         } catch (ex) {
             return makeErrorResponse(ex);
         }
