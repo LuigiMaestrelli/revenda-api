@@ -1,12 +1,13 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { UserAttributes } from '@/domain/models/user/user';
+import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import BaseModel from '../infra/basemodel';
 
-export default class UserModel extends BaseModel<UserAttributes> implements UserAttributes {
+export default class UserModel extends BaseModel<UserAttributes, CreateUserAttributes> implements UserAttributes {
     public id!: string;
     public name!: string;
     public email!: string;
     public password!: string;
+    public active!: boolean;
 
     static initialize(sequelize: Sequelize): void {
         UserModel.init(
@@ -26,6 +27,11 @@ export default class UserModel extends BaseModel<UserAttributes> implements User
                 password: {
                     type: new DataTypes.STRING(128),
                     allowNull: false
+                },
+                active: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false,
+                    defaultValue: true
                 },
                 createdAt: {
                     type: DataTypes.DATE,

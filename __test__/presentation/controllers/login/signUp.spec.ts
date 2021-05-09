@@ -26,7 +26,8 @@ const makeAddUserUseCase = (): IAddUser => {
                     id: 'valid_id',
                     name: 'valid name',
                     email: 'valid_email@email.com',
-                    password: 'hashed password'
+                    password: 'hashed password',
+                    active: true
                 },
                 auth: {
                     token: 'valid token',
@@ -134,7 +135,8 @@ describe('SignUp Controller', () => {
                 id: 'valid_id',
                 name: 'valid name',
                 email: 'valid_email@email.com',
-                password: 'hashed password'
+                password: 'hashed password',
+                active: true
             },
             auth: {
                 token: 'valid token',

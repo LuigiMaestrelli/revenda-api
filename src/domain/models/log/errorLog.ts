@@ -9,6 +9,7 @@ export interface ErrorLogAttributes {
 }
 
 export interface CreateErrorLogAttributes {
+    id?: string;
     location: string;
     message: string;
     stack: string;

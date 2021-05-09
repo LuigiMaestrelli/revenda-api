@@ -17,7 +17,8 @@ jest.mock('@/infra/db/model/user/user', () => ({
             id: 'valid uuid',
             email: 'valid e-mail',
             name: 'valid name',
-            password: 'valid password'
+            password: 'valid password',
+            active: true
         };
     },
 

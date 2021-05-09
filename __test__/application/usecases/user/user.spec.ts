@@ -40,7 +40,8 @@ const makeAddUserRepository = (): IAddUserRepository => {
                 id: 'valid id',
                 email: 'valid e-mail',
                 name: 'valid name',
-                password: 'hashed password'
+                password: 'hashed password',
+                active: true
             };
         }
     }
@@ -79,6 +80,7 @@ const makeUpdateUserRepository = (): IUpdateUserRepository => {
                 id: id,
                 email: 'valid e-mail',
                 password: 'hashed password',
+                active: true,
                 ...userData
             };
         }
@@ -164,7 +166,8 @@ describe('User UseCase', () => {
                     id: 'valid id',
                     name: 'valid name',
                     email: 'valid e-mail',
-                    password: 'hashed password'
+                    password: 'hashed password',
+                    active: true
                 },
                 auth: {
                     token: 'valid token',
@@ -219,7 +222,8 @@ describe('User UseCase', () => {
                         id: 'valid id',
                         email: 'valid e-mail',
                         name: 'valid name',
-                        password: 'hashed password'
+                        password: 'hashed password',
+                        active: true
                     })
                 );
             });
@@ -282,7 +286,8 @@ describe('User UseCase', () => {
                 id: 'valid id',
                 name: 'new name',
                 email: 'valid e-mail',
-                password: 'hashed password'
+                password: 'hashed password',
+                active: true
             });
         });
 

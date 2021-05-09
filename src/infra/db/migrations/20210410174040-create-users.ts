@@ -20,6 +20,11 @@ export default {
                 type: Sequelize.STRING(128),
                 allowNull: false
             },
+            active: {
+                type: Sequelize.BOOLEAN,
+                allowNull: false,
+                defaultValue: true
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 allowNull: false

@@ -44,7 +44,8 @@ const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
                 id: 'valid id',
                 email: 'valid email',
                 name: 'valid name',
-                password: 'password hash'
+                password: 'password hash',
+                active: true
             };
         }
     }

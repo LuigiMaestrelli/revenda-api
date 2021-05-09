@@ -25,6 +25,7 @@ const makeUpdateUser = (): IUpdateUser => {
                 id: id,
                 email: 'valid email',
                 password: 'hashed password',
+                active: true,
                 ...userData
             };
         }

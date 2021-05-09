@@ -25,7 +25,8 @@ const makeFindUserByIdRepository = (): IFindUserByIdRepository => {
                 id: id,
                 name: 'valid name',
                 email: 'valid email',
-                password: 'valid password'
+                password: 'valid password',
+                active: true
             };
         }
     }

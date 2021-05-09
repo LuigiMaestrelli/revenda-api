@@ -5,12 +5,14 @@ export interface UserAttributes {
     name: string;
     email: string;
     password: string;
+    active: boolean;
 
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export type CreateUserAttributes = {
+    id?: string;
     name: string;
     email: string;
     password: string;

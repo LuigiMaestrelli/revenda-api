@@ -1,8 +1,10 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { ErrorLogAttributes } from '@/domain/models/log/errorLog';
+import { ErrorLogAttributes, CreateErrorLogAttributes } from '@/domain/models/log/errorLog';
 import BaseModel from '../infra/basemodel';
 
-export default class ErrorLogModel extends BaseModel<ErrorLogAttributes> implements ErrorLogAttributes {
+export default class ErrorLogModel
+    extends BaseModel<ErrorLogAttributes, CreateErrorLogAttributes>
+    implements ErrorLogAttributes {
     public id!: string;
     public location!: string;
     public message!: string;
