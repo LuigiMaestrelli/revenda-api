@@ -1,4 +1,4 @@
-import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
+import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { SignInController } from '@/presentation/controllers/login/signIn';
 import { IValidation } from '@/presentation/protocols';
@@ -20,7 +20,7 @@ const makeValidation = (): IValidation => {
 
 const makeGenerateAuth = (): IGenerateAuthentication => {
     class GenerateAuthenticationStub implements IGenerateAuthentication {
-        async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
+        async auth(autentication: AuthenticationAttributes): Promise<AuthenticationResult> {
             return {
                 token: 'valid token',
                 refreshToken: 'valid refreshtoken',

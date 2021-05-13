@@ -8,7 +8,7 @@ export type AuthenticationResult = {
     expiresIn: number;
 };
 
-export interface AutenticationAttributes {
+export interface AuthenticationAttributes {
     email: string;
     password: string;
 }

@@ -4,7 +4,7 @@ import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/do
 import { IAddUserRepository, IFindUserByEmailRepository, IUpdateUserRepository } from '@/domain/repository/user/user';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
-import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
+import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 
 type SutTypes = {
     hasherStub: IHasher;
@@ -61,7 +61,7 @@ const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
 
 const makeGerenerateAuthentication = (): IGenerateAuthentication => {
     class GerenerateAuthenticationStub implements IGenerateAuthentication {
-        async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
+        async auth(autentication: AuthenticationAttributes): Promise<AuthenticationResult> {
             return {
                 token: 'valid token',
                 refreshToken: 'valid refreshtoken',

@@ -1,4 +1,4 @@
-import { AutenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
+import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { IHashCompare } from '@/infra/protocols/cryptography';
@@ -12,7 +12,7 @@ export class AuthenticationUseCase implements IGenerateAuthentication {
         private readonly findUserByEmailRepository: IFindUserByEmailRepository
     ) {}
 
-    async auth(autentication: AutenticationAttributes): Promise<AuthenticationResult> {
+    async auth(autentication: AuthenticationAttributes): Promise<AuthenticationResult> {
         const user = await this.findUserByEmailRepository.findUserByEmail(autentication.email);
         if (!user) {
             throw new UnauthorizedError('Invalid e-mail or password');
