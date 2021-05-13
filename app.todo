@@ -5,6 +5,10 @@
     [x] editar
     [] inativar
     [] ativar
+    [] alterar senha
+    [] validar campos no modelo
 
 - Login
     [] Log de acessos
+
+[] testes para o UUID Generator

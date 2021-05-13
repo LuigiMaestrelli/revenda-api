@@ -97,16 +97,30 @@ describe('User Repository', () => {
     });
 
     describe('Update user', () => {
-        test('should update user', async () => {
+        test('should throw if no user was found', async () => {
             const { sut, idGenerator } = makeSut();
 
             const id = await idGenerator.generate();
+            const updatePromise = sut.update(id, {
+                name: 'new name'
+            });
+
+            await expect(updatePromise).rejects.toThrow(new NotFoundError('Data not found'));
+        });
+
+        test('should update only the user`s name', async () => {
+            const { sut, idGenerator } = makeSut();
+
+            const id = await idGenerator.generate();
+            const email = faker.internet.email();
+            const name = faker.name.firstName();
+            const password = faker.internet.password();
 
             await UserModel.create({
-                id: id,
-                email: faker.internet.email(),
-                name: faker.name.firstName(),
-                password: faker.internet.password()
+                id,
+                email,
+                name,
+                password
             });
 
             const user = await sut.update(id, {
@@ -117,17 +131,65 @@ describe('User Repository', () => {
 
             expect(user.name).toBe('new name');
             expect(userFind.name).toBe('new name');
+            expect(userFind.email).toBe(email);
+            expect(userFind.password).toBe(password);
+            expect(userFind.active).toBe(true);
         });
 
-        test('should throw if no user was found', async () => {
+        test('should update only the user`s password', async () => {
             const { sut, idGenerator } = makeSut();
 
             const id = await idGenerator.generate();
-            const updatePromise = sut.update(id, {
-                name: 'new name'
+            const email = faker.internet.email();
+            const name = faker.name.firstName();
+            const password = faker.internet.password();
+
+            await UserModel.create({
+                id,
+                email,
+                name,
+                password
             });
 
-            await expect(updatePromise).rejects.toThrow(new NotFoundError('Data not found'));
+            const user = await sut.update(id, {
+                password: 'new password'
+            });
+
+            const userFind = await sut.findById(id);
+
+            expect(user.password).toBe('new password');
+            expect(userFind.password).toBe('new password');
+            expect(userFind.name).toBe(name);
+            expect(userFind.email).toBe(email);
+            expect(userFind.active).toBe(true);
+        });
+
+        test('should update only the user`s active', async () => {
+            const { sut, idGenerator } = makeSut();
+
+            const id = await idGenerator.generate();
+            const email = faker.internet.email();
+            const name = faker.name.firstName();
+            const password = faker.internet.password();
+
+            await UserModel.create({
+                id,
+                email,
+                name,
+                password
+            });
+
+            const user = await sut.update(id, {
+                active: false
+            });
+
+            const userFind = await sut.findById(id);
+
+            expect(user.active).toBe(false);
+            expect(userFind.active).toBe(false);
+            expect(userFind.name).toBe(name);
+            expect(userFind.email).toBe(email);
+            expect(userFind.password).toBe(password);
         });
     });
 });

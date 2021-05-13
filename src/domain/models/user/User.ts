@@ -18,11 +18,13 @@ export type CreateUserAttributes = {
     password: string;
 };
 
+export type UpdateUserAttributes = {
+    name?: string;
+    active?: boolean;
+    password?: string;
+};
+
 export interface UserWithAuthAttributes {
     user: UserAttributes;
     auth: AuthenticationResult;
 }
-
-export type UpdateUserAttributes = {
-    name: string;
-};

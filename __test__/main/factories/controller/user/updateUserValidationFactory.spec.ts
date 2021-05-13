@@ -1,9 +1,5 @@
 import { makeUpdateUserValidation } from '@/main/factories/controller/user/updateUserValidationFactory';
-import {
-    ValidationComposite,
-    RequiredParamValidation,
-    RequiredFieldValidation
-} from '@/presentation/helpers/validators';
+import { ValidationComposite, RequiredParamValidation } from '@/presentation/helpers/validators';
 import { IValidation } from '@/presentation/protocols';
 
 jest.mock('@/presentation/helpers/validators/validationComposite');
@@ -14,7 +10,6 @@ describe('UpdateUserValidation Factory', () => {
 
         const validations: IValidation[] = [];
         validations.push(new RequiredParamValidation('id'));
-        validations.push(new RequiredFieldValidation('name'));
 
         expect(ValidationComposite).toHaveBeenCalledWith(validations);
     });

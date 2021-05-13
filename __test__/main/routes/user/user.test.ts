@@ -119,16 +119,53 @@ describe('User Routes', () => {
             expect(response.status).toBe(401);
         });
 
-        test('should return 400 on put user/id with no name', async () => {
+        test('should not update password on PUT user/id', async () => {
             const userData = await generateValidUserData();
             const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxxxxx'
+            });
 
             const response = await request(app)
                 .put(`/api/user/${id}`)
                 .set('authorization', `Bearer ${userData.auth.token}`)
-                .send({});
+                .send({
+                    password: 'new password'
+                });
 
-            expect(response.status).toBe(400);
+            const updatedUser = await UserModel.findByPk(id);
+
+            expect(response.status).toBe(200);
+            expect(updatedUser.password).toBe('xxxxxxxx');
+        });
+
+        test('should not update email on PUT user/id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+            const email = faker.internet.email();
+
+            await UserModel.create({
+                id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email,
+                password: 'xxxxxxxx'
+            });
+
+            const response = await request(app)
+                .put(`/api/user/${id}`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({
+                    email: 'new email'
+                });
+
+            const updatedUser = await UserModel.findByPk(id);
+
+            expect(response.status).toBe(200);
+            expect(updatedUser.email).toBe(email);
         });
     });
 });

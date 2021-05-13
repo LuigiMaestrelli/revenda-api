@@ -2,12 +2,14 @@ import { UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user'
 import { IUpdateUser } from '@/domain/usecases/user/user';
 import { UpdateUserController } from '@/presentation/controllers/user/updateUser';
 import { IValidation } from '@/presentation/protocols';
+import { IObjectManipulation } from '@/infra/protocols/objectManipulation';
 import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
     sut: UpdateUserController;
     validationStub: IValidation;
     updateUserStub: IUpdateUser;
+    objectManipulationSub: IObjectManipulation;
 };
 
 const makeValidation = (): IValidation => {
@@ -18,11 +20,23 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
+const makeObjectManipulation = (): IObjectManipulation => {
+    class ObjectManipulationSub implements IObjectManipulation {
+        filterAllowedProps(object: any, allowedProps: string[]): any {
+            delete object.password;
+            return object;
+        }
+    }
+
+    return new ObjectManipulationSub();
+};
+
 const makeUpdateUser = (): IUpdateUser => {
     class UpdateUserStub implements IUpdateUser {
         async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
             return {
                 id: id,
+                name: 'valid name',
                 email: 'valid email',
                 password: 'hashed password',
                 active: true,
@@ -37,12 +51,14 @@ const makeUpdateUser = (): IUpdateUser => {
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
     const updateUserStub = makeUpdateUser();
-    const sut = new UpdateUserController(validationStub, updateUserStub);
+    const objectManipulationSub = makeObjectManipulation();
+    const sut = new UpdateUserController(validationStub, objectManipulationSub, updateUserStub);
 
     return {
         sut,
         validationStub,
-        updateUserStub
+        updateUserStub,
+        objectManipulationSub
     };
 };
 
@@ -166,5 +182,71 @@ describe('UpdateUser Controller', () => {
         const httpResponse = await sut.handle(httpRequest);
         expect(httpResponse.body.id).toBe('valid id');
         expect(httpResponse.body.name).toBe('valid name');
+    });
+
+    test('should call ObjectManipulation with correct values', async () => {
+        const { sut, objectManipulationSub } = makeSut();
+
+        const filterAllowedPropsSpy = jest.spyOn(objectManipulationSub, 'filterAllowedProps');
+
+        const httpRequest = {
+            params: {
+                id: 'valid id'
+            },
+            body: {
+                name: 'new name'
+            }
+        };
+
+        await sut.handle(httpRequest);
+
+        expect(filterAllowedPropsSpy).toBeCalledWith(
+            {
+                name: 'new name'
+            },
+            ['name']
+        );
+    });
+
+    test('should return 500 if ObjectManipulation throws', async () => {
+        const { sut, objectManipulationSub } = makeSut();
+
+        jest.spyOn(objectManipulationSub, 'filterAllowedProps').mockImplementation(() => {
+            throw new Error('Test throw');
+        });
+
+        const httpRequest = {
+            params: {
+                id: 'valid id'
+            },
+            body: {
+                name: 'invalid name'
+            }
+        };
+
+        const httpResponse = await sut.handle(httpRequest);
+        expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body.message).toBe('Test throw');
+    });
+
+    test('should call UpdateUser with filtered body properties', async () => {
+        const { sut, updateUserStub } = makeSut();
+
+        const updateSpy = jest.spyOn(updateUserStub, 'update');
+
+        const httpRequest = {
+            params: {
+                id: 'valid id'
+            },
+            body: {
+                name: 'new name',
+                password: 'xxxx'
+            }
+        };
+
+        await sut.handle(httpRequest);
+        expect(updateSpy).toBeCalledWith('valid id', {
+            name: 'new name'
+        });
     });
 });

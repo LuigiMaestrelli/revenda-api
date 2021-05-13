@@ -76,11 +76,16 @@ const makeGerenerateAuthentication = (): IGenerateAuthentication => {
 const makeUpdateUserRepository = (): IUpdateUserRepository => {
     class UpdateUserRepositoryStub implements IUpdateUserRepository {
         async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            return {
+            const currentData = {
                 id: id,
                 email: 'valid e-mail',
                 password: 'hashed password',
                 active: true,
+                name: 'valid name'
+            };
+
+            return {
+                ...currentData,
                 ...userData
             };
         }
@@ -276,7 +281,20 @@ describe('User UseCase', () => {
             });
         });
 
-        test('should return updated user data', async () => {
+        test('should throw if UpdateUserRepository throws', async () => {
+            const { sut, updateUserRepositoryStub } = makeSut();
+            const userData = { name: 'new name' };
+
+            jest.spyOn(updateUserRepositoryStub, 'update').mockImplementationOnce(() => {
+                throw new Error('Test throw');
+            });
+
+            const updatePromise = sut.update('valid id', userData);
+
+            await expect(updatePromise).rejects.toThrow(new Error('Test throw'));
+        });
+
+        test('should return updated user data when sending a new name', async () => {
             const { sut } = makeSut();
             const userData = { name: 'new name' };
 
@@ -291,17 +309,34 @@ describe('User UseCase', () => {
             });
         });
 
-        test('should throw if UpdateUserRepository throws', async () => {
-            const { sut, updateUserRepositoryStub } = makeSut();
-            const userData = { name: 'new name' };
+        test('should return updated user data when sending a new password', async () => {
+            const { sut } = makeSut();
+            const userData = { password: 'new password' };
 
-            jest.spyOn(updateUserRepositoryStub, 'update').mockImplementationOnce(() => {
-                throw new Error('Test throw');
+            const user = await sut.update('valid id', userData);
+
+            expect(user).toEqual({
+                id: 'valid id',
+                name: 'valid name',
+                email: 'valid e-mail',
+                password: 'new password',
+                active: true
             });
+        });
 
-            const updatePromise = sut.update('valid id', userData);
+        test('should return updated user data when sending active', async () => {
+            const { sut } = makeSut();
+            const userData = { active: false };
 
-            await expect(updatePromise).rejects.toThrow(new Error('Test throw'));
+            const user = await sut.update('valid id', userData);
+
+            expect(user).toEqual({
+                id: 'valid id',
+                name: 'valid name',
+                email: 'valid e-mail',
+                password: 'hashed password',
+                active: false
+            });
         });
     });
 });
