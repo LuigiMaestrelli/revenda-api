@@ -8,5 +8,5 @@ export const makeUserUseCase = (): UserUseCase => {
     const userRepository = makeUserRepository();
     const authenticationUseCase = makeAuthenticationUseCase();
 
-    return new UserUseCase(hasher, userRepository, userRepository, authenticationUseCase, userRepository);
+    return new UserUseCase(hasher, userRepository, authenticationUseCase);
 };

@@ -1,5 +1,5 @@
 import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
-import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
+import { IUserRepository } from '@/domain/repository/user/user';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { IHashCompare } from '@/infra/protocols/cryptography';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
@@ -9,11 +9,11 @@ export class AuthenticationUseCase implements IGenerateAuthentication {
     constructor(
         private readonly tokenSigner: ITokenSigner,
         private readonly hasherCompare: IHashCompare,
-        private readonly findUserByEmailRepository: IFindUserByEmailRepository
+        private readonly userRepository: IUserRepository
     ) {}
 
     async auth(autentication: AuthenticationAttributes): Promise<AuthenticationResult> {
-        const user = await this.findUserByEmailRepository.findUserByEmail(autentication.email);
+        const user = await this.userRepository.findUserByEmail(autentication.email);
         if (!user) {
             throw new UnauthorizedError('Invalid e-mail or password');
         }

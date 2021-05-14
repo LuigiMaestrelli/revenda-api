@@ -1,13 +1,13 @@
 import { GetUserByIdController } from '@/presentation/controllers/user/getUserById';
-import { IFindUserByIdRepository } from '@/domain/repository/user/user';
-import { UserAttributes } from '@/domain/models/user/user';
+import { IUserRepository } from '@/domain/repository/user/user';
+import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
     sut: GetUserByIdController;
     validationStub: IValidation;
-    findUserByIdRepositoryStub: IFindUserByIdRepository;
+    userRepositoryStub: IUserRepository;
 };
 
 const makeValidation = (): IValidation => {
@@ -18,8 +18,20 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
-const makeFindUserByIdRepository = (): IFindUserByIdRepository => {
-    class FindUserByIdRepositoryStub implements IFindUserByIdRepository {
+const makeUserRepository = (): IUserRepository => {
+    class UserRepositoryStub implements IUserRepository {
+        async add(userData: CreateUserAttributes): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
+        async findUserByEmail(email: string): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
+        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
         async findById(id: string): Promise<UserAttributes> {
             return {
                 id: id,
@@ -31,17 +43,17 @@ const makeFindUserByIdRepository = (): IFindUserByIdRepository => {
         }
     }
 
-    return new FindUserByIdRepositoryStub();
+    return new UserRepositoryStub();
 };
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const findUserByIdRepositoryStub = makeFindUserByIdRepository();
-    const sut = new GetUserByIdController(validationStub, findUserByIdRepositoryStub);
+    const userRepositoryStub = makeUserRepository();
+    const sut = new GetUserByIdController(validationStub, userRepositoryStub);
 
     return {
         sut,
-        findUserByIdRepositoryStub,
+        userRepositoryStub,
         validationStub
     };
 };
@@ -100,9 +112,9 @@ describe('GetUserById Controller', () => {
     });
 
     test('should call FindUserById with correct value', async () => {
-        const { sut, findUserByIdRepositoryStub } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        const addSpy = jest.spyOn(findUserByIdRepositoryStub, 'findById');
+        const addSpy = jest.spyOn(userRepositoryStub, 'findById');
 
         const httpRequest = {
             params: {
@@ -115,9 +127,9 @@ describe('GetUserById Controller', () => {
     });
 
     test('should return 404 if no user whas found', async () => {
-        const { sut, findUserByIdRepositoryStub } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        jest.spyOn(findUserByIdRepositoryStub, 'findById').mockReturnValueOnce(null);
+        jest.spyOn(userRepositoryStub, 'findById').mockReturnValueOnce(null);
 
         const httpRequest = {
             params: {
@@ -130,9 +142,9 @@ describe('GetUserById Controller', () => {
     });
 
     test('should return 500 if FindUserById throws', async () => {
-        const { sut, findUserByIdRepositoryStub } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        jest.spyOn(findUserByIdRepositoryStub, 'findById').mockImplementationOnce(() => {
+        jest.spyOn(userRepositoryStub, 'findById').mockImplementationOnce(() => {
             throw new Error('Test throw');
         });
 

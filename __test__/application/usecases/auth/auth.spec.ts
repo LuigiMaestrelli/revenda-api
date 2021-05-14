@@ -1,7 +1,7 @@
 import { AuthenticationUseCase } from '@/application/usecases/auth/auth';
 import { TokenPayload, AuthenticationResult } from '@/domain/models/auth/authentication';
-import { UserAttributes } from '@/domain/models/user/user';
-import { IFindUserByEmailRepository } from '@/domain/repository/user/user';
+import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
+import { IUserRepository } from '@/domain/repository/user/user';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { IHashCompare } from '@/infra/protocols/cryptography';
 import { UnauthorizedError } from '@/shared/errors';
@@ -10,7 +10,7 @@ type SutTypes = {
     sut: AuthenticationUseCase;
     tokenSigner: ITokenSigner;
     hasherCompare: IHashCompare;
-    findUserByEmailRepository: IFindUserByEmailRepository;
+    userRepository: IUserRepository;
 };
 
 const makeTokenSigner = (): ITokenSigner => {
@@ -37,8 +37,20 @@ const makeHashCompare = (): IHashCompare => {
     return new HashCompareStub();
 };
 
-const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
-    class FindUserByEmailRepositoryStub implements IFindUserByEmailRepository {
+const makeUserRepository = (): IUserRepository => {
+    class UserRepositoryStub implements IUserRepository {
+        async add(userData: CreateUserAttributes): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
+        async findById(id: string): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
+        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
         async findUserByEmail(email: string): Promise<UserAttributes | null> {
             return {
                 id: 'valid id',
@@ -50,39 +62,39 @@ const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
         }
     }
 
-    return new FindUserByEmailRepositoryStub();
+    return new UserRepositoryStub();
 };
 
 const makeSut = (): SutTypes => {
     const tokenSigner = makeTokenSigner();
     const hasherCompare = makeHashCompare();
-    const findUserByEmailRepository = makeFindUserByEmailRepository();
-    const sut = new AuthenticationUseCase(tokenSigner, hasherCompare, findUserByEmailRepository);
+    const userRepository = makeUserRepository();
+    const sut = new AuthenticationUseCase(tokenSigner, hasherCompare, userRepository);
 
     return {
         sut,
         tokenSigner,
         hasherCompare,
-        findUserByEmailRepository
+        userRepository
     };
 };
 
 describe('Auth UseCase', () => {
-    test('should call findUserByEmailRepository with correct values', async () => {
-        const { sut, findUserByEmailRepository } = makeSut();
+    test('should call userRepository with correct values', async () => {
+        const { sut, userRepository } = makeSut();
 
-        const findUserByEmailRepositorySpy = jest.spyOn(findUserByEmailRepository, 'findUserByEmail');
+        const userRepositorySpy = jest.spyOn(userRepository, 'findUserByEmail');
 
         const authDto = { email: 'valid email', password: 'valid password' };
         await sut.auth(authDto);
 
-        expect(findUserByEmailRepositorySpy).toBeCalledWith('valid email');
+        expect(userRepositorySpy).toBeCalledWith('valid email');
     });
 
-    test('should throw if findUserByEmailRepository throws', async () => {
-        const { sut, findUserByEmailRepository } = makeSut();
+    test('should throw if userRepository throws', async () => {
+        const { sut, userRepository } = makeSut();
 
-        jest.spyOn(findUserByEmailRepository, 'findUserByEmail').mockImplementationOnce(() => {
+        jest.spyOn(userRepository, 'findUserByEmail').mockImplementationOnce(() => {
             throw new Error('Test error');
         });
 
@@ -93,11 +105,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should throw if no user was found with requested e-mail', async () => {
-        const { sut, findUserByEmailRepository } = makeSut();
+        const { sut, userRepository } = makeSut();
 
-        jest.spyOn(findUserByEmailRepository, 'findUserByEmail').mockReturnValueOnce(
-            new Promise(resolve => resolve(null))
-        );
+        jest.spyOn(userRepository, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
 
         const authDto = { email: 'invalid email', password: 'valid password' };
         const authPromise = sut.auth(authDto);

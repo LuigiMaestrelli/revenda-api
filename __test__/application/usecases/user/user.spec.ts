@@ -1,17 +1,15 @@
 import { IHasher } from '@/infra/protocols/cryptography';
 import { UserUseCase } from '@/application/usecases/user/user';
 import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/User';
-import { IAddUserRepository, IFindUserByEmailRepository, IUpdateUserRepository } from '@/domain/repository/user/user';
+import { IUserRepository } from '@/domain/repository/user/user';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 
 type SutTypes = {
     hasherStub: IHasher;
-    addUserRepositoryStub: IAddUserRepository;
-    findUserByEmailRepositoryStub: IFindUserByEmailRepository;
+    userRepositoryStub: IUserRepository;
     gerenerateAuthenticationStub: IGenerateAuthentication;
-    updateUserRepositoryStub: IUpdateUserRepository;
     sut: UserUseCase;
 };
 
@@ -33,8 +31,31 @@ const makeHasher = (): IHasher => {
     return new HasherStub();
 };
 
-const makeAddUserRepository = (): IAddUserRepository => {
-    class AddUserRepositoryStub implements IAddUserRepository {
+const makeUserRepository = (): IUserRepository => {
+    class UserRepositoryStub implements IUserRepository {
+        async findUserByEmail(email: string): Promise<UserAttributes> {
+            return null;
+        }
+
+        async findById(id: string): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
+
+        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
+            const currentData = {
+                id: id,
+                email: 'valid e-mail',
+                password: 'hashed password',
+                active: true,
+                name: 'valid name'
+            };
+
+            return {
+                ...currentData,
+                ...userData
+            };
+        }
+
         async add(accountData: CreateUserAttributes): Promise<UserAttributes> {
             return {
                 id: 'valid id',
@@ -46,17 +67,7 @@ const makeAddUserRepository = (): IAddUserRepository => {
         }
     }
 
-    return new AddUserRepositoryStub();
-};
-
-const makeFindUserByEmailRepository = (): IFindUserByEmailRepository => {
-    class FindUserByEmailRepositoryStub implements IFindUserByEmailRepository {
-        async findUserByEmail(email: string): Promise<UserAttributes | null> {
-            return null;
-        }
-    }
-
-    return new FindUserByEmailRepositoryStub();
+    return new UserRepositoryStub();
 };
 
 const makeGerenerateAuthentication = (): IGenerateAuthentication => {
@@ -73,48 +84,17 @@ const makeGerenerateAuthentication = (): IGenerateAuthentication => {
     return new GerenerateAuthenticationStub();
 };
 
-const makeUpdateUserRepository = (): IUpdateUserRepository => {
-    class UpdateUserRepositoryStub implements IUpdateUserRepository {
-        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            const currentData = {
-                id: id,
-                email: 'valid e-mail',
-                password: 'hashed password',
-                active: true,
-                name: 'valid name'
-            };
-
-            return {
-                ...currentData,
-                ...userData
-            };
-        }
-    }
-
-    return new UpdateUserRepositoryStub();
-};
-
 const makeSut = (): SutTypes => {
     const hasherStub = makeHasher();
-    const addUserRepositoryStub = makeAddUserRepository();
-    const findUserByEmailRepositoryStub = makeFindUserByEmailRepository();
-    const updateUserRepositoryStub = makeUpdateUserRepository();
+    const userRepositoryStub = makeUserRepository();
     const gerenerateAuthenticationStub = makeGerenerateAuthentication();
 
-    const sut = new UserUseCase(
-        hasherStub,
-        addUserRepositoryStub,
-        findUserByEmailRepositoryStub,
-        gerenerateAuthenticationStub,
-        updateUserRepositoryStub
-    );
+    const sut = new UserUseCase(hasherStub, userRepositoryStub, gerenerateAuthenticationStub);
 
     return {
         hasherStub,
-        addUserRepositoryStub,
-        findUserByEmailRepositoryStub,
         gerenerateAuthenticationStub,
-        updateUserRepositoryStub,
+        userRepositoryStub,
         sut
     };
 };
@@ -146,8 +126,8 @@ describe('User UseCase', () => {
         });
 
         test('should call AddUserRepository with correct values', async () => {
-            const { sut, addUserRepositoryStub } = makeSut();
-            const addUserRepositorySpy = jest.spyOn(addUserRepositoryStub, 'add');
+            const { sut, userRepositoryStub } = makeSut();
+            const addUserRepositorySpy = jest.spyOn(userRepositoryStub, 'add');
 
             const userData = makeValidCreateUserAttributes();
 
@@ -183,9 +163,9 @@ describe('User UseCase', () => {
         });
 
         test('should throw if AddUserRepository throws', async () => {
-            const { sut, addUserRepositoryStub } = makeSut();
+            const { sut, userRepositoryStub } = makeSut();
 
-            jest.spyOn(addUserRepositoryStub, 'add').mockImplementation(() => {
+            jest.spyOn(userRepositoryStub, 'add').mockImplementation(() => {
                 throw new Error('Test throw');
             });
 
@@ -196,9 +176,9 @@ describe('User UseCase', () => {
         });
 
         test('should throw if FindUserByEmailRepository throws', async () => {
-            const { sut, findUserByEmailRepositoryStub } = makeSut();
+            const { sut, userRepositoryStub } = makeSut();
 
-            jest.spyOn(findUserByEmailRepositoryStub, 'findUserByEmail').mockImplementation(() => {
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementation(() => {
                 throw new Error('Test throw');
             });
 
@@ -209,8 +189,8 @@ describe('User UseCase', () => {
         });
 
         test('should call FindUserByEmailRepository with correct value', async () => {
-            const { sut, findUserByEmailRepositoryStub } = makeSut();
-            const findUserByEmailRepositorySpy = jest.spyOn(findUserByEmailRepositoryStub, 'findUserByEmail');
+            const { sut, userRepositoryStub } = makeSut();
+            const findUserByEmailRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
 
             const userData = makeValidCreateUserAttributes();
 
@@ -220,8 +200,8 @@ describe('User UseCase', () => {
         });
 
         test('should throw if e-mail already exists', async () => {
-            const { sut, findUserByEmailRepositoryStub } = makeSut();
-            jest.spyOn(findUserByEmailRepositoryStub, 'findUserByEmail').mockImplementationOnce(async () => {
+            const { sut, userRepositoryStub } = makeSut();
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(async () => {
                 return await new Promise(resolve =>
                     resolve({
                         id: 'valid id',
@@ -269,8 +249,8 @@ describe('User UseCase', () => {
 
     describe('Update user', () => {
         test('should call UpdateUserRepository with correct values', async () => {
-            const { sut, updateUserRepositoryStub } = makeSut();
-            const updateUserRepositorySpy = jest.spyOn(updateUserRepositoryStub, 'update');
+            const { sut, userRepositoryStub } = makeSut();
+            const updateUserRepositorySpy = jest.spyOn(userRepositoryStub, 'update');
 
             const userData = { name: 'new name' };
 
@@ -282,10 +262,10 @@ describe('User UseCase', () => {
         });
 
         test('should throw if UpdateUserRepository throws', async () => {
-            const { sut, updateUserRepositoryStub } = makeSut();
+            const { sut, userRepositoryStub } = makeSut();
             const userData = { name: 'new name' };
 
-            jest.spyOn(updateUserRepositoryStub, 'update').mockImplementationOnce(() => {
+            jest.spyOn(userRepositoryStub, 'update').mockImplementationOnce(() => {
                 throw new Error('Test throw');
             });
 
