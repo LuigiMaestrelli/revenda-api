@@ -4,13 +4,13 @@ import {
     UserAttributes,
     UserWithAuthAttributes
 } from '@/domain/models/user/user';
-import { IAddUser, IUpdateUser } from '@/domain/usecases/user/user';
+import { IUserUseCase } from '@/domain/usecases/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { IHasher } from '@/infra/protocols/cryptography';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 
-export class UserUseCase implements IAddUser, IUpdateUser {
+export class UserUseCase implements IUserUseCase {
     constructor(
         private readonly hasher: IHasher,
         private readonly userRepository: IUserRepository,

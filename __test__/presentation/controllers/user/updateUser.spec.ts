@@ -1,5 +1,10 @@
-import { UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
-import { IUpdateUser } from '@/domain/usecases/user/user';
+import {
+    CreateUserAttributes,
+    UpdateUserAttributes,
+    UserAttributes,
+    UserWithAuthAttributes
+} from '@/domain/models/user/user';
+import { IUserUseCase } from '@/domain/usecases/user/user';
 import { UpdateUserController } from '@/presentation/controllers/user/updateUser';
 import { IValidation } from '@/presentation/protocols';
 import { IObjectManipulation } from '@/infra/protocols/objectManipulation';
@@ -8,7 +13,7 @@ import { MissingParamError } from '@/shared/errors';
 type SutTypes = {
     sut: UpdateUserController;
     validationStub: IValidation;
-    updateUserStub: IUpdateUser;
+    userUseCaseStub: IUserUseCase;
     objectManipulationSub: IObjectManipulation;
 };
 
@@ -31,8 +36,12 @@ const makeObjectManipulation = (): IObjectManipulation => {
     return new ObjectManipulationSub();
 };
 
-const makeUpdateUser = (): IUpdateUser => {
-    class UpdateUserStub implements IUpdateUser {
+const makeUpdateUser = (): IUserUseCase => {
+    class UserUseCaseStub implements IUserUseCase {
+        async add(userData: CreateUserAttributes): Promise<UserWithAuthAttributes> {
+            throw new Error('not implemented');
+        }
+
         async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
             return {
                 id: id,
@@ -45,19 +54,19 @@ const makeUpdateUser = (): IUpdateUser => {
         }
     }
 
-    return new UpdateUserStub();
+    return new UserUseCaseStub();
 };
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const updateUserStub = makeUpdateUser();
+    const userUseCaseStub = makeUpdateUser();
     const objectManipulationSub = makeObjectManipulation();
-    const sut = new UpdateUserController(validationStub, objectManipulationSub, updateUserStub);
+    const sut = new UpdateUserController(validationStub, objectManipulationSub, userUseCaseStub);
 
     return {
         sut,
         validationStub,
-        updateUserStub,
+        userUseCaseStub,
         objectManipulationSub
     };
 };
@@ -127,9 +136,9 @@ describe('UpdateUser Controller', () => {
     });
 
     test('should call UpdateUser with correct values', async () => {
-        const { sut, updateUserStub } = makeSut();
+        const { sut, userUseCaseStub } = makeSut();
 
-        const updateSpy = jest.spyOn(updateUserStub, 'update');
+        const updateSpy = jest.spyOn(userUseCaseStub, 'update');
 
         const httpRequest = {
             params: {
@@ -147,9 +156,9 @@ describe('UpdateUser Controller', () => {
     });
 
     test('should return 500 if UpdateUser throws', async () => {
-        const { sut, updateUserStub } = makeSut();
+        const { sut, userUseCaseStub } = makeSut();
 
-        jest.spyOn(updateUserStub, 'update').mockImplementation(async () => {
+        jest.spyOn(userUseCaseStub, 'update').mockImplementation(async () => {
             return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 
@@ -230,9 +239,9 @@ describe('UpdateUser Controller', () => {
     });
 
     test('should call UpdateUser with filtered body properties', async () => {
-        const { sut, updateUserStub } = makeSut();
+        const { sut, userUseCaseStub } = makeSut();
 
-        const updateSpy = jest.spyOn(updateUserStub, 'update');
+        const updateSpy = jest.spyOn(userUseCaseStub, 'update');
 
         const httpRequest = {
             params: {

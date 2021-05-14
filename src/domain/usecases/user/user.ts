@@ -5,10 +5,7 @@ import {
     UserAttributes
 } from '@/domain/models/user/user';
 
-export interface IAddUser {
+export interface IUserUseCase {
     add: (userData: CreateUserAttributes) => Promise<UserWithAuthAttributes>;
-}
-
-export interface IUpdateUser {
     update: (id: string, userData: UpdateUserAttributes) => Promise<UserAttributes>;
 }

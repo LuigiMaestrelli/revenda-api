@@ -1,13 +1,18 @@
 import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { IValidation } from '@/presentation/protocols';
-import { IAddUser } from '@/domain/usecases/user/user';
-import { CreateUserAttributes, UserWithAuthAttributes } from '@/domain/models/user/user';
+import { IUserUseCase } from '@/domain/usecases/user/user';
+import {
+    CreateUserAttributes,
+    UpdateUserAttributes,
+    UserAttributes,
+    UserWithAuthAttributes
+} from '@/domain/models/user/user';
 import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
     sut: SignUpController;
     validationStub: IValidation;
-    addUserUseCaseStub: IAddUser;
+    userUseCaseStub: IUserUseCase;
 };
 
 const makeValidation = (): IValidation => {
@@ -18,8 +23,8 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
-const makeAddUserUseCase = (): IAddUser => {
-    class AddUserUseCaseStub implements IAddUser {
+const makeUserUseCase = (): IUserUseCase => {
+    class UserUseCaseStub implements IUserUseCase {
         async add(user: CreateUserAttributes): Promise<UserWithAuthAttributes> {
             return {
                 user: {
@@ -36,20 +41,24 @@ const makeAddUserUseCase = (): IAddUser => {
                 }
             };
         }
+
+        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
+            throw new Error('not implemented');
+        }
     }
 
-    return new AddUserUseCaseStub();
+    return new UserUseCaseStub();
 };
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const addUserUseCaseStub = makeAddUserUseCase();
-    const sut = new SignUpController(validationStub, addUserUseCaseStub);
+    const userUseCaseStub = makeUserUseCase();
+    const sut = new SignUpController(validationStub, userUseCaseStub);
 
     return {
         sut,
         validationStub,
-        addUserUseCaseStub
+        userUseCaseStub
     };
 };
 
@@ -147,9 +156,9 @@ describe('SignUp Controller', () => {
     });
 
     test('should call AddUser with correct values', async () => {
-        const { sut, addUserUseCaseStub } = makeSut();
+        const { sut, userUseCaseStub } = makeSut();
 
-        const addSpy = jest.spyOn(addUserUseCaseStub, 'add');
+        const addSpy = jest.spyOn(userUseCaseStub, 'add');
 
         const httpRequest = {
             body: {
@@ -169,9 +178,9 @@ describe('SignUp Controller', () => {
     });
 
     test('should return 500 if AddUser throws', async () => {
-        const { sut, addUserUseCaseStub } = makeSut();
+        const { sut, userUseCaseStub } = makeSut();
 
-        jest.spyOn(addUserUseCaseStub, 'add').mockImplementation(async () => {
+        jest.spyOn(userUseCaseStub, 'add').mockImplementation(async () => {
             return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 
