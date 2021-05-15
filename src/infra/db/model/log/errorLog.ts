@@ -4,7 +4,8 @@ import BaseModel from '../infra/basemodel';
 
 export default class ErrorLogModel
     extends BaseModel<ErrorLogAttributes, CreateErrorLogAttributes>
-    implements ErrorLogAttributes {
+    implements ErrorLogAttributes
+{
     public id!: string;
     public location!: string;
     public message!: string;
