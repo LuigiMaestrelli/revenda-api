@@ -1,7 +1,7 @@
 import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 
-export function makeUserRepository(): IUserRepository {
+export function makeUserRepositoryStub(): IUserRepository {
     class UserRepositoryStub implements IUserRepository {
         async add(userData: CreateUserAttributes): Promise<UserAttributes> {
             return {

@@ -5,7 +5,7 @@ import { IUserRepository } from '@/domain/repository/user/user';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
-import { makeUserRepository } from '@test/utils/mocks/repository/user';
+import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 
 type SutTypes = {
     hasherStub: IHasher;
@@ -48,7 +48,7 @@ const makeGerenerateAuthentication = (): IGenerateAuthentication => {
 
 const makeSut = (): SutTypes => {
     const hasherStub = makeHasher();
-    const userRepositoryStub = makeUserRepository();
+    const userRepositoryStub = makeUserRepositoryStub();
     const gerenerateAuthenticationStub = makeGerenerateAuthentication();
 
     const sut = new UserUseCase(hasherStub, userRepositoryStub, gerenerateAuthenticationStub);

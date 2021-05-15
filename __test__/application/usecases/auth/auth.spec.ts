@@ -4,7 +4,7 @@ import { IUserRepository } from '@/domain/repository/user/user';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { IHashCompare } from '@/infra/protocols/cryptography';
 import { UnauthorizedError } from '@/shared/errors';
-import { makeUserRepository } from '@test/utils/mocks/repository/user';
+import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 
 type SutTypes = {
     sut: AuthenticationUseCase;
@@ -40,7 +40,7 @@ const makeHashCompare = (): IHashCompare => {
 const makeSut = (): SutTypes => {
     const tokenSigner = makeTokenSigner();
     const hasherCompare = makeHashCompare();
-    const userRepository = makeUserRepository();
+    const userRepository = makeUserRepositoryStub();
     const sut = new AuthenticationUseCase(tokenSigner, hasherCompare, userRepository);
 
     return {

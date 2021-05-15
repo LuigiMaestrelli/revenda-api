@@ -2,7 +2,7 @@ import { GetUserByIdController } from '@/presentation/controllers/user/getUserBy
 import { IUserRepository } from '@/domain/repository/user/user';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
-import { makeUserRepository } from '@test/utils/mocks/repository/user';
+import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 
 type SutTypes = {
     sut: GetUserByIdController;
@@ -20,7 +20,7 @@ const makeValidation = (): IValidation => {
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const userRepositoryStub = makeUserRepository();
+    const userRepositoryStub = makeUserRepositoryStub();
     const sut = new GetUserByIdController(validationStub, userRepositoryStub);
 
     return {
