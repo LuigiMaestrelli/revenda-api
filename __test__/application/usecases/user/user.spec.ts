@@ -1,10 +1,11 @@
 import { IHasher } from '@/infra/protocols/cryptography';
 import { UserUseCase } from '@/application/usecases/user/user';
-import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/User';
+import { CreateUserAttributes } from '@/domain/models/user/User';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
+import { makeUserRepository } from '@test/utils/mocks/repository/user';
 
 type SutTypes = {
     hasherStub: IHasher;
@@ -29,45 +30,6 @@ const makeHasher = (): IHasher => {
     }
 
     return new HasherStub();
-};
-
-const makeUserRepository = (): IUserRepository => {
-    class UserRepositoryStub implements IUserRepository {
-        async findUserByEmail(email: string): Promise<UserAttributes> {
-            return null;
-        }
-
-        async findById(id: string): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            const currentData = {
-                id: id,
-                email: 'valid e-mail',
-                password: 'hashed password',
-                active: true,
-                name: 'valid name'
-            };
-
-            return {
-                ...currentData,
-                ...userData
-            };
-        }
-
-        async add(accountData: CreateUserAttributes): Promise<UserAttributes> {
-            return {
-                id: 'valid id',
-                email: 'valid e-mail',
-                name: 'valid name',
-                password: 'hashed password',
-                active: true
-            };
-        }
-    }
-
-    return new UserRepositoryStub();
 };
 
 const makeGerenerateAuthentication = (): IGenerateAuthentication => {
@@ -102,7 +64,9 @@ const makeSut = (): SutTypes => {
 describe('User UseCase', () => {
     describe('Add user', () => {
         test('should call Encrypter with correct value', async () => {
-            const { sut, hasherStub } = makeSut();
+            const { sut, hasherStub, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
             const encryptSpy = jest.spyOn(hasherStub, 'hash');
 
             const accountData = makeValidCreateUserAttributes();
@@ -127,6 +91,8 @@ describe('User UseCase', () => {
 
         test('should call AddUserRepository with correct values', async () => {
             const { sut, userRepositoryStub } = makeSut();
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
+
             const addUserRepositorySpy = jest.spyOn(userRepositoryStub, 'add');
 
             const userData = makeValidCreateUserAttributes();
@@ -141,7 +107,9 @@ describe('User UseCase', () => {
         });
 
         test('should return created user data with authentication data', async () => {
-            const { sut } = makeSut();
+            const { sut, userRepositoryStub } = makeSut();
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
+
             const userData = makeValidCreateUserAttributes();
 
             const user = await sut.add(userData);
@@ -190,6 +158,9 @@ describe('User UseCase', () => {
 
         test('should call FindUserByEmailRepository with correct value', async () => {
             const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
+
             const findUserByEmailRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
 
             const userData = makeValidCreateUserAttributes();
@@ -220,7 +191,9 @@ describe('User UseCase', () => {
         });
 
         test('should call GerenerateAuthentication with correct values', async () => {
-            const { sut, gerenerateAuthenticationStub } = makeSut();
+            const { sut, gerenerateAuthenticationStub, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
             const gerenerateAuthenticationSpy = jest.spyOn(gerenerateAuthenticationStub, 'auth');
 
             const userData = makeValidCreateUserAttributes();
@@ -234,7 +207,9 @@ describe('User UseCase', () => {
         });
 
         test('should throw if GerenerateAuthentication throws', async () => {
-            const { sut, gerenerateAuthenticationStub } = makeSut();
+            const { sut, gerenerateAuthenticationStub, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
             jest.spyOn(gerenerateAuthenticationStub, 'auth').mockImplementationOnce(() => {
                 throw new Error('Test throw');
             });

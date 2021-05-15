@@ -1,10 +1,10 @@
 import { AuthenticationUseCase } from '@/application/usecases/auth/auth';
 import { TokenPayload, AuthenticationResult } from '@/domain/models/auth/authentication';
-import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { IHashCompare } from '@/infra/protocols/cryptography';
 import { UnauthorizedError } from '@/shared/errors';
+import { makeUserRepository } from '@test/utils/mocks/repository/user';
 
 type SutTypes = {
     sut: AuthenticationUseCase;
@@ -35,34 +35,6 @@ const makeHashCompare = (): IHashCompare => {
     }
 
     return new HashCompareStub();
-};
-
-const makeUserRepository = (): IUserRepository => {
-    class UserRepositoryStub implements IUserRepository {
-        async add(userData: CreateUserAttributes): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async findById(id: string): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async findUserByEmail(email: string): Promise<UserAttributes | null> {
-            return {
-                id: 'valid id',
-                email: 'valid email',
-                name: 'valid name',
-                password: 'password hash',
-                active: true
-            };
-        }
-    }
-
-    return new UserRepositoryStub();
 };
 
 const makeSut = (): SutTypes => {
@@ -162,7 +134,7 @@ describe('Auth UseCase', () => {
         const authDto = { email: 'valid email', password: 'valid password' };
         await sut.auth(authDto);
 
-        expect(hasherCompareSpy).toBeCalledWith('valid password', 'password hash');
+        expect(hasherCompareSpy).toBeCalledWith('valid password', 'hashed password');
     });
 
     test('should throw if the password is wrong', async () => {

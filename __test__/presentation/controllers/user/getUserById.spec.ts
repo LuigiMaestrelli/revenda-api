@@ -1,8 +1,8 @@
 import { GetUserByIdController } from '@/presentation/controllers/user/getUserById';
 import { IUserRepository } from '@/domain/repository/user/user';
-import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
+import { makeUserRepository } from '@test/utils/mocks/repository/user';
 
 type SutTypes = {
     sut: GetUserByIdController;
@@ -16,34 +16,6 @@ const makeValidation = (): IValidation => {
     }
 
     return new ValidationStub();
-};
-
-const makeUserRepository = (): IUserRepository => {
-    class UserRepositoryStub implements IUserRepository {
-        async add(userData: CreateUserAttributes): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async findUserByEmail(email: string): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async findById(id: string): Promise<UserAttributes> {
-            return {
-                id: id,
-                name: 'valid name',
-                email: 'valid email',
-                password: 'valid password',
-                active: true
-            };
-        }
-    }
-
-    return new UserRepositoryStub();
 };
 
 const makeSut = (): SutTypes => {
