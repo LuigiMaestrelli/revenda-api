@@ -1,14 +1,9 @@
-import {
-    CreateUserAttributes,
-    UpdateUserAttributes,
-    UserAttributes,
-    UserWithAuthAttributes
-} from '@/domain/models/user/user';
 import { IUserUseCase } from '@/domain/usecases/user/user';
 import { UpdateUserController } from '@/presentation/controllers/user/updateUser';
 import { IValidation } from '@/presentation/protocols';
 import { IObjectManipulation } from '@/infra/protocols/objectManipulation';
 import { MissingParamError } from '@/shared/errors';
+import { makeUserUseCaseStub } from '@test/utils/mocks/application/user';
 
 type SutTypes = {
     sut: UpdateUserController;
@@ -36,30 +31,9 @@ const makeObjectManipulation = (): IObjectManipulation => {
     return new ObjectManipulationSub();
 };
 
-const makeUpdateUser = (): IUserUseCase => {
-    class UserUseCaseStub implements IUserUseCase {
-        async add(userData: CreateUserAttributes): Promise<UserWithAuthAttributes> {
-            throw new Error('not implemented');
-        }
-
-        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            return {
-                id: id,
-                name: 'valid name',
-                email: 'valid email',
-                password: 'hashed password',
-                active: true,
-                ...userData
-            };
-        }
-    }
-
-    return new UserUseCaseStub();
-};
-
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const userUseCaseStub = makeUpdateUser();
+    const userUseCaseStub = makeUserUseCaseStub();
     const objectManipulationSub = makeObjectManipulation();
     const sut = new UpdateUserController(validationStub, objectManipulationSub, userUseCaseStub);
 

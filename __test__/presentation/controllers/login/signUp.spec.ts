@@ -1,13 +1,8 @@
 import { SignUpController } from '@/presentation/controllers/login/signUp';
 import { IValidation } from '@/presentation/protocols';
 import { IUserUseCase } from '@/domain/usecases/user/user';
-import {
-    CreateUserAttributes,
-    UpdateUserAttributes,
-    UserAttributes,
-    UserWithAuthAttributes
-} from '@/domain/models/user/user';
 import { MissingParamError } from '@/shared/errors';
+import { makeUserUseCaseStub } from '@test/utils/mocks/application/user';
 
 type SutTypes = {
     sut: SignUpController;
@@ -23,36 +18,9 @@ const makeValidation = (): IValidation => {
     return new ValidationStub();
 };
 
-const makeUserUseCase = (): IUserUseCase => {
-    class UserUseCaseStub implements IUserUseCase {
-        async add(user: CreateUserAttributes): Promise<UserWithAuthAttributes> {
-            return {
-                user: {
-                    id: 'valid_id',
-                    name: 'valid name',
-                    email: 'valid_email@email.com',
-                    password: 'hashed password',
-                    active: true
-                },
-                auth: {
-                    token: 'valid token',
-                    refreshToken: 'valid refreshtoken',
-                    expiresIn: 100
-                }
-            };
-        }
-
-        async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
-            throw new Error('not implemented');
-        }
-    }
-
-    return new UserUseCaseStub();
-};
-
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const userUseCaseStub = makeUserUseCase();
+    const userUseCaseStub = makeUserUseCaseStub();
     const sut = new SignUpController(validationStub, userUseCaseStub);
 
     return {
