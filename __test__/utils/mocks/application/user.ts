@@ -35,6 +35,10 @@ export function makeUserUseCaseStub(): IUserUseCase {
                 ...userData
             };
         }
+
+        async active(id: string): Promise<void> {}
+
+        async inactive(id: string): Promise<void> {}
     }
 
     return new UserUseCaseStub();

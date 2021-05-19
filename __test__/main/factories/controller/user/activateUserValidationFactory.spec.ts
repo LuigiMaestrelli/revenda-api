@@ -1,12 +1,12 @@
-import { makeGetUserByIdValidation } from '@/main/factories/controller/user/getUserByIdValidationFactory';
+import { makeActivateUserValidation } from '@/main/factories/controller/user/activateUserValidationFactory';
 import { ValidationComposite, RequiredParamValidation } from '@/presentation/helpers/validators';
 import { IValidation } from '@/presentation/protocols';
 
 jest.mock('@/presentation/helpers/validators/validationComposite');
 
-describe('GetUserByIdValidation Factory', () => {
+describe('ActivateUser Factory', () => {
     test('should call ValidationComposite with all validations', async () => {
-        makeGetUserByIdValidation();
+        makeActivateUserValidation();
 
         const validations: IValidation[] = [];
         validations.push(new RequiredParamValidation('id'));

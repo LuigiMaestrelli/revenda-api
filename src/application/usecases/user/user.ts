@@ -38,4 +38,12 @@ export class UserUseCase implements IUserUseCase {
     async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
         return await this.userRepository.update(id, userData);
     }
+
+    async active(id: string): Promise<void> {
+        await this.userRepository.update(id, { active: true });
+    }
+
+    async inactive(id: string): Promise<void> {
+        await this.userRepository.update(id, { active: false });
+    }
 }

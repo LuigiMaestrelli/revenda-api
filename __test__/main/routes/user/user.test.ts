@@ -112,9 +112,9 @@ describe('User Routes', () => {
             expect(response.status).toBe(500);
         });
 
-        test('should return 401 on get user/id without valid token', async () => {
+        test('should return 401 on put user/id without valid token', async () => {
             const id = uuidv4();
-            const response = await request(app).get(`/api/user/${id}`).send();
+            const response = await request(app).put(`/api/user/${id}`).send();
 
             expect(response.status).toBe(401);
         });
@@ -166,6 +166,155 @@ describe('User Routes', () => {
 
             expect(response.status).toBe(200);
             expect(updatedUser.email).toBe(email);
+        });
+    });
+
+    describe('PUT /user/id/active', () => {
+        test('should return 404 on put user/id/active with unknown id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const response = await request(app)
+                .put(`/api/user/${id}/active`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            expect(response.status).toBe(404);
+        });
+
+        test('should return 200 on put user/id/active with known id and valid data', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxxxxx'
+            });
+
+            const response = await request(app)
+                .put(`/api/user/${id}/active`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            expect(response.status).toBe(200);
+        });
+
+        test('should return 500 on put user/id/active with invalid id', async () => {
+            const userData = await generateValidUserData();
+
+            const response = await request(app)
+                .put('/api/user/xxxxxx-xxxxx-xxxxx/active')
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({
+                    name: 'name'
+                });
+            expect(response.status).toBe(500);
+        });
+
+        test('should return 401 on put user/id/active without valid token', async () => {
+            const id = uuidv4();
+            const response = await request(app).put(`/api/user/${id}/active`).send();
+
+            expect(response.status).toBe(401);
+        });
+
+        test('should update active prop on PUT user/id/active', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const userCreated = await UserModel.create({
+                id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxxxxx'
+            });
+            await userCreated.update({ active: false });
+
+            const response = await request(app)
+                .put(`/api/user/${id}/active`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            const updatedUser = await UserModel.findByPk(id);
+
+            expect(response.status).toBe(200);
+            expect(updatedUser.active).toBe(true);
+        });
+    });
+
+    describe('PUT /user/id/inactive', () => {
+        test('should return 404 on put user/id/inactive with unknown id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const response = await request(app)
+                .put(`/api/user/${id}/inactive`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            expect(response.status).toBe(404);
+        });
+
+        test('should return 200 on put user/id/inactive with known id and valid data', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxxxxx'
+            });
+
+            const response = await request(app)
+                .put(`/api/user/${id}/inactive`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            expect(response.status).toBe(200);
+        });
+
+        test('should return 500 on put user/id/inactive with invalid id', async () => {
+            const userData = await generateValidUserData();
+
+            const response = await request(app)
+                .put('/api/user/xxxxxx-xxxxx-xxxxx/inactive')
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send({
+                    name: 'name'
+                });
+            expect(response.status).toBe(500);
+        });
+
+        test('should return 401 on put user/id/inactive without valid token', async () => {
+            const id = uuidv4();
+            const response = await request(app).put(`/api/user/${id}/inactive`).send();
+
+            expect(response.status).toBe(401);
+        });
+
+        test('should update inactive prop on PUT user/id/inactive', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxxxxx'
+            });
+
+            const response = await request(app)
+                .put(`/api/user/${id}/inactive`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            const updatedUser = await UserModel.findByPk(id);
+
+            expect(response.status).toBe(200);
+            expect(updatedUser.active).toBe(false);
         });
     });
 });

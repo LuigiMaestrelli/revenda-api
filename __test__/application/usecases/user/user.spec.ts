@@ -294,4 +294,54 @@ describe('User UseCase', () => {
             });
         });
     });
+
+    describe('Activate user', () => {
+        test('should call UpdateUserRepository with correct values', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+            const updateUserRepositorySpy = jest.spyOn(userRepositoryStub, 'update');
+
+            await sut.active('valid id');
+
+            expect(updateUserRepositorySpy).toHaveBeenCalledWith('valid id', {
+                active: true
+            });
+        });
+
+        test('should throw if UpdateUserRepository throws', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'update').mockImplementationOnce(() => {
+                throw new Error('Test throw');
+            });
+
+            const updatePromise = sut.active('valid id');
+
+            await expect(updatePromise).rejects.toThrow(new Error('Test throw'));
+        });
+    });
+
+    describe('Inactivate user', () => {
+        test('should call UpdateUserRepository with correct values', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+            const updateUserRepositorySpy = jest.spyOn(userRepositoryStub, 'update');
+
+            await sut.inactive('valid id');
+
+            expect(updateUserRepositorySpy).toHaveBeenCalledWith('valid id', {
+                active: false
+            });
+        });
+
+        test('should throw if UpdateUserRepository throws', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'update').mockImplementationOnce(() => {
+                throw new Error('Test throw');
+            });
+
+            const updatePromise = sut.inactive('valid id');
+
+            await expect(updatePromise).rejects.toThrow(new Error('Test throw'));
+        });
+    });
 });

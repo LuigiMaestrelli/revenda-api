@@ -3,10 +3,11 @@
     [x] autenticar
     [x] recuperar por id
     [x] editar
-    [] inativar
-    [] ativar
+    [x] inativar
+    [x] ativar
     [] alterar senha
     [] validar campos no modelo
 
 - Login
     [] Log de acessos
+    [] Validar usuário ativo no login
