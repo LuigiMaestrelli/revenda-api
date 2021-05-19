@@ -18,6 +18,10 @@ export class AuthenticationUseCase implements IGenerateAuthentication {
             throw new UnauthorizedError('Invalid e-mail or password');
         }
 
+        if (!user.active) {
+            throw new UnauthorizedError('Invalid e-mail or password');
+        }
+
         const isValid = await this.hasherCompare.compare(autentication.password, user.password);
         if (!isValid) {
             throw new UnauthorizedError('Invalid e-mail or password');

@@ -87,6 +87,38 @@ describe('Auth UseCase', () => {
         await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
     });
 
+    test('should throw if the password does not match', async () => {
+        const { sut, hasherCompare } = makeSut();
+
+        jest.spyOn(hasherCompare, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+
+        const authDto = { email: 'valid email', password: 'invalid password' };
+        const authPromise = sut.auth(authDto);
+
+        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
+    });
+
+    test('should throw if user is inactive', async () => {
+        const { sut, userRepository } = makeSut();
+
+        jest.spyOn(userRepository, 'findUserByEmail').mockReturnValueOnce(
+            new Promise(resolve =>
+                resolve({
+                    id: 'valid id',
+                    email: 'valid email',
+                    name: 'valid name',
+                    password: 'xxx',
+                    active: false
+                })
+            )
+        );
+
+        const authDto = { email: 'invalid email', password: 'valid password' };
+        const authPromise = sut.auth(authDto);
+
+        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
+    });
+
     test('should throw if tokenSigner throws', async () => {
         const { sut, tokenSigner } = makeSut();
 
@@ -135,16 +167,5 @@ describe('Auth UseCase', () => {
         await sut.auth(authDto);
 
         expect(hasherCompareSpy).toBeCalledWith('valid password', 'hashed password');
-    });
-
-    test('should throw if the password is wrong', async () => {
-        const { sut, hasherCompare } = makeSut();
-
-        jest.spyOn(hasherCompare, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
-
-        const authDto = { email: 'valid email', password: 'invalid password' };
-        const authPromise = sut.auth(authDto);
-
-        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
     });
 });

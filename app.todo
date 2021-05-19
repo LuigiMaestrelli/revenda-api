@@ -10,4 +10,7 @@
 
 - Login
     [] Log de acessos
-    [] Validar usuário ativo no login
+    [x] Validar usuário ativo no login
+
+- Infra
+    [] Migrations/Seeds

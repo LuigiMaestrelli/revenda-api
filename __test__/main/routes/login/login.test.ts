@@ -221,7 +221,7 @@ describe('Login Routes', () => {
             expect(response.body.message).toBe('Missing param: password');
         });
 
-        test('should return 400 if invalid password is provided', async () => {
+        test('should return 401 if invalid password is provided', async () => {
             const email = faker.internet.email();
             const bcryptAdapter = new BcryptAdapter();
             const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
@@ -242,7 +242,7 @@ describe('Login Routes', () => {
             expect(response.body.message).toBe('Unauthorized: Invalid e-mail or password');
         });
 
-        test('should return 400 if invalid email is provided', async () => {
+        test('should return 401 if invalid email is provided', async () => {
             const bcryptAdapter = new BcryptAdapter();
             const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
 
@@ -252,6 +252,27 @@ describe('Login Routes', () => {
                 email: faker.internet.email(),
                 password: hashedPassword
             });
+
+            const response = await request(app).post('/api/signin').send({
+                email: faker.internet.email(),
+                password: hashedPassword
+            });
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toBe('Unauthorized: Invalid e-mail or password');
+        });
+
+        test('should return 401 if user with email is inactive', async () => {
+            const bcryptAdapter = new BcryptAdapter();
+            const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
+
+            const userCreate = await UserModel.create({
+                id: uuidv4(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: hashedPassword
+            });
+            await userCreate.update({ active: false });
 
             const response = await request(app).post('/api/signin').send({
                 email: faker.internet.email(),
