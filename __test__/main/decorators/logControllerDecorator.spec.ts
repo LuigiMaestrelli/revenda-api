@@ -1,14 +1,14 @@
 import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 import { LogControllerDecorator } from '@/main/decorators/logControllerDecorator';
 import { ServerError } from '@/shared/errors';
-import { IAddErrorLogRepository } from '@/domain/repository/log/errorLog';
+import { IErrorLogRepository } from '@/domain/repository/log/errorLog';
 import { CreateErrorLogAttributes, ErrorLogAttributes } from '@/domain/models/log/errorLog';
 import { makeServerErrorResponse } from '@/shared/utils/http';
 
 interface SutTypes {
     controllerStub: IController;
     sut: LogControllerDecorator;
-    errorLogRepositoryStub: IAddErrorLogRepository;
+    errorLogRepositoryStub: IErrorLogRepository;
 }
 
 const makeController = (): IController => {
@@ -28,8 +28,8 @@ const makeController = (): IController => {
     return new ControllerStub();
 };
 
-const makeErrorLogRepository = (): IAddErrorLogRepository => {
-    class ErrorLogRepositoryStub implements IAddErrorLogRepository {
+const makeErrorLogRepository = (): IErrorLogRepository => {
+    class ErrorLogRepositoryStub implements IErrorLogRepository {
         async add(errorData: CreateErrorLogAttributes): Promise<ErrorLogAttributes> {
             return {
                 id: 'valid id',

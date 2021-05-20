@@ -1,10 +1,10 @@
 import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
-import { IAddErrorLogRepository } from '@/domain/repository/log/errorLog';
+import { IErrorLogRepository } from '@/domain/repository/log/errorLog';
 
 export class LogControllerDecorator implements IController {
     constructor(
         private readonly controller: IController,
-        private readonly addErrorLogRepository: IAddErrorLogRepository
+        private readonly addErrorLogRepository: IErrorLogRepository
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {

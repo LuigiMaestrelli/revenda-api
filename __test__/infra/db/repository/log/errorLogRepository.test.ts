@@ -28,12 +28,12 @@ describe('ErrorLog Repository', () => {
     test('should create error log', async () => {
         const { sut } = makeSut();
 
-        const user = await sut.add({
+        const errorLog = await sut.add({
             location: faker.random.alpha({ count: 100 }),
             message: faker.lorem.lines(1),
             stack: faker.lorem.lines(4)
         });
 
-        expect(user.id).toBeTruthy();
+        expect(errorLog.id).toBeTruthy();
     });
 });
