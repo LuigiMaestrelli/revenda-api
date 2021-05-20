@@ -9,8 +9,9 @@
     [] validar campos no modelo
 
 - Login
-    [] Log de acessos
+    [x] Log de acessos
     [x] Validar usuário ativo no login
 
 - Infra
     [] Migrations/Seeds
+    [] Docker
