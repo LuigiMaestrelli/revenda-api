@@ -13,8 +13,6 @@ export interface AccessLogAttributes {
 }
 
 export interface CreateAccessLogAttributes {
-    id?: string;
-    authorized: boolean;
     email: string;
     ip?: string;
     userAgent?: string;

@@ -31,64 +31,123 @@ const makeSut = (): SutTypes => {
 };
 
 describe('AccessLog Repository', () => {
-    test('should call IdGenerator', async () => {
-        const { sut, idGeneratorStub } = makeSut();
-        const idGeneratorStubSpy = jest.spyOn(idGeneratorStub, 'generate');
+    describe('addAuthorized', () => {
+        test('should call IdGenerator', async () => {
+            const { sut, idGeneratorStub } = makeSut();
+            const idGeneratorStubSpy = jest.spyOn(idGeneratorStub, 'generate');
 
-        await sut.add({
-            authorized: true,
-            email: 'valid email',
-            ip: 'valid ip',
-            userAgent: 'valid agent',
-            hostName: 'valid host name',
-            origin: 'valid origin',
-            reason: 'valid reason'
+            await sut.addAuthorized({
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            expect(idGeneratorStubSpy).toHaveBeenCalled();
         });
 
-        expect(idGeneratorStubSpy).toHaveBeenCalled();
+        test('should throw if IdGenerator throws', async () => {
+            const { sut, idGeneratorStub } = makeSut();
+            jest.spyOn(idGeneratorStub, 'generate').mockImplementationOnce(() => {
+                throw new Error('test error');
+            });
+
+            const addPromise = sut.addAuthorized({
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            await expect(addPromise).rejects.toThrow(new Error('test error'));
+        });
+
+        test('should return generated authorized access log', async () => {
+            const { sut } = makeSut();
+
+            const logAttr = await sut.addAuthorized({
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            expect(logAttr).toEqual({
+                id: 'valid uuid',
+                authorized: true,
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+        });
     });
 
-    test('should throw if IdGenerator throws', async () => {
-        const { sut, idGeneratorStub } = makeSut();
-        jest.spyOn(idGeneratorStub, 'generate').mockImplementationOnce(() => {
-            throw new Error('test error');
+    describe('addUnauthorized', () => {
+        test('should call IdGenerator', async () => {
+            const { sut, idGeneratorStub } = makeSut();
+            const idGeneratorStubSpy = jest.spyOn(idGeneratorStub, 'generate');
+
+            await sut.addUnauthorized({
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            expect(idGeneratorStubSpy).toHaveBeenCalled();
         });
 
-        const addPromise = sut.add({
-            authorized: true,
-            email: 'valid email',
-            ip: 'valid ip',
-            userAgent: 'valid agent',
-            hostName: 'valid host name',
-            origin: 'valid origin',
-            reason: 'valid reason'
+        test('should throw if IdGenerator throws', async () => {
+            const { sut, idGeneratorStub } = makeSut();
+            jest.spyOn(idGeneratorStub, 'generate').mockImplementationOnce(() => {
+                throw new Error('test error');
+            });
+
+            const addPromise = sut.addUnauthorized({
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            await expect(addPromise).rejects.toThrow(new Error('test error'));
         });
 
-        await expect(addPromise).rejects.toThrow(new Error('test error'));
-    });
+        test('should return generated unauthorized access log', async () => {
+            const { sut } = makeSut();
 
-    test('should return generated error log', async () => {
-        const { sut } = makeSut();
+            const logAttr = await sut.addUnauthorized({
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
 
-        const logAttr = await sut.add({
-            authorized: true,
-            email: 'valid email',
-            ip: 'valid ip',
-            userAgent: 'valid agent',
-            hostName: 'valid host name',
-            origin: 'valid origin',
-            reason: 'valid reason'
-        });
-
-        expect(logAttr).toEqual({
-            id: 'valid uuid',
-            authorized: true,
-            email: 'valid email',
-            ip: 'valid ip',
-            userAgent: 'valid agent',
-            hostName: 'valid host name',
-            origin: 'valid origin',
-            reason: 'valid reason'
+            expect(logAttr).toEqual({
+                id: 'valid uuid',
+                authorized: false,
+                email: 'valid email',
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
         });
     });
 });

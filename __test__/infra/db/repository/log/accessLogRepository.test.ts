@@ -25,19 +25,39 @@ describe('AccessLog Repository', () => {
         await truncate();
     });
 
-    test('should create access log', async () => {
-        const { sut } = makeSut();
+    describe('addAuthorized', () => {
+        test('should create authorized access log', async () => {
+            const { sut } = makeSut();
 
-        const accessLog = await sut.add({
-            authorized: true,
-            email: faker.internet.email(),
-            ip: faker.internet.ip(),
-            userAgent: 'valid agent',
-            hostName: 'valid host name',
-            origin: 'valid origin',
-            reason: 'valid reason'
+            const accessLog = await sut.addAuthorized({
+                email: faker.internet.email(),
+                ip: faker.internet.ip(),
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            expect(accessLog.id).toBeTruthy();
+            expect(accessLog.authorized).toBe(true);
         });
+    });
 
-        expect(accessLog.id).toBeTruthy();
+    describe('addUnauthorized', () => {
+        test('should create authorized access log', async () => {
+            const { sut } = makeSut();
+
+            const accessLog = await sut.addUnauthorized({
+                email: faker.internet.email(),
+                ip: faker.internet.ip(),
+                userAgent: 'valid agent',
+                hostName: 'valid host name',
+                origin: 'valid origin',
+                reason: 'valid reason'
+            });
+
+            expect(accessLog.id).toBeTruthy();
+            expect(accessLog.authorized).toBe(false);
+        });
     });
 });

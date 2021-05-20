@@ -1,9 +1,9 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { AccessLogAttributes, CreateAccessLogAttributes } from '@/domain/models/log/accessLog';
+import { AccessLogAttributes } from '@/domain/models/log/accessLog';
 import BaseModel from '../infra/basemodel';
 
 export default class AccessLogModel
-    extends BaseModel<AccessLogAttributes, CreateAccessLogAttributes>
+    extends BaseModel<AccessLogAttributes, AccessLogAttributes>
     implements AccessLogAttributes
 {
     public id!: string;

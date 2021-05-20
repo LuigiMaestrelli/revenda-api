@@ -6,11 +6,22 @@ import AccessLogModel from '../../model/log/accessLog';
 export class AccessLogRepository implements IAccessLogRepository {
     constructor(private readonly idGenerator: IIdGenerator) {}
 
-    async add(accessData: CreateAccessLogAttributes): Promise<AccessLogAttributes> {
+    async addAuthorized(accessData: CreateAccessLogAttributes): Promise<AccessLogAttributes> {
         const id = await this.idGenerator.generate();
 
         return await AccessLogModel.create({
             id,
+            authorized: true,
+            ...accessData
+        });
+    }
+
+    async addUnauthorized(accessData: CreateAccessLogAttributes): Promise<AccessLogAttributes> {
+        const id = await this.idGenerator.generate();
+
+        return await AccessLogModel.create({
+            id,
+            authorized: false,
             ...accessData
         });
     }
