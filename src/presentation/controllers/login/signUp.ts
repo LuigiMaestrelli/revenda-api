@@ -9,12 +9,15 @@ export class SignUpController implements IController {
         try {
             await this.validation.validate(httpRequest);
 
-            const { body } = httpRequest;
-            const user = await this.userUseCase.add({
-                name: body.name,
-                email: body.email,
-                password: body.password
-            });
+            const { body, networkAccess } = httpRequest;
+            const user = await this.userUseCase.add(
+                {
+                    name: body.name,
+                    email: body.email,
+                    password: body.password
+                },
+                networkAccess
+            );
 
             return makeSuccessResponse(user);
         } catch (ex) {

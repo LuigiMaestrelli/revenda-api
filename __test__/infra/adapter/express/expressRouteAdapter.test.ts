@@ -48,7 +48,13 @@ describe('Express Route Adapter', () => {
                 data: true
             },
             query: {},
-            params: {}
+            params: {},
+            networkAccess: {
+                hostName: '127.0.0.1',
+                ip: '::ffff:127.0.0.1',
+                origin: undefined,
+                userAgent: undefined
+            }
         });
     });
 
@@ -68,6 +74,12 @@ describe('Express Route Adapter', () => {
                 a: '1',
                 b: '2',
                 c: 'qweasd'
+            },
+            networkAccess: {
+                hostName: '127.0.0.1',
+                ip: '::ffff:127.0.0.1',
+                origin: undefined,
+                userAgent: undefined
             }
         });
     });
@@ -86,7 +98,13 @@ describe('Express Route Adapter', () => {
             params: {
                 id: 'valid-id'
             },
-            query: {}
+            query: {},
+            networkAccess: {
+                hostName: '127.0.0.1',
+                ip: '::ffff:127.0.0.1',
+                origin: undefined,
+                userAgent: undefined
+            }
         });
     });
 

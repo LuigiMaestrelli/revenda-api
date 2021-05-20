@@ -9,8 +9,8 @@ export class SignInController implements IController {
         try {
             await this.validation.validate(httpRequest);
 
-            const { body } = httpRequest;
-            const authData = await this.generateAuth.auth(body);
+            const { body, networkAccess } = httpRequest;
+            const authData = await this.generateAuth.auth(body, networkAccess);
 
             return makeSuccessResponse(authData);
         } catch (ex) {

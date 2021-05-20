@@ -71,7 +71,7 @@ describe('User UseCase', () => {
 
             const accountData = makeValidCreateUserAttributes();
 
-            await sut.add(accountData);
+            await sut.add(accountData, {});
 
             expect(encryptSpy).toHaveBeenCalledWith('valid password');
         });
@@ -85,7 +85,7 @@ describe('User UseCase', () => {
 
             const accountData = makeValidCreateUserAttributes();
 
-            const addPromise = sut.add(accountData);
+            const addPromise = sut.add(accountData, {});
             await expect(addPromise).rejects.toThrow();
         });
 
@@ -97,7 +97,7 @@ describe('User UseCase', () => {
 
             const userData = makeValidCreateUserAttributes();
 
-            await sut.add(userData);
+            await sut.add(userData, {});
 
             expect(addUserRepositorySpy).toHaveBeenCalledWith({
                 name: 'valid name',
@@ -112,7 +112,7 @@ describe('User UseCase', () => {
 
             const userData = makeValidCreateUserAttributes();
 
-            const user = await sut.add(userData);
+            const user = await sut.add(userData, {});
 
             expect(user).toEqual({
                 user: {
@@ -139,7 +139,7 @@ describe('User UseCase', () => {
 
             const accountData = makeValidCreateUserAttributes();
 
-            const addPromise = sut.add(accountData);
+            const addPromise = sut.add(accountData, {});
             await expect(addPromise).rejects.toThrow();
         });
 
@@ -152,7 +152,7 @@ describe('User UseCase', () => {
 
             const accountData = makeValidCreateUserAttributes();
 
-            const addPromise = sut.add(accountData);
+            const addPromise = sut.add(accountData, {});
             await expect(addPromise).rejects.toThrow();
         });
 
@@ -165,7 +165,7 @@ describe('User UseCase', () => {
 
             const userData = makeValidCreateUserAttributes();
 
-            await sut.add(userData);
+            await sut.add(userData, {});
 
             expect(findUserByEmailRepositorySpy).toHaveBeenCalledWith('valid e-mail');
         });
@@ -186,7 +186,7 @@ describe('User UseCase', () => {
 
             const userData = makeValidCreateUserAttributes();
 
-            const addPromise = sut.add(userData);
+            const addPromise = sut.add(userData, {});
             await expect(addPromise).rejects.toThrow(new InvalidParamError('e-mail already in use'));
         });
 
@@ -197,13 +197,27 @@ describe('User UseCase', () => {
             const gerenerateAuthenticationSpy = jest.spyOn(gerenerateAuthenticationStub, 'auth');
 
             const userData = makeValidCreateUserAttributes();
+            const networkData = {
+                hostName: 'valid host',
+                ip: 'valid ip',
+                origin: 'valid origen',
+                userAgent: 'valid user agent'
+            };
 
-            await sut.add(userData);
+            await sut.add(userData, networkData);
 
-            expect(gerenerateAuthenticationSpy).toHaveBeenCalledWith({
-                email: 'valid e-mail',
-                password: 'valid password'
-            });
+            expect(gerenerateAuthenticationSpy).toHaveBeenCalledWith(
+                {
+                    email: 'valid e-mail',
+                    password: 'valid password'
+                },
+                {
+                    hostName: 'valid host',
+                    ip: 'valid ip',
+                    origin: 'valid origen',
+                    userAgent: 'valid user agent'
+                }
+            );
         });
 
         test('should throw if GerenerateAuthentication throws', async () => {
@@ -216,7 +230,7 @@ describe('User UseCase', () => {
 
             const userData = makeValidCreateUserAttributes();
 
-            const addPromise = sut.add(userData);
+            const addPromise = sut.add(userData, {});
 
             await expect(addPromise).rejects.toThrow(new Error('Test throw'));
         });

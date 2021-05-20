@@ -9,6 +9,7 @@ import { IUserRepository } from '@/domain/repository/user/user';
 import { IHasher } from '@/infra/protocols/cryptography';
 import { InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
+import { NetworkAccessInfo } from '@/domain/models/auth/networkAccessInfo';
 
 export class UserUseCase implements IUserUseCase {
     constructor(
@@ -17,7 +18,7 @@ export class UserUseCase implements IUserUseCase {
         private readonly generateAuthentication: IGenerateAuthentication
     ) {}
 
-    async add(userData: CreateUserAttributes): Promise<UserWithAuthAttributes> {
+    async add(userData: CreateUserAttributes, networkAccessInfo: NetworkAccessInfo): Promise<UserWithAuthAttributes> {
         const userWithEmail = await this.userRepository.findUserByEmail(userData.email);
         if (userWithEmail) {
             throw new InvalidParamError('e-mail already in use');
@@ -27,7 +28,10 @@ export class UserUseCase implements IUserUseCase {
         userData.password = await this.hasher.hash(passwordOriginal);
 
         const user = await this.userRepository.add(userData);
-        const authData = await this.generateAuthentication.auth({ email: userData.email, password: passwordOriginal });
+        const authData = await this.generateAuthentication.auth(
+            { email: userData.email, password: passwordOriginal },
+            networkAccessInfo
+        );
 
         return {
             user: user,

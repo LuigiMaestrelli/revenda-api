@@ -134,15 +134,29 @@ describe('SignUp Controller', () => {
                 email: 'valid_email@email.com',
                 password: 'any password',
                 passwordConfirmation: 'any password'
+            },
+            networkAccess: {
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host',
+                origin: 'valid origin'
             }
         };
 
         await sut.handle(httpRequest);
-        expect(addSpy).toBeCalledWith({
-            name: 'Any name',
-            email: 'valid_email@email.com',
-            password: 'any password'
-        });
+        expect(addSpy).toBeCalledWith(
+            {
+                name: 'Any name',
+                email: 'valid_email@email.com',
+                password: 'any password'
+            },
+            {
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host',
+                origin: 'valid origin'
+            }
+        );
     });
 
     test('should return 500 if AddUser throws', async () => {

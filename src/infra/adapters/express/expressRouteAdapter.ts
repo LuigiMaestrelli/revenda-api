@@ -8,7 +8,13 @@ export const adaptRoute = (controller: IController): RequestHandler => {
             query: req.query,
             params: req.params,
             /* @ts-expect-error */
-            auth: req.auth
+            auth: req.auth,
+            networkAccess: {
+                ip: req.ip,
+                hostName: req.hostname,
+                origin: req.headers.origin,
+                userAgent: req.headers['user-agent']
+            }
         };
 
         const response = await controller.handle(httpResquest);

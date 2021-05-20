@@ -85,7 +85,7 @@ describe('SignIn Controller', () => {
         expect(httpResponse.body.message).toBe('Missing param: Test throw');
     });
 
-    test('should call generateAuth with correct valus', async () => {
+    test('should call generateAuth with correct values', async () => {
         const { sut, generateAuthStub } = makeSut();
         const generateAuthSpy = jest.spyOn(generateAuthStub, 'auth');
 
@@ -93,15 +93,29 @@ describe('SignIn Controller', () => {
             body: {
                 email: 'valid_email@email.com',
                 password: 'any password'
+            },
+            networkAccess: {
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host',
+                origin: 'valid origin'
             }
         };
 
         await sut.handle(httpRequest);
 
-        expect(generateAuthSpy).toBeCalledWith({
-            email: 'valid_email@email.com',
-            password: 'any password'
-        });
+        expect(generateAuthSpy).toBeCalledWith(
+            {
+                email: 'valid_email@email.com',
+                password: 'any password'
+            },
+            {
+                ip: 'valid ip',
+                userAgent: 'valid agent',
+                hostName: 'valid host',
+                origin: 'valid origin'
+            }
+        );
     });
 
     test('should return 500 if GenerateAuth throws', async () => {

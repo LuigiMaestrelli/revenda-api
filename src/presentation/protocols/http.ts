@@ -1,10 +1,12 @@
 import { TokenPayload } from '@/domain/models/auth/authentication';
+import { NetworkAccessInfo } from '@/domain/models/auth/networkAccessInfo';
 
 export type HttpRequest = {
     body?: any;
     params?: any;
     query?: any;
     auth?: TokenPayload;
+    networkAccess?: NetworkAccessInfo;
 };
 
 export type HttpResponse = {
