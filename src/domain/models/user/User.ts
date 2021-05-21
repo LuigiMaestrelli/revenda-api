@@ -28,3 +28,8 @@ export interface UserWithAuthAttributes {
     user: UserAttributes;
     auth: AuthenticationResult;
 }
+
+export interface UpdateUserPassword {
+    currentPassword: string;
+    newPassword: string;
+}

@@ -1,6 +1,7 @@
 import {
     CreateUserAttributes,
     UpdateUserAttributes,
+    UpdateUserPassword,
     UserAttributes,
     UserWithAuthAttributes
 } from '@/domain/models/user/user';
@@ -39,6 +40,8 @@ export function makeUserUseCaseStub(): IUserUseCase {
         async active(id: string): Promise<void> {}
 
         async inactive(id: string): Promise<void> {}
+
+        async changePassword(id: string, passwordData: UpdateUserPassword): Promise<void> {}
     }
 
     return new UserUseCaseStub();

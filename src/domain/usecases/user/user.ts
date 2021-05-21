@@ -3,7 +3,8 @@ import {
     CreateUserAttributes,
     UserWithAuthAttributes,
     UpdateUserAttributes,
-    UserAttributes
+    UserAttributes,
+    UpdateUserPassword
 } from '@/domain/models/user/user';
 
 export interface IUserUseCase {
@@ -11,4 +12,5 @@ export interface IUserUseCase {
     update: (id: string, userData: UpdateUserAttributes) => Promise<UserAttributes>;
     active: (id: string) => Promise<void>;
     inactive: (id: string) => Promise<void>;
+    changePassword: (id: string, passwordData: UpdateUserPassword) => Promise<void>;
 }

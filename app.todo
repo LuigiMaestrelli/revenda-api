@@ -5,7 +5,7 @@
     [x] editar
     [x] inativar
     [x] ativar
-    [] alterar senha
+    [x] alterar senha
     [] validar campos no modelo
 
 - Login

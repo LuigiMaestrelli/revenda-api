@@ -1,21 +1,24 @@
 import {
     CreateUserAttributes,
     UpdateUserAttributes,
+    UpdateUserPassword,
     UserAttributes,
     UserWithAuthAttributes
 } from '@/domain/models/user/user';
 import { IUserUseCase } from '@/domain/usecases/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
-import { IHasher } from '@/infra/protocols/cryptography';
-import { InvalidParamError } from '@/shared/errors';
+import { IHashCompare, IHasher } from '@/infra/protocols/cryptography';
+import { ForbiddenError, InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { NetworkAccessInfo } from '@/domain/models/auth/networkAccessInfo';
+import { NotFoundError } from '@/shared/errors/notFoundError';
 
 export class UserUseCase implements IUserUseCase {
     constructor(
         private readonly hasher: IHasher,
         private readonly userRepository: IUserRepository,
-        private readonly generateAuthentication: IGenerateAuthentication
+        private readonly generateAuthentication: IGenerateAuthentication,
+        private readonly hasherCompare: IHashCompare
     ) {}
 
     async add(userData: CreateUserAttributes, networkAccessInfo: NetworkAccessInfo): Promise<UserWithAuthAttributes> {
@@ -37,6 +40,21 @@ export class UserUseCase implements IUserUseCase {
             user: user,
             auth: authData
         };
+    }
+
+    async changePassword(id: string, passwordData: UpdateUserPassword): Promise<void> {
+        const user = await this.userRepository.findById(id);
+        if (!user) {
+            throw new NotFoundError('User not found');
+        }
+
+        const isValid = await this.hasherCompare.compare(passwordData.currentPassword, user.password);
+        if (!isValid) {
+            throw new ForbiddenError('Password does not match');
+        }
+
+        const hashedPassword = await this.hasher.hash(passwordData.newPassword);
+        await this.update(id, { password: hashedPassword });
     }
 
     async update(id: string, userData: UpdateUserAttributes): Promise<UserAttributes> {
