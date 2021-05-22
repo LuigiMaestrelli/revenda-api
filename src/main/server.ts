@@ -1,5 +1,8 @@
-import 'module-alias/register';
-import database from '@/infra/db';
+import path from 'path';
+import moduleAlias from 'module-alias';
+moduleAlias.addAliases({
+    '@': path.join(__dirname, '..')
+});
 
 process.on('uncaughtException', err => {
     console.log('Uncaught exception', err);
@@ -12,6 +15,8 @@ process.on('unhandledRejection', err => {
 
 console.log('Connecting to the database');
 
+// eslint-disable-next-line
+import database from '@/infra/db';
 database
     .authenticate()
     .then(async (): Promise<void> => {

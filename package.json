@@ -27,7 +27,6 @@
         "node": "16.x"
     },
     "_moduleAliases": {
-        "@": "src",
         "@test": "__test__"
     },
     "dependencies": {
@@ -58,6 +57,7 @@
         "@types/helmet": "^4.0.0",
         "@types/jest": "^26.0.23",
         "@types/jsonwebtoken": "^8.5.1",
+        "@types/module-alias": "^2.0.0",
         "@types/node": "^15.6.0",
         "@types/sequelize": "^4.28.9",
         "@types/supertest": "^2.0.11",
