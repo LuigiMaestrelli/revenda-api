@@ -14,5 +14,7 @@
     [x] Validar usuário ativo no login
 
 - Infra
+    [x] Logs de erro
     [] Migrations/Seeds
     [] Docker
+    [] Repositório e UseCase genérico com crud
