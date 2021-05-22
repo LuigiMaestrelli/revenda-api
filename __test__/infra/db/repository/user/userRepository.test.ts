@@ -8,7 +8,7 @@ import { NotFoundError } from '@/shared/errors/notFoundError';
 
 type SutTypes = {
     sut: UserRepository;
-    idGenerator: IIdGenerator;
+    idGeneratorStub: IIdGenerator;
 };
 
 const makeIdGenerator = (): IIdGenerator => {
@@ -16,9 +16,10 @@ const makeIdGenerator = (): IIdGenerator => {
 };
 
 const makeSut = (): SutTypes => {
-    const idGenerator = makeIdGenerator();
-    const sut = new UserRepository(idGenerator);
-    return { sut, idGenerator };
+    const idGeneratorStub = makeIdGenerator();
+    const sut = new UserRepository(idGeneratorStub);
+
+    return { sut, idGeneratorStub };
 };
 
 describe('User Repository', () => {
@@ -42,9 +43,9 @@ describe('User Repository', () => {
 
     describe('Find user by e-mail', () => {
         test('should find user by e-mail', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             const email = faker.internet.email();
 
             await UserModel.create({
@@ -71,9 +72,9 @@ describe('User Repository', () => {
 
     describe('Find user by id', () => {
         test('should find user by id', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             await UserModel.create({
                 id: id,
                 email: faker.internet.email(),
@@ -87,9 +88,9 @@ describe('User Repository', () => {
         });
 
         test('should return null if no user was found with id', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             const user = await sut.findById(id);
 
             expect(user).toBeFalsy();
@@ -98,9 +99,9 @@ describe('User Repository', () => {
 
     describe('Update user', () => {
         test('should throw if no user was found', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             const updatePromise = sut.update(id, {
                 name: 'new name'
             });
@@ -109,9 +110,9 @@ describe('User Repository', () => {
         });
 
         test('should update only the user`s name', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             const email = faker.internet.email();
             const name = faker.name.firstName();
             const password = faker.internet.password();
@@ -137,9 +138,9 @@ describe('User Repository', () => {
         });
 
         test('should update only the user`s password', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             const email = faker.internet.email();
             const name = faker.name.firstName();
             const password = faker.internet.password();
@@ -165,9 +166,9 @@ describe('User Repository', () => {
         });
 
         test('should update only the user`s active', async () => {
-            const { sut, idGenerator } = makeSut();
+            const { sut, idGeneratorStub } = makeSut();
 
-            const id = await idGenerator.generate();
+            const id = await idGeneratorStub.generate();
             const email = faker.internet.email();
             const name = faker.name.firstName();
             const password = faker.internet.password();

@@ -1,4 +1,4 @@
-import { IHashCompare, IHasher } from '@/infra/protocols/cryptography';
+import { IHasher } from '@/infra/protocols/cryptography';
 import { UserUseCase } from '@/application/usecases/user/user';
 import { CreateUserAttributes } from '@/domain/models/user/User';
 import { IUserRepository } from '@/domain/repository/user/user';
@@ -12,7 +12,6 @@ type SutTypes = {
     hasherStub: IHasher;
     userRepositoryStub: IUserRepository;
     gerenerateAuthenticationStub: IGenerateAuthentication;
-    hasherCompare: IHashCompare;
     sut: UserUseCase;
 };
 
@@ -29,19 +28,13 @@ const makeHasher = (): IHasher => {
         async hash(value: string): Promise<string> {
             return 'hashed password';
         }
-    }
 
-    return new HasherStub();
-};
-
-const makeHashCompare = (): IHashCompare => {
-    class HashCompareStub implements IHashCompare {
         async compare(value: string, hash: string): Promise<boolean> {
             return true;
         }
     }
 
-    return new HashCompareStub();
+    return new HasherStub();
 };
 
 const makeGerenerateAuthentication = (): IGenerateAuthentication => {
@@ -62,15 +55,13 @@ const makeSut = (): SutTypes => {
     const hasherStub = makeHasher();
     const userRepositoryStub = makeUserRepositoryStub();
     const gerenerateAuthenticationStub = makeGerenerateAuthentication();
-    const hasherCompare = makeHashCompare();
 
-    const sut = new UserUseCase(hasherStub, userRepositoryStub, gerenerateAuthenticationStub, hasherCompare);
+    const sut = new UserUseCase(hasherStub, userRepositoryStub, gerenerateAuthenticationStub);
 
     return {
         hasherStub,
         gerenerateAuthenticationStub,
         userRepositoryStub,
-        hasherCompare,
         sut
     };
 };
@@ -418,8 +409,8 @@ describe('User UseCase', () => {
         });
 
         test('should call hashCompare with correct values', async () => {
-            const { sut, hasherCompare } = makeSut();
-            const hashCompereSpy = jest.spyOn(hasherCompare, 'compare');
+            const { sut, hasherStub } = makeSut();
+            const hashCompereSpy = jest.spyOn(hasherStub, 'compare');
 
             const passwordData = {
                 currentPassword: 'valid current password',
@@ -431,8 +422,8 @@ describe('User UseCase', () => {
         });
 
         test('should throw if hashCompare throws', async () => {
-            const { sut, hasherCompare } = makeSut();
-            jest.spyOn(hasherCompare, 'compare').mockImplementationOnce(() => {
+            const { sut, hasherStub } = makeSut();
+            jest.spyOn(hasherStub, 'compare').mockImplementationOnce(() => {
                 throw new Error('Test throw');
             });
 
@@ -445,8 +436,8 @@ describe('User UseCase', () => {
         });
 
         test('should throw if current password does not match', async () => {
-            const { sut, hasherCompare } = makeSut();
-            jest.spyOn(hasherCompare, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+            const { sut, hasherStub } = makeSut();
+            jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
 
             const passwordData = {
                 currentPassword: 'valid current password',

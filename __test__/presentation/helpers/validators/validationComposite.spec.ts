@@ -3,7 +3,7 @@ import { IValidation } from '@/presentation/protocols/validation';
 import { ValidationComposite } from '@/presentation/helpers/validators/validationComposite';
 
 interface SutTypes {
-    validationStubs: IValidation[];
+    validationStub: IValidation[];
     sut: ValidationComposite;
 }
 
@@ -16,19 +16,19 @@ const makeValidation = (): IValidation => {
 };
 
 const makeSut = (): SutTypes => {
-    const validationStubs = [makeValidation(), makeValidation()];
-    const sut = new ValidationComposite(validationStubs);
+    const validationStub = [makeValidation(), makeValidation()];
+    const sut = new ValidationComposite(validationStub);
 
     return {
         sut,
-        validationStubs
+        validationStub
     };
 };
 
 describe('Validation Composite', () => {
     test('should thrown an error if any validation fails', async () => {
-        const { sut, validationStubs } = makeSut();
-        jest.spyOn(validationStubs[0], 'validate').mockImplementationOnce(() => {
+        const { sut, validationStub } = makeSut();
+        jest.spyOn(validationStub[0], 'validate').mockImplementationOnce(() => {
             throw new MissingParamError('someField');
         });
 
@@ -43,11 +43,11 @@ describe('Validation Composite', () => {
     });
 
     test('should return the error if more than one validation fails', async () => {
-        const { sut, validationStubs } = makeSut();
-        jest.spyOn(validationStubs[0], 'validate').mockImplementationOnce(() => {
+        const { sut, validationStub } = makeSut();
+        jest.spyOn(validationStub[0], 'validate').mockImplementationOnce(() => {
             throw new Error();
         });
-        jest.spyOn(validationStubs[1], 'validate').mockImplementationOnce(() => {
+        jest.spyOn(validationStub[1], 'validate').mockImplementationOnce(() => {
             throw new MissingParamError('someField');
         });
 

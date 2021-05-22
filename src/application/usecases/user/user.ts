@@ -7,7 +7,7 @@ import {
 } from '@/domain/models/user/user';
 import { IUserUseCase } from '@/domain/usecases/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
-import { IHashCompare, IHasher } from '@/infra/protocols/cryptography';
+import { IHasher } from '@/infra/protocols/cryptography';
 import { ForbiddenError, InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { NetworkAccessInfo } from '@/domain/models/auth/networkAccessInfo';
@@ -17,8 +17,7 @@ export class UserUseCase implements IUserUseCase {
     constructor(
         private readonly hasher: IHasher,
         private readonly userRepository: IUserRepository,
-        private readonly generateAuthentication: IGenerateAuthentication,
-        private readonly hasherCompare: IHashCompare
+        private readonly generateAuthentication: IGenerateAuthentication
     ) {}
 
     async add(userData: CreateUserAttributes, networkAccessInfo: NetworkAccessInfo): Promise<UserWithAuthAttributes> {
@@ -48,7 +47,7 @@ export class UserUseCase implements IUserUseCase {
             throw new NotFoundError('User not found');
         }
 
-        const isValid = await this.hasherCompare.compare(passwordData.currentPassword, user.password);
+        const isValid = await this.hasher.compare(passwordData.currentPassword, user.password);
         if (!isValid) {
             throw new ForbiddenError('Password does not match');
         }

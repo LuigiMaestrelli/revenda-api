@@ -3,14 +3,14 @@ import { NetworkAccessInfo } from '@/domain/models/auth/networkAccessInfo';
 import { IAccessLogRepository } from '@/domain/repository/log/accessLog';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
-import { IHashCompare } from '@/infra/protocols/cryptography';
+import { IHasher } from '@/infra/protocols/cryptography';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { UnauthorizedError } from '@/shared/errors';
 
 export class AuthenticationUseCase implements IGenerateAuthentication {
     constructor(
         private readonly tokenSigner: ITokenSigner,
-        private readonly hasherCompare: IHashCompare,
+        private readonly hasher: IHasher,
         private readonly userRepository: IUserRepository,
         private readonly accessLogRepository: IAccessLogRepository
     ) {}
@@ -38,7 +38,7 @@ export class AuthenticationUseCase implements IGenerateAuthentication {
             throw new UnauthorizedError('Invalid e-mail or password');
         }
 
-        const isValid = await this.hasherCompare.compare(autentication.password, user.password);
+        const isValid = await this.hasher.compare(autentication.password, user.password);
         if (!isValid) {
             await this.accessLogRepository.addUnauthorized({
                 ...networkAccessInfo,

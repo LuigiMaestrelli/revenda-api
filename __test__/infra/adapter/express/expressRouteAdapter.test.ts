@@ -7,7 +7,7 @@ import app from '@/main/config/app';
 import { ServerError } from '@/shared/errors';
 
 type SutTypes = {
-    controller: IController;
+    controllerStub: IController;
     sut: RequestHandler;
 };
 
@@ -25,18 +25,18 @@ class TestControllerStub implements IController {
 }
 
 const makeSut = (): SutTypes => {
-    const controller = new TestControllerStub();
-    const sut = adaptRoute(controller);
+    const controllerStub = new TestControllerStub();
+    const sut = adaptRoute(controllerStub);
 
-    return { sut, controller };
+    return { sut, controllerStub };
 };
 
 describe('Express Route Adapter', () => {
     test('should call controller with correct body values', async () => {
-        const { sut, controller } = makeSut();
+        const { sut, controllerStub } = makeSut();
         app.post('/testRouteAdapter', sut);
 
-        const controllerSpy = jest.spyOn(controller, 'handle');
+        const controllerSpy = jest.spyOn(controllerStub, 'handle');
 
         await request(app).post('/testRouteAdapter').send({
             data: true
@@ -59,10 +59,10 @@ describe('Express Route Adapter', () => {
     });
 
     test('should call controller with correct query values', async () => {
-        const { sut, controller } = makeSut();
+        const { sut, controllerStub } = makeSut();
         app.get('/testRouteAdapter', sut);
 
-        const controllerSpy = jest.spyOn(controller, 'handle');
+        const controllerSpy = jest.spyOn(controllerStub, 'handle');
 
         await request(app).get('/testRouteAdapter?a=1&b=2&c=qweasd').send();
 
@@ -85,10 +85,10 @@ describe('Express Route Adapter', () => {
     });
 
     test('should call controller with correct param values', async () => {
-        const { sut, controller } = makeSut();
+        const { sut, controllerStub } = makeSut();
         app.get('/testRouteAdapter/:id', sut);
 
-        const controllerSpy = jest.spyOn(controller, 'handle');
+        const controllerSpy = jest.spyOn(controllerStub, 'handle');
 
         await request(app).get('/testRouteAdapter/valid-id').send();
 
@@ -117,10 +117,10 @@ describe('Express Route Adapter', () => {
     });
 
     test('should return correct server error status code', async () => {
-        const { sut, controller } = makeSut();
+        const { sut, controllerStub } = makeSut();
         app.get('/testRouteAdapterServerError', sut);
 
-        jest.spyOn(controller, 'handle').mockImplementationOnce(async () => {
+        jest.spyOn(controllerStub, 'handle').mockImplementationOnce(async () => {
             return await new Promise(resolve => {
                 resolve(makeServerErrorResponse(new ServerError('teste')));
             });
@@ -131,10 +131,10 @@ describe('Express Route Adapter', () => {
     });
 
     test('should return correct bad request status code', async () => {
-        const { sut, controller } = makeSut();
+        const { sut, controllerStub } = makeSut();
         app.get('/testRouteAdapterBaseRequest', sut);
 
-        jest.spyOn(controller, 'handle').mockImplementationOnce(async () => {
+        jest.spyOn(controllerStub, 'handle').mockImplementationOnce(async () => {
             return await new Promise(resolve => {
                 resolve(makeBadRequestResponse(new Error('teste')));
             });
@@ -145,10 +145,10 @@ describe('Express Route Adapter', () => {
     });
 
     test('should return correct headers', async () => {
-        const { sut, controller } = makeSut();
+        const { sut, controllerStub } = makeSut();
         app.get('/testRouteAdapterHeader', sut);
 
-        jest.spyOn(controller, 'handle').mockImplementationOnce(async () => {
+        jest.spyOn(controllerStub, 'handle').mockImplementationOnce(async () => {
             return await new Promise(resolve => {
                 const response = makeSuccessResponse(null, {
                     someHeader: 10,

@@ -2,7 +2,7 @@ import { AuthenticationUseCase } from '@/application/usecases/auth/auth';
 import { TokenPayload, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
-import { IHashCompare } from '@/infra/protocols/cryptography';
+import { IHasher } from '@/infra/protocols/cryptography';
 import { UnauthorizedError } from '@/shared/errors';
 import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 import { IAccessLogRepository } from '@/domain/repository/log/accessLog';
@@ -10,10 +10,10 @@ import { CreateAccessLogAttributes, AccessLogAttributes } from '@/domain/models/
 
 type SutTypes = {
     sut: AuthenticationUseCase;
-    tokenSigner: ITokenSigner;
-    hasherCompare: IHashCompare;
-    userRepository: IUserRepository;
-    accessLogRepository: IAccessLogRepository;
+    tokenSignerStub: ITokenSigner;
+    hasherStub: IHasher;
+    userRepositoryStub: IUserRepository;
+    accessLogRepositoryStub: IAccessLogRepository;
 };
 
 const makeTokenSigner = (): ITokenSigner => {
@@ -30,8 +30,12 @@ const makeTokenSigner = (): ITokenSigner => {
     return new TokenSignerStub();
 };
 
-const makeHashCompare = (): IHashCompare => {
-    class HashCompareStub implements IHashCompare {
+const makeHasher = (): IHasher => {
+    class HashCompareStub implements IHasher {
+        async hash(value: string): Promise<string> {
+            return 'hashed value';
+        }
+
         async compare(value: string, hash: string): Promise<boolean> {
             return true;
         }
@@ -73,26 +77,26 @@ const makeAccessLogRepository = (): IAccessLogRepository => {
 };
 
 const makeSut = (): SutTypes => {
-    const tokenSigner = makeTokenSigner();
-    const hasherCompare = makeHashCompare();
-    const userRepository = makeUserRepositoryStub();
-    const accessLogRepository = makeAccessLogRepository();
-    const sut = new AuthenticationUseCase(tokenSigner, hasherCompare, userRepository, accessLogRepository);
+    const tokenSignerStub = makeTokenSigner();
+    const hasherStub = makeHasher();
+    const userRepositoryStub = makeUserRepositoryStub();
+    const accessLogRepositoryStub = makeAccessLogRepository();
+    const sut = new AuthenticationUseCase(tokenSignerStub, hasherStub, userRepositoryStub, accessLogRepositoryStub);
 
     return {
         sut,
-        tokenSigner,
-        hasherCompare,
-        userRepository,
-        accessLogRepository
+        tokenSignerStub,
+        hasherStub,
+        userRepositoryStub,
+        accessLogRepositoryStub
     };
 };
 
 describe('Auth UseCase', () => {
     test('should call userRepository with correct values', async () => {
-        const { sut, userRepository } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        const userRepositorySpy = jest.spyOn(userRepository, 'findUserByEmail');
+        const userRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
 
         const authDto = { email: 'valid email', password: 'valid password' };
         await sut.auth(authDto, {});
@@ -101,9 +105,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should throw if userRepository throws', async () => {
-        const { sut, userRepository } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepository, 'findUserByEmail').mockImplementationOnce(() => {
+        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(() => {
             throw new Error('Test error');
         });
 
@@ -114,9 +118,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should throw if no user was found with requested e-mail', async () => {
-        const { sut, userRepository } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepository, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
+        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
 
         const authDto = { email: 'invalid email', password: 'valid password' };
         const authPromise = sut.auth(authDto, {});
@@ -125,9 +129,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should throw if the password does not match', async () => {
-        const { sut, hasherCompare } = makeSut();
+        const { sut, hasherStub } = makeSut();
 
-        jest.spyOn(hasherCompare, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+        jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
 
         const authDto = { email: 'valid email', password: 'invalid password' };
         const authPromise = sut.auth(authDto, {});
@@ -136,9 +140,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should throw if user is inactive', async () => {
-        const { sut, userRepository } = makeSut();
+        const { sut, userRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepository, 'findUserByEmail').mockReturnValueOnce(
+        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
             new Promise(resolve =>
                 resolve({
                     id: 'valid id',
@@ -157,9 +161,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should throw if tokenSigner throws', async () => {
-        const { sut, tokenSigner } = makeSut();
+        const { sut, tokenSignerStub } = makeSut();
 
-        jest.spyOn(tokenSigner, 'sign').mockImplementationOnce(() => {
+        jest.spyOn(tokenSignerStub, 'sign').mockImplementationOnce(() => {
             throw new Error('Test error');
         });
 
@@ -170,9 +174,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should call tokenSigner with correct values', async () => {
-        const { sut, tokenSigner } = makeSut();
+        const { sut, tokenSignerStub } = makeSut();
 
-        const tokenSignerSpy = jest.spyOn(tokenSigner, 'sign');
+        const tokenSignerSpy = jest.spyOn(tokenSignerStub, 'sign');
 
         const authDto = { email: 'valid email', password: 'valid password' };
         await sut.auth(authDto, {});
@@ -182,10 +186,10 @@ describe('Auth UseCase', () => {
         });
     });
 
-    test('should throw if hasherCompare throws', async () => {
-        const { sut, hasherCompare } = makeSut();
+    test('should throw if hasher throws', async () => {
+        const { sut, hasherStub } = makeSut();
 
-        jest.spyOn(hasherCompare, 'compare').mockImplementationOnce(() => {
+        jest.spyOn(hasherStub, 'compare').mockImplementationOnce(() => {
             throw new Error('Test error');
         });
 
@@ -195,22 +199,22 @@ describe('Auth UseCase', () => {
         await expect(authPromise).rejects.toThrow(new Error('Test error'));
     });
 
-    test('should call hasherCompare with correct values', async () => {
-        const { sut, hasherCompare } = makeSut();
+    test('should call hasher with correct values', async () => {
+        const { sut, hasherStub } = makeSut();
 
-        const hasherCompareSpy = jest.spyOn(hasherCompare, 'compare');
+        const hasherSpy = jest.spyOn(hasherStub, 'compare');
 
         const authDto = { email: 'valid email', password: 'valid password' };
         await sut.auth(authDto, {});
 
-        expect(hasherCompareSpy).toBeCalledWith('valid password', 'hashed password');
+        expect(hasherSpy).toBeCalledWith('valid password', 'hashed password');
     });
 
     test('should call addUnauthorized access log if no user with e-mail was found', async () => {
-        const { sut, userRepository, accessLogRepository } = makeSut();
+        const { sut, userRepositoryStub, accessLogRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepository, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
-        const addUnauthorizedSpy = jest.spyOn(accessLogRepository, 'addUnauthorized');
+        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
+        const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
 
         const authDto = { email: 'invalid email', password: 'valid password' };
         const networkAccessDto = {
@@ -232,10 +236,10 @@ describe('Auth UseCase', () => {
     });
 
     test('should call addUnauthorized access log if user is inactive', async () => {
-        const { sut, userRepository, accessLogRepository } = makeSut();
+        const { sut, userRepositoryStub, accessLogRepositoryStub } = makeSut();
 
-        const addUnauthorizedSpy = jest.spyOn(accessLogRepository, 'addUnauthorized');
-        jest.spyOn(userRepository, 'findUserByEmail').mockReturnValueOnce(
+        const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
+        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
             new Promise(resolve =>
                 resolve({
                     id: 'valid id',
@@ -267,10 +271,10 @@ describe('Auth UseCase', () => {
     });
 
     test('should call addUnauthorized access log if password is invalid', async () => {
-        const { sut, hasherCompare, accessLogRepository } = makeSut();
+        const { sut, hasherStub, accessLogRepositoryStub } = makeSut();
 
-        jest.spyOn(hasherCompare, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
-        const addUnauthorizedSpy = jest.spyOn(accessLogRepository, 'addUnauthorized');
+        jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+        const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
 
         const authDto = { email: 'valid email', password: 'invalid password' };
         const networkAccessDto = {
@@ -292,9 +296,9 @@ describe('Auth UseCase', () => {
     });
 
     test('should call addAuthorized access log if valid data is sent', async () => {
-        const { sut, accessLogRepository } = makeSut();
+        const { sut, accessLogRepositoryStub } = makeSut();
 
-        const addAuthorizedSpy = jest.spyOn(accessLogRepository, 'addAuthorized');
+        const addAuthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addAuthorized');
 
         const authDto = { email: 'valid email', password: 'valid password' };
         const networkAccessDto = {
