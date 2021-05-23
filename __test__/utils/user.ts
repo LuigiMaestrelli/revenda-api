@@ -4,7 +4,7 @@ import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
 import UserModel from '@/infra/db/model/user/user';
 import config from '@/main/config';
-import { UserWithAuthAttributes } from '@/domain/models/user/user';
+import { UserWithAuthAttributes } from 'domain/models/user/user';
 
 const STRONG_PASSWORD = '^znET!St5+.PXgtZ';
 

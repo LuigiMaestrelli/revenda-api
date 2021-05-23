@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { CreateUserAttributes, UserAttributes } from '@/domain/models/user/user';
+import { CreateUserAttributes, UserAttributes } from 'domain/models/user/user';
 import BaseModel from '../infra/basemodel';
 
 export default class UserModel extends BaseModel<UserAttributes, CreateUserAttributes> implements UserAttributes {

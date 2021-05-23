@@ -56,3 +56,9 @@ Pensando nisso, ele lhe contratou para desenvolver o sistema. Os pré-requisitos
 
 -   yarn sequelize db:seed:undo:all
     Desfaz todos os seeds
+
+## Comandos DOCKER
+
+-   docker build . -t "revenda-api"
+-   docker compose build
+-   docker compose up

@@ -1,6 +1,6 @@
 import { IHasher } from '@/infra/protocols/cryptography';
 import { UserUseCase } from '@/application/usecases/user/user';
-import { CreateUserAttributes } from '@/domain/models/user/User';
+import { CreateUserAttributes } from 'domain/models/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { ForbiddenError, InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';

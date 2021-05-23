@@ -21,7 +21,7 @@
         "downlevelIteration": true,
         "allowUnreachableCode": false,
         "paths": {
-            "@/*": ["*"],
+            "@/*": ["../src/*"],
             "@test/*": ["../__test__/*"]
         },
         "typeRoots": ["node_modules/@types"]

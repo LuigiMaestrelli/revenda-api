@@ -1,4 +1,4 @@
-import { CreateUserAttributes, UserAttributes, UpdateUserAttributes } from '@/domain/models/user/user';
+import { CreateUserAttributes, UserAttributes, UpdateUserAttributes } from 'domain/models/user/user';
 
 export interface IUserRepository {
     add: (userData: CreateUserAttributes) => Promise<UserAttributes>;

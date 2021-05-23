@@ -6,6 +6,7 @@
     "author": "Luigi Maestrelli",
     "license": "MIT",
     "scripts": {
+        "start": "node dist/main/server.js",
         "dev": "nodemon --config nodemon.json src/main/server.ts",
         "dev:debug": "nodemon --config nodemon.json --inspect-brk src/main/server.ts",
         "build": "rimraf ./dist && tsc -p tsconfig.build.json",
@@ -25,9 +26,6 @@
     },
     "engines": {
         "node": "16.x"
-    },
-    "_moduleAliases": {
-        "@test": "__test__"
     },
     "dependencies": {
         "bcrypt": "^5.0.1",
