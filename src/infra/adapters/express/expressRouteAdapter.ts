@@ -2,7 +2,7 @@ import { Request, Response, RequestHandler } from 'express';
 import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
 
 export const convertRequest = (req: Request): HttpRequest => {
-    return {
+    const httpRequest: HttpRequest = {
         body: req.body,
         query: req.query,
         params: req.params,
@@ -15,6 +15,14 @@ export const convertRequest = (req: Request): HttpRequest => {
             userAgent: req.headers['user-agent']
         }
     };
+
+    if (req.file) {
+        httpRequest.file = {
+            ...req.file
+        };
+    }
+
+    return httpRequest;
 };
 
 export const setHeaders = (httpResponse: HttpResponse, res: Response): void => {

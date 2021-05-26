@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import path from 'path';
 
 import dbConfig from '@/main/config/database';
-import filesUtils from '@/shared/utils/files';
+import { getFileList } from '@/shared/utils/files';
 
 /* @ts-expect-error */
 Sequelize.postgres.DECIMAL.parse = (value: any): number => parseFloat(value);
@@ -14,9 +14,9 @@ const connection = new Sequelize(config);
 
 const modelPath = path.join(__dirname, './model');
 
-const modelClasses = filesUtils
-    .getFileList(modelPath, ['index.ts', 'index.js', 'basemodel.ts', 'basemodel.js'])
-    .map(filePath => require(filePath));
+const modelClasses = getFileList(modelPath, ['index.ts', 'index.js', 'basemodel.ts', 'basemodel.js']).map(filePath =>
+    require(filePath)
+);
 
 modelClasses.forEach(Model => Model.default.initialize(connection));
 modelClasses.filter(p => !!p.associate).forEach(Model => Model.associate(connection.models));

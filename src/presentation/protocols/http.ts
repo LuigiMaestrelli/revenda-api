@@ -7,6 +7,7 @@ export type HttpRequest = {
     query?: any;
     auth?: TokenPayload;
     networkAccess?: NetworkAccessInfo;
+    file?: HttpUploadFile;
 };
 
 export type HttpResponse = {
@@ -24,4 +25,12 @@ export type HttpRequestError = {
     message: string;
     parentMessage?: string;
     details?: string;
+};
+
+export type HttpUploadFile = {
+    fieldname: string;
+    mimetype: string;
+    originalname: string;
+    size: number;
+    buffer: Buffer;
 };

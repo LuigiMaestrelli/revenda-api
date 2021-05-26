@@ -16,5 +16,6 @@
 - Infra
     [x] Logs de erro
     [] Migrations/Seeds
-    [] Docker
+    [] Docker para postgresql
+    [] Passar configs via docker para api
     [] Repositório e UseCase genérico com crud

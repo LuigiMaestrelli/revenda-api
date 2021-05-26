@@ -1,27 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 
-export default {
-    getFileList(dir: string, excludes: string[] = []): string[] {
-        let files: string[] = [];
+export const getFileList = (dir: string, excludes: string[] = []): string[] => {
+    let files: string[] = [];
 
-        const dirData = fs.readdirSync(dir);
-        dirData.forEach(file => {
-            const filepath = path.join(dir, file);
-            const stat = fs.lstatSync(filepath);
+    fs.readdirSync(dir).forEach(file => {
+        const filepath = path.join(dir, file);
+        const stat = fs.lstatSync(filepath);
 
-            if (stat.isDirectory()) {
-                files = files.concat(this.getFileList(filepath, excludes));
-                return;
-            }
+        if (stat.isDirectory()) {
+            files = files.concat(getFileList(filepath, excludes));
+            return;
+        }
 
-            if (excludes.includes(file)) {
-                return;
-            }
+        if (excludes.includes(file)) {
+            return;
+        }
 
-            files.push(filepath);
-        });
+        files.push(filepath);
+    });
 
-        return files;
+    return files;
+};
+
+export const isValidMimeType = (acceptedMime: string[], mimetype: string): boolean => {
+    if (!acceptedMime.map(p => p.toLowerCase()).includes(mimetype.toLowerCase())) {
+        return false;
     }
+
+    return true;
 };
