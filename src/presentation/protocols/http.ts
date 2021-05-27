@@ -14,6 +14,7 @@ export type HttpResponse = {
     statusCode: number;
     body?: any;
     headers?: any;
+    contentType?: string;
 };
 
 export type HttpResponseError = {

@@ -162,4 +162,34 @@ describe('Express Route Adapter', () => {
         expect(response.header.someheader).toBe('10');
         expect(response.header.otherheader).toBe('test');
     });
+
+    test('should return json as a default contentType', async () => {
+        const { sut, controllerStub } = makeSut();
+        app.get('/testRouteAdapterDefaultContent', sut);
+
+        jest.spyOn(controllerStub, 'handle').mockImplementationOnce(async () => {
+            return await new Promise(resolve => {
+                const response = makeSuccessResponse();
+                resolve(response);
+            });
+        });
+
+        const response = await request(app).get('/testRouteAdapterDefaultContent').send();
+        expect(response.header['content-type']).toContain('application/json');
+    });
+
+    test('should return defined contentType', async () => {
+        const { sut, controllerStub } = makeSut();
+        app.get('/testRouteAdapterDefinedContent', sut);
+
+        jest.spyOn(controllerStub, 'handle').mockImplementationOnce(async () => {
+            return await new Promise(resolve => {
+                const response = makeSuccessResponse(null, null, 'image/png');
+                resolve(response);
+            });
+        });
+
+        const response = await request(app).get('/testRouteAdapterDefinedContent').send();
+        expect(response.header['content-type']).toContain('image/png');
+    });
 });

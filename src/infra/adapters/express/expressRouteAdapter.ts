@@ -34,6 +34,18 @@ export const setHeaders = (httpResponse: HttpResponse, res: Response): void => {
     return headers;
 };
 
+export const setResponseData = (httpResponse: HttpResponse, res: Response): void => {
+    res.status(httpResponse.statusCode);
+
+    if (httpResponse.contentType) {
+        res.contentType(httpResponse.contentType);
+        res.send(httpResponse.body);
+        return;
+    }
+
+    res.json(httpResponse.body);
+};
+
 export const adaptRoute = (controller: IController): RequestHandler => {
     return async (req: Request, res: Response) => {
         const httpResquest = convertRequest(req);
@@ -41,7 +53,6 @@ export const adaptRoute = (controller: IController): RequestHandler => {
         const response = await controller.handle(httpResquest);
 
         setHeaders(response, res);
-
-        res.status(response.statusCode).json(response.body);
+        setResponseData(response, res);
     };
 };

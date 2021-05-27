@@ -1,6 +1,7 @@
 import { UserImageUseCase } from '@/application/usecases/user/userImage';
 import { IUserImageRepository } from '@/domain/repository/user/userImage';
-import { CreateUserImageAttributes, UserImageAttributes } from 'domain/models/user/userImage';
+import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
+import { NotFoundError } from '@/shared/errors/notFoundError';
 
 type SutTypes = {
     userRepositoryStub: IUserImageRepository;
@@ -145,6 +146,15 @@ describe('UserImage UseCase', () => {
                 miniature: null,
                 miniatureSize: 1000
             });
+        });
+
+        test('should throw NotFound if no image was found', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findById').mockReturnValueOnce(null);
+
+            const findByIdPromise = sut.findById('valid id');
+            await expect(findByIdPromise).rejects.toThrow(new NotFoundError('Image not found'));
         });
     });
 });

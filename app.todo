@@ -8,6 +8,12 @@
     [x] alterar senha
     [] validar campos no modelo
     [] foto usuário
+        [x] Upload
+        [] Miniatura
+        [x] Get
+        [] Get Miniatura
+        [] Teste Rotas
+        [] Teste integração repositório
     
 - Login
     [x] Log de acessos

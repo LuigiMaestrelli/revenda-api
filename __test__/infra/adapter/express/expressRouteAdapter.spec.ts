@@ -1,5 +1,5 @@
 import { getMockReq, getMockRes } from '@jest-mock/express';
-import { convertRequest, setHeaders } from '@/infra/adapters/express/expressRouteAdapter';
+import { convertRequest, setHeaders, setResponseData } from '@/infra/adapters/express/expressRouteAdapter';
 import { HttpRequest, HttpResponse } from '@/presentation/protocols';
 
 const DEFAULT_REQUEST: HttpRequest = {
@@ -86,6 +86,24 @@ describe('Express Route Adapter', () => {
                 }
             });
         });
+
+        test('should convert File data', async () => {
+            const request = getMockReq({
+                file: {
+                    someData: 'teste',
+                    buffer: null
+                }
+            });
+            const result = convertRequest(request);
+
+            expect(result).toEqual({
+                ...DEFAULT_REQUEST,
+                file: {
+                    someData: 'teste',
+                    buffer: null
+                }
+            });
+        });
     });
 
     describe('setHeaders', () => {
@@ -119,6 +137,65 @@ describe('Express Route Adapter', () => {
             const headers = setHeaders(response, res);
 
             expect(headers).toEqual({});
+        });
+    });
+
+    describe('setResponseData', () => {
+        test('should return a json as default contentType', () => {
+            const { res } = getMockRes();
+
+            const jsonSpy = jest.spyOn(res, 'json');
+
+            const response: HttpResponse = {
+                body: {
+                    test: 1
+                },
+                statusCode: 200
+            };
+
+            setResponseData(response, res);
+
+            expect(jsonSpy).toHaveBeenCalledWith({
+                test: 1
+            });
+        });
+
+        test('should return setted contentType', () => {
+            const { res } = getMockRes();
+
+            const contentTypeSpy = jest.spyOn(res, 'contentType');
+            const jsonSpy = jest.spyOn(res, 'json');
+
+            const response: HttpResponse = {
+                body: {
+                    test: 1
+                },
+                contentType: 'test',
+                statusCode: 200
+            };
+
+            setResponseData(response, res);
+
+            expect(contentTypeSpy).toHaveBeenCalledWith('test');
+            expect(jsonSpy).not.toHaveBeenCalled();
+        });
+
+        test('should call status with correct value', () => {
+            const { res } = getMockRes();
+
+            const statusSpy = jest.spyOn(res, 'status');
+
+            const response: HttpResponse = {
+                body: {
+                    test: 1
+                },
+                contentType: 'test',
+                statusCode: 501
+            };
+
+            setResponseData(response, res);
+
+            expect(statusSpy).toHaveBeenCalledWith(501);
         });
     });
 });

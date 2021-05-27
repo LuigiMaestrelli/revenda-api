@@ -7,6 +7,7 @@ import { makeActivateUser } from '@/main/factories/controller/user/activateUserF
 import { makeInactivateUser } from '@/main/factories/controller/user/inactivateUserFactory';
 import { makeChangeUserPassword } from '@/main/factories/controller/user/changeUserPasswordFactory';
 import { makeUpdateUserImage } from '@/main/factories/controller/user/updateUserImageFactory';
+import { makeGetUserImage } from '@/main/factories/controller/user/getUserImageFactory';
 import { makeAuthenticationMiddleware } from '@/main/factories/middleware/authenticationFactory';
 
 export default (router: Router): void => {
@@ -21,4 +22,5 @@ export default (router: Router): void => {
         imageUpload.single('image'),
         adaptRoute(makeUpdateUserImage())
     );
+    router.get('/user/:id/image', makeAuthenticationMiddleware(), adaptRoute(makeGetUserImage()));
 };
