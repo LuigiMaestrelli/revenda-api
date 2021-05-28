@@ -1,5 +1,6 @@
 import { Request, Response, RequestHandler } from 'express';
-import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
+import { IController } from '@/presentation/protocols';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export const convertRequest = (req: Request): HttpRequest => {
     const httpRequest: HttpRequest = {

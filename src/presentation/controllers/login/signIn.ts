@@ -1,6 +1,7 @@
-import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
+import { IController, IValidation } from '@/presentation/protocols';
 import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export class SignInController implements IController {
     constructor(private readonly validation: IValidation, private readonly generateAuth: IGenerateAuthentication) {}

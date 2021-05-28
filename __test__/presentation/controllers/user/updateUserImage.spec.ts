@@ -1,6 +1,7 @@
 import { IUserImageUseCase } from '@/domain/usecases/user/userImage';
 import { UpdateUserImageController } from '@/presentation/controllers/user/updateImage';
-import { HttpRequest, IValidation } from '@/presentation/protocols';
+import { IValidation } from '@/presentation/protocols';
+import { HttpRequest } from '@/domain/models/infra/http';
 import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
 import { MissingParamError } from '@/shared/errors';
 

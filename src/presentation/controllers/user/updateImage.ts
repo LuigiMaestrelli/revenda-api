@@ -1,6 +1,7 @@
-import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
+import { IController, IValidation } from '@/presentation/protocols';
 import { makeErrorResponse, makeSuccessResponse } from '@/shared/utils/http';
 import { IUserImageUseCase } from '@/domain/usecases/user/userImage';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export class UpdateUserImageController implements IController {
     constructor(private readonly validation: IValidation, private readonly userImageUseCase: IUserImageUseCase) {}

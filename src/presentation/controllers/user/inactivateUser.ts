@@ -1,6 +1,7 @@
-import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
+import { IController, IValidation } from '@/presentation/protocols';
 import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
 import { IUserUseCase } from '@/domain/usecases/user/user';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export class InactivateUserController implements IController {
     constructor(private readonly validation: IValidation, private readonly userUseCase: IUserUseCase) {}

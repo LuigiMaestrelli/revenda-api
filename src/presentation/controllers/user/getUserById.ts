@@ -1,7 +1,8 @@
-import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
+import { IController, IValidation } from '@/presentation/protocols';
 import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { NotFoundError } from '@/shared/errors/notFoundError';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export class GetUserByIdController implements IController {
     constructor(private readonly validation: IValidation, private readonly userRepository: IUserRepository) {}

@@ -1,4 +1,4 @@
-import { HttpRequest, HttpResponse } from './http';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export interface IController {
     handle: (httpRequest: HttpRequest) => Promise<HttpResponse>;

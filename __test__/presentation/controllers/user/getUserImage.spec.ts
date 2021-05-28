@@ -1,8 +1,9 @@
 import { IUserImageUseCase } from '@/domain/usecases/user/userImage';
 import { GetUserImageController } from '@/presentation/controllers/user/getUserImage';
-import { HttpRequest, IValidation } from '@/presentation/protocols';
+import { IValidation } from '@/presentation/protocols';
 import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
 import { MissingParamError } from '@/shared/errors';
+import { HttpRequest } from '@/domain/models/infra/http';
 
 type SutTypes = {
     sut: GetUserImageController;

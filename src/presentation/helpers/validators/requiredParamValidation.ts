@@ -1,5 +1,6 @@
 import { MissingParamError } from '@/shared/errors';
-import { HttpRequest, IValidation } from '@/presentation/protocols';
+import { IValidation } from '@/presentation/protocols';
+import { HttpRequest } from '@/domain/models/infra/http';
 
 export class RequiredParamValidation implements IValidation {
     constructor(private readonly paramName: string) {}

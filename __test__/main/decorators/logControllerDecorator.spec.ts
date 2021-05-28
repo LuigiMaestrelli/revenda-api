@@ -1,4 +1,5 @@
-import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
+import { IController } from '@/presentation/protocols';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 import { LogControllerDecorator } from '@/main/decorators/logControllerDecorator';
 import { ServerError } from '@/shared/errors';
 import { IErrorLogRepository } from '@/domain/repository/log/errorLog';

@@ -1,6 +1,6 @@
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import { convertRequest, setHeaders, setResponseData } from '@/infra/adapters/express/expressRouteAdapter';
-import { HttpRequest, HttpResponse } from '@/presentation/protocols';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 const DEFAULT_REQUEST: HttpRequest = {
     body: {},

@@ -1,5 +1,6 @@
-import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
+import { IController } from '@/presentation/protocols';
 import { makeSuccessResponse, makeServerErrorResponse } from '@/shared/utils/http';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export class ServerHealthController implements IController {
     getProcessUpTime(): number {

@@ -1,6 +1,6 @@
 import { InvalidParamError } from '@/shared/errors';
 import { IValidation } from '@/presentation/protocols/validation';
-import { HttpRequest } from '@/presentation/protocols';
+import { HttpRequest } from '@/domain/models/infra/http';
 
 export class CompareFieldsValidation implements IValidation {
     constructor(private readonly fieldName: string, private readonly fieldToCompareName: string) {}

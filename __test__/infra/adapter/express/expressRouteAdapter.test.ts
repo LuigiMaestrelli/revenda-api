@@ -2,7 +2,8 @@ import { RequestHandler } from 'express';
 import request from 'supertest';
 import { adaptRoute } from '@/infra/adapters/express/expressRouteAdapter';
 import { makeBadRequestResponse, makeServerErrorResponse, makeSuccessResponse } from '@/shared/utils/http';
-import { IController, HttpRequest, HttpResponse } from '@/presentation/protocols';
+import { IController } from '@/presentation/protocols';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 import app from '@/main/config/app';
 import { ServerError } from '@/shared/errors';
 

@@ -1,5 +1,6 @@
 import { InvalidParamError } from '@/shared/errors';
-import { IValidation, IPasswordValidator, HttpRequest } from '@/presentation/protocols';
+import { IValidation, IPasswordValidator } from '@/presentation/protocols';
+import { HttpRequest } from '@/domain/models/infra/http';
 
 export class StrongPasswordValidation implements IValidation {
     constructor(private readonly fieldName: string, private readonly passwordValidator: IPasswordValidator) {}

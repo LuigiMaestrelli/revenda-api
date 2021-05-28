@@ -1,4 +1,4 @@
-import { HttpRequest } from '@/presentation/protocols';
+import { HttpRequest } from '@/domain/models/infra/http';
 import { IValidation } from '@/presentation/protocols/validation';
 
 export class ValidationComposite implements IValidation {

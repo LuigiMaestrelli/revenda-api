@@ -1,7 +1,8 @@
 import { IUserUseCase } from '@/domain/usecases/user/user';
-import { IController, HttpRequest, HttpResponse, IValidation } from '@/presentation/protocols';
+import { IController, IValidation } from '@/presentation/protocols';
 import { IObjectManipulation } from '@/infra/protocols/objectManipulation';
 import { makeErrorResponse, makeSuccessResponse } from '@/shared/utils/http';
+import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
 export class UpdateUserController implements IController {
     constructor(
