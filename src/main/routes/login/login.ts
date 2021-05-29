@@ -5,5 +5,5 @@ import { makeSignInController } from '@/main/factories/controller/login/signInFa
 
 export default (router: Router): void => {
     router.post('/signup', adaptRoute(makeSignUpController()));
-    router.post('/signin', adaptRoute(makeSignInController()));
+    router.post('/signin/token', adaptRoute(makeSignInController()));
 };

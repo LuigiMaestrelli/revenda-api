@@ -146,8 +146,8 @@ describe('Login Routes', () => {
         });
     });
 
-    describe('POST /signin', () => {
-        test('should return 200 on signin', async () => {
+    describe('POST /token', () => {
+        test('should return 200 on signin/token', async () => {
             const email = faker.internet.email();
             const bcryptAdapter = new BcryptAdapter();
             const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
@@ -159,7 +159,7 @@ describe('Login Routes', () => {
                 password: hashedPassword
             });
 
-            const response = await request(app).post('/api/signin').send({
+            const response = await request(app).post('/api/signin/token').send({
                 email: email,
                 password: STRONG_PASSWORD
             });
@@ -167,7 +167,7 @@ describe('Login Routes', () => {
             expect(response.status).toBe(200);
         });
 
-        test('should return valid token and refreshtoken on signin', async () => {
+        test('should return valid token and refreshtoken on signin/token', async () => {
             const email = faker.internet.email();
             const bcryptAdapter = new BcryptAdapter();
             const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
@@ -180,7 +180,7 @@ describe('Login Routes', () => {
                 password: hashedPassword
             });
 
-            const response = await request(app).post('/api/signin').send({
+            const response = await request(app).post('/api/signin/token').send({
                 email: email,
                 password: STRONG_PASSWORD
             });
@@ -204,8 +204,8 @@ describe('Login Routes', () => {
             });
         });
 
-        test('should return 400 on signin if no email is provided', async () => {
-            const response = await request(app).post('/api/signin').send({
+        test('should return 400 on signin/token if no email is provided', async () => {
+            const response = await request(app).post('/api/signin/token').send({
                 password: STRONG_PASSWORD
             });
 
@@ -213,8 +213,8 @@ describe('Login Routes', () => {
             expect(response.body.message).toBe('Missing param: email');
         });
 
-        test('should return 400 on signin if no password is provided', async () => {
-            const response = await request(app).post('/api/signin').send({
+        test('should return 400 on signin/token if no password is provided', async () => {
+            const response = await request(app).post('/api/signin/token').send({
                 email: faker.internet.email()
             });
 
@@ -234,7 +234,7 @@ describe('Login Routes', () => {
                 password: hashedPassword
             });
 
-            const response = await request(app).post('/api/signin').send({
+            const response = await request(app).post('/api/signin/token').send({
                 email: email,
                 password: 'adasdasdasd'
             });
@@ -254,7 +254,7 @@ describe('Login Routes', () => {
                 password: hashedPassword
             });
 
-            const response = await request(app).post('/api/signin').send({
+            const response = await request(app).post('/api/signin/token').send({
                 email: faker.internet.email(),
                 password: hashedPassword
             });
@@ -275,7 +275,7 @@ describe('Login Routes', () => {
             });
             await userCreate.update({ active: false });
 
-            const response = await request(app).post('/api/signin').send({
+            const response = await request(app).post('/api/signin/token').send({
                 email: faker.internet.email(),
                 password: hashedPassword
             });
