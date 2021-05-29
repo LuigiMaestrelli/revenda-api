@@ -14,7 +14,7 @@ export const imageFileFilter = (file: Express.Multer.File, callback: FileFilterC
 };
 
 export const imageUpload = multer({
-    limits: { fileSize: MAXSIZE_30_MB },
     storage: multer.memoryStorage(),
+    limits: { fileSize: MAXSIZE_30_MB },
     fileFilter: (req, file, callback) => imageFileFilter(file, callback)
 });
