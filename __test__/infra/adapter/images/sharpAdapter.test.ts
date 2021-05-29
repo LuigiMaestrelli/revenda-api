@@ -1,10 +1,10 @@
 import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
-import { ImageManipulation } from '@/infra/adapters/images/imageManipulation';
+import { SharpAdapter } from '@/infra/adapters/images/sharpAdapter';
 
-const makeSut = (): ImageManipulation => {
-    return new ImageManipulation();
+const makeSut = (): SharpAdapter => {
+    return new SharpAdapter();
 };
 
 describe('Image manipulations', () => {

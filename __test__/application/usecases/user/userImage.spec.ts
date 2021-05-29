@@ -2,10 +2,12 @@ import { UserImageUseCase } from '@/application/usecases/user/userImage';
 import { IUserImageRepository } from '@/domain/repository/user/userImage';
 import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
 import { NotFoundError } from '@/shared/errors/notFoundError';
-import { HttpUploadFile } from 'domain/models/infra/http';
+import { HttpUploadFile } from '@/domain/models/infra/http';
+import { IImageManipulation } from '@/infra/protocols/imageManipulation';
 
 type SutTypes = {
     userRepositoryStub: IUserImageRepository;
+    imageManipulationStub: IImageManipulation;
     sut: UserImageUseCase;
 };
 
@@ -31,18 +33,110 @@ const makeUserImageRepositoryStub = (): IUserImageRepository => {
     return new UserImageRepositoryStub();
 };
 
+const makeImageManipulation = (): IImageManipulation => {
+    class ImageManipulationStub implements IImageManipulation {
+        async resize(imageBuffer: Buffer, size: number): Promise<Buffer> {
+            return imageBuffer;
+        }
+
+        async getImageSize(imageBuffer: Buffer): Promise<number> {
+            return 150;
+        }
+    }
+
+    return new ImageManipulationStub();
+};
+
 const makeSut = (): SutTypes => {
     const userRepositoryStub = makeUserImageRepositoryStub();
-    const sut = new UserImageUseCase(userRepositoryStub);
+    const imageManipulationStub = makeImageManipulation();
+    const sut = new UserImageUseCase(userRepositoryStub, imageManipulationStub);
 
     return {
         sut,
-        userRepositoryStub
+        userRepositoryStub,
+        imageManipulationStub
     };
+};
+
+const createTestBuffer = (): Buffer => {
+    return Buffer.from('Test data', 'utf8');
 };
 
 describe('UserImage UseCase', () => {
     describe('setImage', () => {
+        test('should call resize with correct values', async () => {
+            const { sut, imageManipulationStub } = makeSut();
+            const resizeSpy = jest.spyOn(imageManipulationStub, 'resize');
+            const buffer = createTestBuffer();
+
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
+                mimetype: 'valid mimetype',
+                originalname: 'valid name',
+                size: 1000,
+                buffer: buffer
+            };
+
+            await sut.setImage('valid id', data);
+            expect(resizeSpy).toBeCalledWith(buffer, 300);
+        });
+
+        test('should throw if resize throws', async () => {
+            const { sut, imageManipulationStub } = makeSut();
+            jest.spyOn(imageManipulationStub, 'resize').mockImplementationOnce(() => {
+                throw new Error('Test throw');
+            });
+            const buffer = createTestBuffer();
+
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
+                mimetype: 'valid mimetype',
+                originalname: 'valid name',
+                size: 1000,
+                buffer: buffer
+            };
+
+            const setImagePromise = sut.setImage('valid id', data);
+            await expect(setImagePromise).rejects.toThrow(new Error('Test throw'));
+        });
+
+        test('should call getImageSize with correct values', async () => {
+            const { sut, imageManipulationStub } = makeSut();
+            const getImageSizeSpy = jest.spyOn(imageManipulationStub, 'getImageSize');
+            const buffer = createTestBuffer();
+
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
+                mimetype: 'valid mimetype',
+                originalname: 'valid name',
+                size: 1000,
+                buffer: buffer
+            };
+
+            await sut.setImage('valid id', data);
+            expect(getImageSizeSpy).toBeCalledWith(buffer);
+        });
+
+        test('should throw if getImageSize throws', async () => {
+            const { sut, imageManipulationStub } = makeSut();
+            jest.spyOn(imageManipulationStub, 'getImageSize').mockImplementationOnce(() => {
+                throw new Error('Test throw');
+            });
+            const buffer = createTestBuffer();
+
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
+                mimetype: 'valid mimetype',
+                originalname: 'valid name',
+                size: 1000,
+                buffer: buffer
+            };
+
+            const setImagePromise = sut.setImage('valid id', data);
+            await expect(setImagePromise).rejects.toThrow(new Error('Test throw'));
+        });
+
         test('should call userImageRepository with correct values', async () => {
             const { sut, userRepositoryStub } = makeSut();
             const setImageSpy = jest.spyOn(userRepositoryStub, 'setImage');
@@ -63,7 +157,7 @@ describe('UserImage UseCase', () => {
                 imageSize: 1000,
                 mimetype: 'valid mimetype',
                 miniature: null,
-                miniatureSize: 1000
+                miniatureSize: 150
             });
         });
 
@@ -104,7 +198,7 @@ describe('UserImage UseCase', () => {
                 imageSize: 1000,
                 mimetype: 'valid mimetype',
                 miniature: null,
-                miniatureSize: 1000
+                miniatureSize: 150
             });
         });
     });

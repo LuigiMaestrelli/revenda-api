@@ -1,7 +1,7 @@
 import { IImageManipulation } from '@/infra/protocols/imageManipulation';
 import sharp from 'sharp';
 
-export class ImageManipulation implements IImageManipulation {
+export class SharpAdapter implements IImageManipulation {
     async resize(imageBuffer: Buffer, size: number): Promise<Buffer> {
         const sharpImg = sharp(imageBuffer);
         const image = await sharpImg.resize(size).toBuffer();

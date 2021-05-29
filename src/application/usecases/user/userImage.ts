@@ -3,19 +3,26 @@ import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/
 import { IUserImageRepository } from '@/domain/repository/user/userImage';
 import { NotFoundError } from '@/shared/errors/notFoundError';
 import { HttpUploadFile } from '@/domain/models/infra/http';
+import { IImageManipulation } from '@/infra/protocols/imageManipulation';
 
 export class UserImageUseCase implements IUserImageUseCase {
-    constructor(private readonly userImageRepository: IUserImageRepository) {}
+    constructor(
+        private readonly userImageRepository: IUserImageRepository,
+        private readonly imageManipulation: IImageManipulation
+    ) {}
 
     async setImage(userId: string, file: HttpUploadFile): Promise<UserImageAttributes> {
+        const miniature = await this.imageManipulation.resize(file.buffer, 300);
+        const miniatureSize = await this.imageManipulation.getImageSize(miniature);
+
         const imageData: CreateUserImageAttributes = {
             id: userId,
             image: file.buffer,
             imageSize: file.size,
             mimetype: file.mimetype,
             name: file.originalname,
-            miniature: file.buffer,
-            miniatureSize: file.size
+            miniature,
+            miniatureSize
         };
 
         return await this.userImageRepository.setImage(imageData);
