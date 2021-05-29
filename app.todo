@@ -9,6 +9,7 @@
     [] validar campos no modelo
     [] foto usuário
         [x] Upload
+        [] Tamanho maximo MB
         [] Miniatura
         [x] Get
         [] Get Miniatura
