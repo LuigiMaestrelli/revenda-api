@@ -6,8 +6,8 @@ import { UserRepository } from '@/infra/db/repository/user/user';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { truncate } from '@test/utils/database';
 import { UserAttributes } from '@/domain/models/user/user';
-import UserModel from '@/infra/db/model/user/user';
-import UserImageModel from '@/infra/db/model/user/userImage';
+import UserModel from '@/infra/db/model/user/userModel';
+import UserImageModel from '@/infra/db/model/user/userImageModel';
 
 type SutTypes = {
     sut: UserImageRepository;

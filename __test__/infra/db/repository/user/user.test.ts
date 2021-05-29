@@ -3,8 +3,8 @@ import { truncate } from '@test/utils/database';
 import { UserRepository } from '@/infra/db/repository/user/user';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';
-import UserModel from '@/infra/db/model/user/user';
 import { NotFoundError } from '@/shared/errors/notFoundError';
+import UserModel from '@/infra/db/model/user/userModel';
 
 type SutTypes = {
     sut: UserRepository;

@@ -2,7 +2,7 @@ import faker from 'faker';
 import { v4 as uuidv4 } from 'uuid';
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
-import UserModel from '@/infra/db/model/user/user';
+import UserModel from '@/infra/db/model/user/userModel';
 import config from '@/main/config';
 import { UserWithAuthAttributes } from 'domain/models/user/user';
 

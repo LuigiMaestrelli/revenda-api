@@ -2,7 +2,7 @@ import { CreateUserImageAttributes, UserImageAttributes } from 'domain/models/us
 import { IUserImageRepository } from '@/domain/repository/user/userImage';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { NotFoundError } from '@/shared/errors/notFoundError';
-import UserImageModel from '@/infra/db/model/user/userImage';
+import UserImageModel from '@/infra/db/model/user/userImageModel';
 
 export class UserImageRepository implements IUserImageRepository {
     constructor(private readonly userRepository: IUserRepository) {}

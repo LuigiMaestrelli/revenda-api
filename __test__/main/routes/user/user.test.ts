@@ -1,12 +1,13 @@
-import { truncate } from '@test/utils/database';
 import request from 'supertest';
 import faker from 'faker';
 import path from 'path';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import { truncate } from '@test/utils/database';
+
 import app from '@/main/config/app';
-import UserModel from '@/infra/db/model/user/user';
-import UserImageModel from '@/infra/db/model/user/userImage';
+import UserModel from '@/infra/db/model/user/userModel';
+import UserImageModel from '@/infra/db/model/user/userImageModel';
 import { generateValidUserData } from '@test/utils/user';
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 

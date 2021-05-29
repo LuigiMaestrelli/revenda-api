@@ -1,12 +1,13 @@
-import { truncate } from '@test/utils/database';
 import request from 'supertest';
 import faker from 'faker';
 import { v4 as uuidv4 } from 'uuid';
+import { truncate } from '@test/utils/database';
+
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
 import config from '@/main/config';
 import app from '@/main/config/app';
-import UserModel from '@/infra/db/model/user/user';
+import UserModel from '@/infra/db/model/user/userModel';
 
 const STRONG_PASSWORD = '^znET!St5+.PXgtZ';
 

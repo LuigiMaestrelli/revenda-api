@@ -1,7 +1,7 @@
 import { CreateAccessLogAttributes, AccessLogAttributes } from '@/domain/models/log/accessLog';
 import { IAccessLogRepository } from '@/domain/repository/log/accessLog';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
-import AccessLogModel from '../../model/log/accessLog';
+import AccessLogModel from '@/infra/db/model/log/accessLogModel';
 
 export class AccessLogRepository implements IAccessLogRepository {
     constructor(private readonly idGenerator: IIdGenerator) {}

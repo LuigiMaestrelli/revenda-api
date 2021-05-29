@@ -3,14 +3,14 @@ import { UserImageRepository } from '@/infra/db/repository/user/userImage';
 import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { NotFoundError } from '@/shared/errors/notFoundError';
-import UserImageModel from '@/infra/db/model/user/userImage';
+import UserImageModel from '@/infra/db/model/user/userImageModel';
 
 type SutTypes = {
     sut: UserImageRepository;
     userRepository: IUserRepository;
 };
 
-jest.mock('@/infra/db/model/user/userImage', () => ({
+jest.mock('@/infra/db/model/user/userImageModel', () => ({
     async upsert(data: CreateUserImageAttributes): Promise<[UserImageAttributes, boolean]> {
         return [data, true];
     },
