@@ -3,7 +3,7 @@ import { makeErrorResponse, makeSuccessResponse } from '@/shared/utils/http';
 import { IUserImageUseCase } from '@/domain/usecases/user/userImage';
 import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
-export class GetUserImageController implements IController {
+export class GetUserMiniatureController implements IController {
     constructor(private readonly validation: IValidation, private readonly userImageUseCase: IUserImageUseCase) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
@@ -13,7 +13,7 @@ export class GetUserImageController implements IController {
             const { params } = httpRequest;
 
             const imageData = await this.userImageUseCase.findById(params.id);
-            return makeSuccessResponse(imageData.image, null, imageData.mimetype);
+            return makeSuccessResponse(imageData.miniature, null, imageData.mimetype);
         } catch (ex) {
             return makeErrorResponse(ex);
         }

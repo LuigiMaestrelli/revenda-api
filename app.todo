@@ -10,9 +10,9 @@
     [] foto usuário
         [x] Upload
         [] Tamanho maximo MB
-        [] Miniatura
+        [x] Miniatura
         [x] Get
-        [] Get Miniatura
+        [x] Get Miniatura
         [] Teste Rotas
         [x] Teste integração repositório
     
