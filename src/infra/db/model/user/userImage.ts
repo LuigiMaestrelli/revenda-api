@@ -2,7 +2,7 @@ import { Sequelize, DataTypes } from 'sequelize';
 import { UserImageAttributes, CreateUserImageAttributes } from 'domain/models/user/userImage';
 import BaseModel from '../infra/basemodel';
 
-export default class UserImagemModel
+export default class UserImageModel
     extends BaseModel<UserImageAttributes, CreateUserImageAttributes>
     implements UserImageAttributes
 {
@@ -15,7 +15,7 @@ export default class UserImagemModel
     miniatureSize!: number;
 
     static initialize(sequelize: Sequelize): void {
-        UserImagemModel.init(
+        UserImageModel.init(
             {
                 id: {
                     type: DataTypes.UUID,

@@ -19,6 +19,6 @@ const modelClasses = getFileList(modelPath, ['index.ts', 'index.js', 'basemodel.
 );
 
 modelClasses.forEach(Model => Model.default.initialize(connection));
-modelClasses.filter(p => !!p.associate).forEach(Model => Model.associate(connection.models));
+modelClasses.filter(p => !!p.default.associate).forEach(Model => Model.default.associate(connection.models));
 
 export default connection;

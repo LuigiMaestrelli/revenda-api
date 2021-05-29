@@ -48,4 +48,12 @@ export default class UserModel extends BaseModel<UserAttributes, CreateUserAttri
             }
         );
     }
+
+    static associate(models: any): void {
+        this.hasOne(models.UserImageModel, {
+            foreignKey: 'id',
+            sourceKey: 'id',
+            as: 'userImage'
+        });
+    }
 }
