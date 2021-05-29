@@ -25,7 +25,7 @@ export default class UserModel extends BaseModel<UserAttributes, CreateUserAttri
                     allowNull: false
                 },
                 password: {
-                    type: new DataTypes.STRING(128),
+                    type: DataTypes.TEXT,
                     allowNull: false
                 },
                 active: {
