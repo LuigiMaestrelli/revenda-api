@@ -7,14 +7,7 @@
     [x] ativar
     [x] alterar senha
     [] validar campos no modelo
-    [] foto usuário
-        [x] Upload
-        [] Tamanho maximo MB
-        [x] Miniatura
-        [x] Get
-        [x] Get Miniatura
-        [] Teste Rotas
-        [x] Teste integração repositório
+    [x] foto usuário
     
 - Login
     [x] Log de acessos

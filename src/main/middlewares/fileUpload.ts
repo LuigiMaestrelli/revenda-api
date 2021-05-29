@@ -7,7 +7,8 @@ const MAXSIZE_30_MB = 30 * 1024 * 1024;
 
 export const imageFileFilter = (file: Express.Multer.File, callback: FileFilterCallback): void => {
     if (!isValidMimeType(ACCEPTED_FILE_TYPES, file.mimetype)) {
-        return callback(new InvalidParamError('Arquivo selecionado não é uma imagem válida'));
+        callback(new InvalidParamError('Selected file is not a valid image'));
+        return;
     }
 
     callback(null, true);
@@ -18,3 +19,7 @@ export const imageUpload = multer({
     limits: { fileSize: MAXSIZE_30_MB },
     fileFilter: (req, file, callback) => imageFileFilter(file, callback)
 });
+
+export const isUploadError = (err: Error): boolean => {
+    return err instanceof multer.MulterError;
+};

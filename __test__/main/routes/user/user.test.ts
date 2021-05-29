@@ -1,9 +1,12 @@
 import { truncate } from '@test/utils/database';
 import request from 'supertest';
 import faker from 'faker';
+import path from 'path';
+import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import app from '@/main/config/app';
 import UserModel from '@/infra/db/model/user/user';
+import UserImageModel from '@/infra/db/model/user/userImage';
 import { generateValidUserData } from '@test/utils/user';
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 
@@ -467,6 +470,236 @@ describe('User Routes', () => {
             const userUpdated = await UserModel.findByPk(id);
             const isValid = await bcryptAdapter.compare(STRONG_PASSWORD, userUpdated.password);
             expect(isValid).toBe(true);
+        });
+    });
+
+    describe('PUT /user/id/image', () => {
+        test('should return 404 on put user/id/image with unknown id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+            const image = path.join(__dirname, '../../../utils/testFiles/PNG_File.png');
+
+            const response = await request(app)
+                .put(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .attach('image', image);
+
+            expect(response.status).toBe(404);
+        });
+
+        test('should return 401 on put user/id/image without valid token', async () => {
+            const id = uuidv4();
+
+            const response = await request(app).put(`/api/user/${id}/image`).send();
+
+            expect(response.status).toBe(401);
+        });
+
+        test('should return 200 on put user/id/image with known id and valid image', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const image = path.join(__dirname, '../../../utils/testFiles/PNG_File.png');
+
+            const response = await request(app)
+                .put(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .attach('image', image);
+
+            expect(response.status).toBe(200);
+        });
+
+        test('should return 400 on put user/id/image with no image', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const response = await request(app)
+                .put(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .send();
+
+            expect(response.status).toBe(400);
+        });
+
+        test('should return 400 on put user/id/image with known id and invalid field', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const image = path.join(__dirname, '../../../utils/testFiles/PNG_File.png');
+
+            const response = await request(app)
+                .put(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .attach('imagem', image);
+
+            expect(response.status).toBe(400);
+        });
+
+        test('should return 400 on put user/id/image with invalid file', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const textFile = path.join(__dirname, '../../../utils/testFiles/TXT_File.txt');
+
+            const response = await request(app)
+                .put(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .attach('image', textFile);
+
+            expect(response.status).toBe(400);
+        });
+
+        test('should return 400 on put user/id/image with invalid file size', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id: id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const textFile = path.join(__dirname, '../../../utils/testFiles/JPG_File_30mb.jpg');
+
+            const response = await request(app)
+                .put(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`)
+                .attach('image', textFile);
+
+            expect(response.status).toBe(400);
+        });
+    });
+
+    describe('GET /user/id/image', () => {
+        test('should return 404 on get user/id/image with unknown id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const response = await request(app)
+                .get(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`);
+
+            expect(response.status).toBe(404);
+        });
+
+        test('should return 401 on get user/id/image without valid token', async () => {
+            const id = uuidv4();
+
+            const response = await request(app).get(`/api/user/${id}/image`).send();
+
+            expect(response.status).toBe(401);
+        });
+
+        test('should return 200 on get user/id/image with known id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const imageDir = path.join(__dirname, '../../../utils/testFiles/PNG_File.png');
+            const imageBuffer = fs.readFileSync(imageDir);
+
+            await UserImageModel.create({
+                id,
+                image: imageBuffer,
+                imageSize: 100,
+                mimetype: 'image/png',
+                miniature: imageBuffer,
+                miniatureSize: 100,
+                name: 'image.png'
+            });
+
+            const response = await request(app)
+                .get(`/api/user/${id}/image`)
+                .set('authorization', `Bearer ${userData.auth.token}`);
+
+            expect(response.status).toBe(200);
+        });
+    });
+
+    describe('GET /user/id/miniature', () => {
+        test('should return 404 on get user/id/miniature with unknown id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            const response = await request(app)
+                .get(`/api/user/${id}/miniature`)
+                .set('authorization', `Bearer ${userData.auth.token}`);
+
+            expect(response.status).toBe(404);
+        });
+
+        test('should return 401 on get user/id/miniature without valid token', async () => {
+            const id = uuidv4();
+
+            const response = await request(app).get(`/api/user/${id}/miniature`).send();
+
+            expect(response.status).toBe(401);
+        });
+
+        test('should return 200 on get user/id/miniature with known id', async () => {
+            const userData = await generateValidUserData();
+            const id = uuidv4();
+
+            await UserModel.create({
+                id,
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: 'xxxxx'
+            });
+
+            const imageDir = path.join(__dirname, '../../../utils/testFiles/PNG_File.png');
+            const imageBuffer = fs.readFileSync(imageDir);
+
+            await UserImageModel.create({
+                id,
+                image: imageBuffer,
+                imageSize: 100,
+                mimetype: 'image/png',
+                miniature: imageBuffer,
+                miniatureSize: 100,
+                name: 'image.png'
+            });
+
+            const response = await request(app)
+                .get(`/api/user/${id}/miniature`)
+                .set('authorization', `Bearer ${userData.auth.token}`);
+
+            expect(response.status).toBe(200);
         });
     });
 });
