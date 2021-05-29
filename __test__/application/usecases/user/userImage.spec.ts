@@ -2,6 +2,7 @@ import { UserImageUseCase } from '@/application/usecases/user/userImage';
 import { IUserImageRepository } from '@/domain/repository/user/userImage';
 import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
 import { NotFoundError } from '@/shared/errors/notFoundError';
+import { HttpUploadFile } from 'domain/models/infra/http';
 
 type SutTypes = {
     userRepositoryStub: IUserImageRepository;
@@ -46,17 +47,15 @@ describe('UserImage UseCase', () => {
             const { sut, userRepositoryStub } = makeSut();
             const setImageSpy = jest.spyOn(userRepositoryStub, 'setImage');
 
-            const data: CreateUserImageAttributes = {
-                id: 'valid id',
-                name: 'valid name',
-                image: null,
-                imageSize: 1000,
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
                 mimetype: 'valid mimetype',
-                miniature: null,
-                miniatureSize: 1000
+                originalname: 'valid name',
+                size: 1000,
+                buffer: null
             };
 
-            await sut.setImage(data);
+            await sut.setImage('valid id', data);
             expect(setImageSpy).toBeCalledWith({
                 id: 'valid id',
                 name: 'valid name',
@@ -74,34 +73,30 @@ describe('UserImage UseCase', () => {
                 throw new Error('Test throw');
             });
 
-            const data: CreateUserImageAttributes = {
-                id: 'valid id',
-                name: 'valid name',
-                image: null,
-                imageSize: 1000,
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
                 mimetype: 'valid mimetype',
-                miniature: null,
-                miniatureSize: 1000
+                originalname: 'valid name',
+                size: 1000,
+                buffer: null
             };
 
-            const setImagePromise = sut.setImage(data);
+            const setImagePromise = sut.setImage('valid id', data);
             await expect(setImagePromise).rejects.toThrow(new Error('Test throw'));
         });
 
         test('should return created image data', async () => {
             const { sut } = makeSut();
 
-            const data: CreateUserImageAttributes = {
-                id: 'valid id',
-                name: 'valid name',
-                image: null,
-                imageSize: 1000,
+            const data: HttpUploadFile = {
+                fieldname: 'valid fieldname',
                 mimetype: 'valid mimetype',
-                miniature: null,
-                miniatureSize: 1000
+                originalname: 'valid name',
+                size: 1000,
+                buffer: null
             };
 
-            const imageData = await sut.setImage(data);
+            const imageData = await sut.setImage('valid id', data);
             expect(imageData).toEqual({
                 id: 'valid id',
                 name: 'valid name',

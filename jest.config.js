@@ -1,9 +1,8 @@
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    clearMocks: true,
-    collectCoverageFrom: ['<rootDir>/src/**'],
-    coverageProvider: 'v8',
+    collectCoverageFrom: ['**/*.{ts,js}', '!**/node_modules/**', '!**/__test__/**'],
+    maxConcurrency: 1,
     coverageReporters: ['json', 'text', 'lcov', 'clover'],
     roots: ['<rootDir>/__test__'],
     moduleNameMapper: {
@@ -13,9 +12,8 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/__test__/setup/setupFilesAfterEnv.ts'],
     testResultsProcessor: 'jest-sonar-reporter',
     coverageDirectory: '<rootDir>/coverage',
-    coveragePathIgnorePatterns: ['\\\\node_modules\\\\', 'src/main/config'],
+    coveragePathIgnorePatterns: ['\\\\node_modules\\\\', 'src/main/config', '\\\\__test__\\\\'],
     globals: {
-        'ts-jest': {
-        }
+        'ts-jest': {}
     }
 };

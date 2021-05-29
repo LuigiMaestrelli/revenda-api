@@ -1,9 +1,9 @@
 import { IUserImageUseCase } from '@/domain/usecases/user/userImage';
 import { GetUserImageController } from '@/presentation/controllers/user/getUserImage';
 import { IValidation } from '@/presentation/protocols';
-import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
+import { UserImageAttributes } from '@/domain/models/user/userImage';
 import { MissingParamError } from '@/shared/errors';
-import { HttpRequest } from '@/domain/models/infra/http';
+import { HttpRequest, HttpUploadFile } from '@/domain/models/infra/http';
 
 type SutTypes = {
     sut: GetUserImageController;
@@ -21,7 +21,7 @@ const makeValidation = (): IValidation => {
 
 const makeUserImageUseCase = (): IUserImageUseCase => {
     class UserImageUseCaseSub implements IUserImageUseCase {
-        async setImage(imageData: CreateUserImageAttributes): Promise<UserImageAttributes> {
+        async setImage(userId: string, file: HttpUploadFile): Promise<UserImageAttributes> {
             return null;
         }
 

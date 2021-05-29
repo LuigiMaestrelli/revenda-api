@@ -1,8 +1,8 @@
 import { IUserImageUseCase } from '@/domain/usecases/user/userImage';
 import { UpdateUserImageController } from '@/presentation/controllers/user/updateImage';
 import { IValidation } from '@/presentation/protocols';
-import { HttpRequest } from '@/domain/models/infra/http';
-import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
+import { HttpRequest, HttpUploadFile } from '@/domain/models/infra/http';
+import { UserImageAttributes } from '@/domain/models/user/userImage';
 import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
@@ -21,7 +21,7 @@ const makeValidation = (): IValidation => {
 
 const makeUserImageUseCase = (): IUserImageUseCase => {
     class UserImageUseCaseSub implements IUserImageUseCase {
-        async setImage(imageData: CreateUserImageAttributes): Promise<UserImageAttributes> {
+        async setImage(userId: string, file: HttpUploadFile): Promise<UserImageAttributes> {
             return null;
         }
 
@@ -144,14 +144,12 @@ describe('UpdateUserImage Controller', () => {
         };
 
         await sut.handle(httpRequest);
-        expect(updateSpy).toBeCalledWith({
-            id: 'valid id',
-            image: null,
-            imageSize: 100,
+        expect(updateSpy).toBeCalledWith('valid id', {
+            buffer: null,
+            fieldname: 'valid name',
             mimetype: 'valid mime',
-            name: 'valid name',
-            miniature: null,
-            miniatureSize: 100
+            originalname: 'valid name',
+            size: 100
         });
     });
 

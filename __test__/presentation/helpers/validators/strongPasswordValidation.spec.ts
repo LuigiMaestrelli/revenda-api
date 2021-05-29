@@ -53,7 +53,7 @@ describe('Password Validation', () => {
         };
 
         const validatorPromise = sut.validate(httpRequest);
-        await expect(validatorPromise).rejects.toThrow();
+        await expect(validatorPromise).rejects.toThrow(new Error('Test throw'));
     });
 
     test('should thrown an Error with PasswordValidation returns false', async () => {
@@ -64,6 +64,22 @@ describe('Password Validation', () => {
             body: {
                 password: 'password'
             }
+        };
+
+        const validatorPromise = sut.validate(httpRequest);
+        await expect(validatorPromise).rejects.toThrow(new InvalidParamError('password is too week'));
+    });
+
+    test('should thrown an Error with PasswordValidation returns false with no password', async () => {
+        const { sut, passwordValidatorStub } = makeSut();
+        jest.spyOn(passwordValidatorStub, 'isStrongPassword').mockReturnValueOnce(false);
+
+        const body: any = {
+            password: null
+        };
+
+        const httpRequest = {
+            body
         };
 
         const validatorPromise = sut.validate(httpRequest);

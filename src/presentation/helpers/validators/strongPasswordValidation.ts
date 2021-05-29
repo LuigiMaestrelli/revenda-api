@@ -6,7 +6,9 @@ export class StrongPasswordValidation implements IValidation {
     constructor(private readonly fieldName: string, private readonly passwordValidator: IPasswordValidator) {}
 
     async validate(httpRequest: HttpRequest): Promise<void> {
-        if (!this.passwordValidator.isStrongPassword(httpRequest.body[this.fieldName])) {
+        const password = httpRequest.body[this.fieldName];
+
+        if (!this.passwordValidator.isStrongPassword(password)) {
             throw new InvalidParamError('password is too week');
         }
     }

@@ -4,3 +4,4 @@ export * from './strongPasswordValidation';
 export * from './requiredFieldValidation';
 export * from './validationComposite';
 export * from './requiredParamValidation';
+export * from './requireSingleFileValidation';

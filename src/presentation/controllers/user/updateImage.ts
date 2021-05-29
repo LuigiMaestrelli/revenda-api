@@ -11,16 +11,7 @@ export class UpdateUserImageController implements IController {
             await this.validation.validate(httpRequest);
 
             const { params, file } = httpRequest;
-
-            await this.userImageUseCase.setImage({
-                id: params.id,
-                image: file.buffer,
-                imageSize: file.size,
-                mimetype: file.mimetype,
-                name: file.originalname,
-                miniature: file.buffer,
-                miniatureSize: file.size
-            });
+            await this.userImageUseCase.setImage(params.id, file);
 
             return makeSuccessResponse();
         } catch (ex) {
