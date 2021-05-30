@@ -11,7 +11,7 @@
 - Login
     [x] Log de acessos
     [x] Validar usuário ativo no login
-    [] Refresh token
+    [x] Refresh token
 
 - Infra
     [x] Logs de erro
