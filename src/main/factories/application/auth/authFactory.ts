@@ -15,5 +15,5 @@ export const makeAuthenticationUseCase = (): AuthenticationUseCase => {
         config.getTokenSecretExpires()
     );
 
-    return new AuthenticationUseCase(tokenSigner, hasher, userRepository, accessLogRepository);
+    return new AuthenticationUseCase(tokenSigner, tokenSigner, hasher, userRepository, accessLogRepository);
 };

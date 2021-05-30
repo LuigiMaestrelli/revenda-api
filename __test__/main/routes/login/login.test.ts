@@ -5,6 +5,7 @@ import { truncate } from '@test/utils/database';
 
 import { BcryptAdapter } from '@/infra/adapters/cryptography/bcryptAdapter';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
+import { generateValidUserData } from '@test/utils/user';
 import config from '@/main/config';
 import app from '@/main/config/app';
 import UserModel from '@/infra/db/model/user/userModel';
@@ -146,7 +147,7 @@ describe('Login Routes', () => {
         });
     });
 
-    describe('POST /token', () => {
+    describe('POST signin/token', () => {
         test('should return 200 on signin/token', async () => {
             const email = faker.internet.email();
             const bcryptAdapter = new BcryptAdapter();
@@ -282,6 +283,87 @@ describe('Login Routes', () => {
 
             expect(response.status).toBe(401);
             expect(response.body.message).toBe('Unauthorized: Invalid e-mail or password');
+        });
+    });
+
+    describe('POST signin/refreshToken', () => {
+        test('should return 200 on signin/refreshtoken', async () => {
+            const userData = await generateValidUserData();
+
+            const response = await request(app).post('/api/signin/refreshtoken').send({
+                refreshToken: userData.auth.refreshToken
+            });
+
+            expect(response.status).toBe(200);
+        });
+
+        test('should return valid token and refreshtoken on signin/refreshtoken', async () => {
+            const userData = await generateValidUserData();
+
+            const response = await request(app).post('/api/signin/refreshtoken').send({
+                refreshToken: userData.auth.refreshToken
+            });
+
+            expect(response.status).toBe(200);
+
+            const jwtAdapter = new JwtAdapter(
+                config.getTokenSecretTokenKey(),
+                config.getTokenSecretRefreshTokenKey(),
+                config.getTokenSecretExpires()
+            );
+
+            const tokenData = await jwtAdapter.validateToken(response.body.token);
+            expect(tokenData).toEqual({
+                userId: userData.user.id
+            });
+
+            const refreshTokenData = await jwtAdapter.validateRefreshToken(response.body.refreshToken);
+            expect(refreshTokenData).toEqual({
+                userId: userData.user.id
+            });
+        });
+
+        test('should return 400 on signin/token if no refreshtoken is provided', async () => {
+            const response = await request(app).post('/api/signin/refreshtoken').send({});
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe('Missing param: refreshToken');
+        });
+
+        test('should return 401 if invalid refreshtoken is provided', async () => {
+            const response = await request(app).post('/api/signin/refreshtoken').send({
+                refreshToken: 'xxxxxxxx'
+            });
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toBe('Unauthorized: jwt malformed');
+        });
+
+        test('should return 401 if user with email is inactive', async () => {
+            const bcryptAdapter = new BcryptAdapter();
+            const hashedPassword = await bcryptAdapter.hash(STRONG_PASSWORD);
+            const jwtAdapter = new JwtAdapter(
+                config.getTokenSecretTokenKey(),
+                config.getTokenSecretRefreshTokenKey(),
+                config.getTokenSecretExpires()
+            );
+
+            const userCreate = await UserModel.create({
+                id: uuidv4(),
+                name: `${faker.name.firstName()} ${faker.name.lastName()}`,
+                email: faker.internet.email(),
+                password: hashedPassword
+            });
+            await userCreate.update({ active: false });
+
+            const authData = await jwtAdapter.sign({ userId: userCreate.id });
+
+            const response = await request(app).post('/api/signin/refreshtoken').send({
+                refreshToken: authData.refreshToken
+            });
+
+            expect(response.status).toBe(401);
+            expect(response.body.message).toBe('Unauthorized: User is no longer active');
         });
     });
 });

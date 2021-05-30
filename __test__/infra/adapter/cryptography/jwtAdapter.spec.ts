@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { JwtAdapter } from '@/infra/adapters/cryptography/jwtAdapter';
+import { UnauthorizedError } from '@/shared/errors';
 
 jest.mock('jsonwebtoken', () => ({
     sign(): String {
@@ -53,14 +54,14 @@ describe('JSONWebToken Adapter', () => {
         await expect(signPromise).rejects.toThrow(new Error('Test throw'));
     });
 
-    test('should throw if jsonwebtoken throws on validateToken', async () => {
+    test('should throw a NotAuthorizedError if jsonwebtoken throws on validateToken', async () => {
         const sut = makeSut();
         jest.spyOn(jwt, 'verify').mockImplementationOnce(() => {
             throw new Error('Test throw');
         });
 
         const signPromise = sut.validateToken('token');
-        await expect(signPromise).rejects.toThrow(new Error('Test throw'));
+        await expect(signPromise).rejects.toThrow(new UnauthorizedError('Test throw'));
     });
 
     test('should throw if jsonwebtoken throws on validateRefreshToken', async () => {
@@ -70,7 +71,7 @@ describe('JSONWebToken Adapter', () => {
         });
 
         const signPromise = sut.validateRefreshToken('refreshtoken');
-        await expect(signPromise).rejects.toThrow(new Error('Test throw'));
+        await expect(signPromise).rejects.toThrow(new UnauthorizedError('Test throw'));
     });
 
     test('should return decoded token data', async () => {

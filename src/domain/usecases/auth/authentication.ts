@@ -6,4 +6,5 @@ export interface IGenerateAuthentication {
         autentication: AuthenticationAttributes,
         networkAccessInfo: NetworkAccessInfo
     ) => Promise<AuthenticationResult>;
+    refreshAuth: (refreshToken: string) => Promise<AuthenticationResult>;
 }

@@ -7,10 +7,12 @@ import { UnauthorizedError } from '@/shared/errors';
 import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 import { IAccessLogRepository } from '@/domain/repository/log/accessLog';
 import { CreateAccessLogAttributes, AccessLogAttributes } from '@/domain/models/log/accessLog';
+import { ITokenValidation } from 'infra/protocols/tokenValidation';
 
 type SutTypes = {
     sut: AuthenticationUseCase;
     tokenSignerStub: ITokenSigner;
+    tokenValidationStub: ITokenValidation;
     hasherStub: IHasher;
     userRepositoryStub: IUserRepository;
     accessLogRepositoryStub: IAccessLogRepository;
@@ -28,6 +30,24 @@ const makeTokenSigner = (): ITokenSigner => {
     }
 
     return new TokenSignerStub();
+};
+
+const makeTokenValidation = (): ITokenValidation => {
+    class TokenValidationStub implements ITokenValidation {
+        async validateToken(token: string): Promise<TokenPayload> {
+            return {
+                userId: 'valid id'
+            };
+        }
+
+        async validateRefreshToken(token: string): Promise<TokenPayload> {
+            return {
+                userId: 'valid id'
+            };
+        }
+    }
+
+    return new TokenValidationStub();
 };
 
 const makeHasher = (): IHasher => {
@@ -78,241 +98,342 @@ const makeAccessLogRepository = (): IAccessLogRepository => {
 
 const makeSut = (): SutTypes => {
     const tokenSignerStub = makeTokenSigner();
+    const tokenValidationStub = makeTokenValidation();
     const hasherStub = makeHasher();
     const userRepositoryStub = makeUserRepositoryStub();
     const accessLogRepositoryStub = makeAccessLogRepository();
-    const sut = new AuthenticationUseCase(tokenSignerStub, hasherStub, userRepositoryStub, accessLogRepositoryStub);
+
+    const sut = new AuthenticationUseCase(
+        tokenSignerStub,
+        tokenValidationStub,
+        hasherStub,
+        userRepositoryStub,
+        accessLogRepositoryStub
+    );
 
     return {
         sut,
         tokenSignerStub,
         hasherStub,
         userRepositoryStub,
-        accessLogRepositoryStub
+        accessLogRepositoryStub,
+        tokenValidationStub
     };
 };
 
 describe('Auth UseCase', () => {
-    test('should call userRepository with correct values', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    describe('Auth', () => {
+        test('should call userRepository with correct values', async () => {
+            const { sut, userRepositoryStub } = makeSut();
 
-        const userRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
+            const userRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
 
-        const authDto = { email: 'valid email', password: 'valid password' };
-        await sut.auth(authDto, {});
+            const authDto = { email: 'valid email', password: 'valid password' };
+            await sut.auth(authDto, {});
 
-        expect(userRepositorySpy).toBeCalledWith('valid email');
-    });
-
-    test('should throw if userRepository throws', async () => {
-        const { sut, userRepositoryStub } = makeSut();
-
-        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(() => {
-            throw new Error('Test error');
+            expect(userRepositorySpy).toBeCalledWith('valid email');
         });
 
-        const authDto = { email: 'valid email', password: 'valid password' };
-        const authPromise = sut.auth(authDto, {});
+        test('should throw if userRepository throws', async () => {
+            const { sut, userRepositoryStub } = makeSut();
 
-        await expect(authPromise).rejects.toThrow(new Error('Test error'));
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(() => {
+                throw new Error('Test error');
+            });
+
+            const authDto = { email: 'valid email', password: 'valid password' };
+            const authPromise = sut.auth(authDto, {});
+
+            await expect(authPromise).rejects.toThrow(new Error('Test error'));
+        });
+
+        test('should throw if no user was found with requested e-mail', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
+                new Promise(resolve => resolve(null))
+            );
+
+            const authDto = { email: 'invalid email', password: 'valid password' };
+            const authPromise = sut.auth(authDto, {});
+
+            await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
+        });
+
+        test('should throw if the password does not match', async () => {
+            const { sut, hasherStub } = makeSut();
+
+            jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+
+            const authDto = { email: 'valid email', password: 'invalid password' };
+            const authPromise = sut.auth(authDto, {});
+
+            await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
+        });
+
+        test('should throw if user is inactive', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
+                new Promise(resolve =>
+                    resolve({
+                        id: 'valid id',
+                        email: 'valid email',
+                        name: 'valid name',
+                        password: 'xxx',
+                        active: false
+                    })
+                )
+            );
+
+            const authDto = { email: 'invalid email', password: 'valid password' };
+            const authPromise = sut.auth(authDto, {});
+
+            await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
+        });
+
+        test('should throw if tokenSigner throws', async () => {
+            const { sut, tokenSignerStub } = makeSut();
+
+            jest.spyOn(tokenSignerStub, 'sign').mockImplementationOnce(() => {
+                throw new Error('Test error');
+            });
+
+            const authDto = { email: 'valid email', password: 'valid password' };
+            const authPromise = sut.auth(authDto, {});
+
+            await expect(authPromise).rejects.toThrow(new Error('Test error'));
+        });
+
+        test('should call tokenSigner with correct values', async () => {
+            const { sut, tokenSignerStub } = makeSut();
+
+            const tokenSignerSpy = jest.spyOn(tokenSignerStub, 'sign');
+
+            const authDto = { email: 'valid email', password: 'valid password' };
+            await sut.auth(authDto, {});
+
+            expect(tokenSignerSpy).toBeCalledWith({
+                userId: 'valid id'
+            });
+        });
+
+        test('should throw if hasher throws', async () => {
+            const { sut, hasherStub } = makeSut();
+
+            jest.spyOn(hasherStub, 'compare').mockImplementationOnce(() => {
+                throw new Error('Test error');
+            });
+
+            const authDto = { email: 'valid email', password: 'valid password' };
+            const authPromise = sut.auth(authDto, {});
+
+            await expect(authPromise).rejects.toThrow(new Error('Test error'));
+        });
+
+        test('should call hasher with correct values', async () => {
+            const { sut, hasherStub } = makeSut();
+
+            const hasherSpy = jest.spyOn(hasherStub, 'compare');
+
+            const authDto = { email: 'valid email', password: 'valid password' };
+            await sut.auth(authDto, {});
+
+            expect(hasherSpy).toBeCalledWith('valid password', 'hashed password');
+        });
+
+        test('should call addUnauthorized access log if no user with e-mail was found', async () => {
+            const { sut, userRepositoryStub, accessLogRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
+                new Promise(resolve => resolve(null))
+            );
+            const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
+
+            const authDto = { email: 'invalid email', password: 'valid password' };
+            const networkAccessDto = {
+                ip: 'valid ip',
+                userAgent: 'valid useragent',
+                hostName: 'valid hostname',
+                origin: 'valid origin'
+            };
+
+            try {
+                await sut.auth(authDto, networkAccessDto);
+            } catch (e) {}
+
+            expect(addUnauthorizedSpy).toBeCalledWith({
+                ...networkAccessDto,
+                email: 'invalid email',
+                reason: 'E-mail not found'
+            });
+        });
+
+        test('should call addUnauthorized access log if user is inactive', async () => {
+            const { sut, userRepositoryStub, accessLogRepositoryStub } = makeSut();
+
+            const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
+                new Promise(resolve =>
+                    resolve({
+                        id: 'valid id',
+                        email: 'valid email',
+                        name: 'valid name',
+                        password: 'xxx',
+                        active: false
+                    })
+                )
+            );
+
+            const authDto = { email: 'invalid email', password: 'valid password' };
+            const networkAccessDto = {
+                ip: 'valid ip',
+                userAgent: 'valid useragent',
+                hostName: 'valid hostname',
+                origin: 'valid origin'
+            };
+
+            try {
+                await sut.auth(authDto, networkAccessDto);
+            } catch (e) {}
+
+            expect(addUnauthorizedSpy).toBeCalledWith({
+                ...networkAccessDto,
+                email: 'invalid email',
+                reason: 'Inactive user'
+            });
+        });
+
+        test('should call addUnauthorized access log if password is invalid', async () => {
+            const { sut, hasherStub, accessLogRepositoryStub } = makeSut();
+
+            jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+            const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
+
+            const authDto = { email: 'valid email', password: 'invalid password' };
+            const networkAccessDto = {
+                ip: 'valid ip',
+                userAgent: 'valid useragent',
+                hostName: 'valid hostname',
+                origin: 'valid origin'
+            };
+
+            try {
+                await sut.auth(authDto, networkAccessDto);
+            } catch (e) {}
+
+            expect(addUnauthorizedSpy).toBeCalledWith({
+                ...networkAccessDto,
+                email: 'valid email',
+                reason: 'Invalid password'
+            });
+        });
+
+        test('should call addAuthorized access log if valid data is sent', async () => {
+            const { sut, accessLogRepositoryStub } = makeSut();
+
+            const addAuthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addAuthorized');
+
+            const authDto = { email: 'valid email', password: 'valid password' };
+            const networkAccessDto = {
+                ip: 'valid ip',
+                userAgent: 'valid useragent',
+                hostName: 'valid hostname',
+                origin: 'valid origin'
+            };
+
+            await sut.auth(authDto, networkAccessDto);
+
+            expect(addAuthorizedSpy).toBeCalledWith({
+                ...networkAccessDto,
+                email: 'valid email'
+            });
+        });
     });
 
-    test('should throw if no user was found with requested e-mail', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    describe('refreshAuth', () => {
+        test('should call tokenValidation with correct values', async () => {
+            const { sut, tokenValidationStub } = makeSut();
 
-        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
+            const userRepositorySpy = jest.spyOn(tokenValidationStub, 'validateRefreshToken');
 
-        const authDto = { email: 'invalid email', password: 'valid password' };
-        const authPromise = sut.auth(authDto, {});
+            await sut.refreshAuth('valid refreshtoken');
 
-        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
-    });
+            expect(userRepositorySpy).toBeCalledWith('valid refreshtoken');
+        });
 
-    test('should throw if the password does not match', async () => {
-        const { sut, hasherStub } = makeSut();
+        test('should throw if tokenValidation throws', async () => {
+            const { sut, tokenValidationStub } = makeSut();
 
-        jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
+            jest.spyOn(tokenValidationStub, 'validateRefreshToken').mockImplementationOnce(() => {
+                throw new Error('Test error');
+            });
 
-        const authDto = { email: 'valid email', password: 'invalid password' };
-        const authPromise = sut.auth(authDto, {});
+            const authPromise = sut.refreshAuth('valid refreshtoken');
 
-        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
-    });
+            await expect(authPromise).rejects.toThrow(new Error('Test error'));
+        });
 
-    test('should throw if user is inactive', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+        test('should call userRepository with correct values', async () => {
+            const { sut, userRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
-            new Promise(resolve =>
-                resolve({
-                    id: 'valid id',
-                    email: 'valid email',
-                    name: 'valid name',
-                    password: 'xxx',
-                    active: false
+            const userRepositorySpy = jest.spyOn(userRepositoryStub, 'findById');
+
+            await sut.refreshAuth('valid refreshtoken');
+
+            expect(userRepositorySpy).toBeCalledWith('valid id');
+        });
+
+        test('should throw if userRepository throws', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findById').mockImplementationOnce(() => {
+                throw new Error('Test error');
+            });
+
+            const authPromise = sut.refreshAuth('valid refreshtoken');
+
+            await expect(authPromise).rejects.toThrow(new Error('Test error'));
+        });
+
+        test('should throw if no user was found', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+            jest.spyOn(userRepositoryStub, 'findById').mockReturnValueOnce(null);
+
+            const authPromise = sut.refreshAuth('valid refreshtoken');
+
+            await expect(authPromise).rejects.toThrow(new UnauthorizedError('User not found'));
+        });
+
+        test('should throw if user is not active', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+            jest.spyOn(userRepositoryStub, 'findById').mockReturnValueOnce(
+                new Promise(resolve => {
+                    resolve({
+                        id: 'valid id',
+                        name: 'valid name',
+                        email: 'valid email',
+                        password: 'valid password',
+                        active: false
+                    });
                 })
-            )
-        );
+            );
 
-        const authDto = { email: 'invalid email', password: 'valid password' };
-        const authPromise = sut.auth(authDto, {});
+            const authPromise = sut.refreshAuth('valid refreshtoken');
 
-        await expect(authPromise).rejects.toThrow(new UnauthorizedError('Invalid e-mail or password'));
-    });
-
-    test('should throw if tokenSigner throws', async () => {
-        const { sut, tokenSignerStub } = makeSut();
-
-        jest.spyOn(tokenSignerStub, 'sign').mockImplementationOnce(() => {
-            throw new Error('Test error');
+            await expect(authPromise).rejects.toThrow(new UnauthorizedError('User is no longer active'));
         });
 
-        const authDto = { email: 'valid email', password: 'valid password' };
-        const authPromise = sut.auth(authDto, {});
+        test('should return valid new token', async () => {
+            const { sut } = makeSut();
 
-        await expect(authPromise).rejects.toThrow(new Error('Test error'));
-    });
+            const authData = await sut.refreshAuth('valid refreshtoken');
 
-    test('should call tokenSigner with correct values', async () => {
-        const { sut, tokenSignerStub } = makeSut();
-
-        const tokenSignerSpy = jest.spyOn(tokenSignerStub, 'sign');
-
-        const authDto = { email: 'valid email', password: 'valid password' };
-        await sut.auth(authDto, {});
-
-        expect(tokenSignerSpy).toBeCalledWith({
-            userId: 'valid id'
-        });
-    });
-
-    test('should throw if hasher throws', async () => {
-        const { sut, hasherStub } = makeSut();
-
-        jest.spyOn(hasherStub, 'compare').mockImplementationOnce(() => {
-            throw new Error('Test error');
-        });
-
-        const authDto = { email: 'valid email', password: 'valid password' };
-        const authPromise = sut.auth(authDto, {});
-
-        await expect(authPromise).rejects.toThrow(new Error('Test error'));
-    });
-
-    test('should call hasher with correct values', async () => {
-        const { sut, hasherStub } = makeSut();
-
-        const hasherSpy = jest.spyOn(hasherStub, 'compare');
-
-        const authDto = { email: 'valid email', password: 'valid password' };
-        await sut.auth(authDto, {});
-
-        expect(hasherSpy).toBeCalledWith('valid password', 'hashed password');
-    });
-
-    test('should call addUnauthorized access log if no user with e-mail was found', async () => {
-        const { sut, userRepositoryStub, accessLogRepositoryStub } = makeSut();
-
-        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(new Promise(resolve => resolve(null)));
-        const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
-
-        const authDto = { email: 'invalid email', password: 'valid password' };
-        const networkAccessDto = {
-            ip: 'valid ip',
-            userAgent: 'valid useragent',
-            hostName: 'valid hostname',
-            origin: 'valid origin'
-        };
-
-        try {
-            await sut.auth(authDto, networkAccessDto);
-        } catch (e) {}
-
-        expect(addUnauthorizedSpy).toBeCalledWith({
-            ...networkAccessDto,
-            email: 'invalid email',
-            reason: 'E-mail not found'
-        });
-    });
-
-    test('should call addUnauthorized access log if user is inactive', async () => {
-        const { sut, userRepositoryStub, accessLogRepositoryStub } = makeSut();
-
-        const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
-        jest.spyOn(userRepositoryStub, 'findUserByEmail').mockReturnValueOnce(
-            new Promise(resolve =>
-                resolve({
-                    id: 'valid id',
-                    email: 'valid email',
-                    name: 'valid name',
-                    password: 'xxx',
-                    active: false
-                })
-            )
-        );
-
-        const authDto = { email: 'invalid email', password: 'valid password' };
-        const networkAccessDto = {
-            ip: 'valid ip',
-            userAgent: 'valid useragent',
-            hostName: 'valid hostname',
-            origin: 'valid origin'
-        };
-
-        try {
-            await sut.auth(authDto, networkAccessDto);
-        } catch (e) {}
-
-        expect(addUnauthorizedSpy).toBeCalledWith({
-            ...networkAccessDto,
-            email: 'invalid email',
-            reason: 'Inactive user'
-        });
-    });
-
-    test('should call addUnauthorized access log if password is invalid', async () => {
-        const { sut, hasherStub, accessLogRepositoryStub } = makeSut();
-
-        jest.spyOn(hasherStub, 'compare').mockReturnValueOnce(new Promise(resolve => resolve(false)));
-        const addUnauthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addUnauthorized');
-
-        const authDto = { email: 'valid email', password: 'invalid password' };
-        const networkAccessDto = {
-            ip: 'valid ip',
-            userAgent: 'valid useragent',
-            hostName: 'valid hostname',
-            origin: 'valid origin'
-        };
-
-        try {
-            await sut.auth(authDto, networkAccessDto);
-        } catch (e) {}
-
-        expect(addUnauthorizedSpy).toBeCalledWith({
-            ...networkAccessDto,
-            email: 'valid email',
-            reason: 'Invalid password'
-        });
-    });
-
-    test('should call addAuthorized access log if valid data is sent', async () => {
-        const { sut, accessLogRepositoryStub } = makeSut();
-
-        const addAuthorizedSpy = jest.spyOn(accessLogRepositoryStub, 'addAuthorized');
-
-        const authDto = { email: 'valid email', password: 'valid password' };
-        const networkAccessDto = {
-            ip: 'valid ip',
-            userAgent: 'valid useragent',
-            hostName: 'valid hostname',
-            origin: 'valid origin'
-        };
-
-        await sut.auth(authDto, networkAccessDto);
-
-        expect(addAuthorizedSpy).toBeCalledWith({
-            ...networkAccessDto,
-            email: 'valid email'
+            expect(authData).toEqual({
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 10
+            });
         });
     });
 });

@@ -3,7 +3,7 @@ import { makeSuccessResponse, makeErrorResponse } from '@/shared/utils/http';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { HttpRequest, HttpResponse } from '@/domain/models/infra/http';
 
-export class SignInController implements IController {
+export class SignInTokenController implements IController {
     constructor(private readonly validation: IValidation, private readonly generateAuth: IGenerateAuthentication) {}
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {

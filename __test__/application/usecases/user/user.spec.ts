@@ -46,6 +46,14 @@ const makeGerenerateAuthentication = (): IGenerateAuthentication => {
                 expiresIn: 100
             };
         }
+
+        async refreshAuth(refreshToken: string): Promise<AuthenticationResult> {
+            return {
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 100
+            };
+        }
     }
 
     return new GerenerateAuthenticationStub();

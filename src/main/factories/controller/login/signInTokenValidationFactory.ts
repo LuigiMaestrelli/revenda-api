@@ -1,7 +1,7 @@
 import { RequiredFieldValidation, ValidationComposite } from '@/presentation/helpers/validators';
 import { IValidation } from '@/presentation/protocols/validation';
 
-export const makeSignInValidation = (): ValidationComposite => {
+export const makeSignInTokenValidation = (): ValidationComposite => {
     const validations: IValidation[] = [];
 
     for (const field of ['email', 'password']) {

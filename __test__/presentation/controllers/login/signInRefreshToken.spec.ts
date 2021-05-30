@@ -1,11 +1,11 @@
 import { AuthenticationAttributes, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
-import { SignInController } from '@/presentation/controllers/login/signIn';
+import { SignInRefreshTokenController } from '@/presentation/controllers/login/signInRefreshToken';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
 
 type SutTypes = {
-    sut: SignInController;
+    sut: SignInRefreshTokenController;
     validationStub: IValidation;
     generateAuthStub: IGenerateAuthentication;
 };
@@ -27,6 +27,14 @@ const makeGenerateAuth = (): IGenerateAuthentication => {
                 expiresIn: 1000
             };
         }
+
+        async refreshAuth(refreshToken: string): Promise<AuthenticationResult> {
+            return {
+                token: 'valid token',
+                refreshToken: 'valid refreshtoken',
+                expiresIn: 1000
+            };
+        }
     }
 
     return new GenerateAuthenticationStub();
@@ -35,7 +43,7 @@ const makeGenerateAuth = (): IGenerateAuthentication => {
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
     const generateAuthStub = makeGenerateAuth();
-    const sut = new SignInController(validationStub, generateAuthStub);
+    const sut = new SignInRefreshTokenController(validationStub, generateAuthStub);
 
     return {
         sut,
@@ -44,15 +52,14 @@ const makeSut = (): SutTypes => {
     };
 };
 
-describe('SignIn Controller', () => {
+describe('SignInRefreshToken Controller', () => {
     test('should call validation with correct values', async () => {
         const { sut, validationStub } = makeSut();
         const validationSpy = jest.spyOn(validationStub, 'validate');
 
         const httpRequest = {
             body: {
-                email: 'valid_email@email.com',
-                password: 'any password'
+                refreshToken: 'valid refreshtoken'
             }
         };
 
@@ -60,8 +67,7 @@ describe('SignIn Controller', () => {
 
         expect(validationSpy).toBeCalledWith({
             body: {
-                email: 'valid_email@email.com',
-                password: 'any password'
+                refreshToken: 'valid refreshtoken'
             }
         });
     });
@@ -75,8 +81,7 @@ describe('SignIn Controller', () => {
 
         const httpRequest = {
             body: {
-                email: 'invalid_email',
-                password: 'any password'
+                refreshToken: 'invalid refreshtoken'
             }
         };
 
@@ -87,48 +92,29 @@ describe('SignIn Controller', () => {
 
     test('should call generateAuth with correct values', async () => {
         const { sut, generateAuthStub } = makeSut();
-        const generateAuthSpy = jest.spyOn(generateAuthStub, 'auth');
+        const generateRefreshAuthSpy = jest.spyOn(generateAuthStub, 'refreshAuth');
 
         const httpRequest = {
             body: {
-                email: 'valid_email@email.com',
-                password: 'any password'
-            },
-            networkAccess: {
-                ip: 'valid ip',
-                userAgent: 'valid agent',
-                hostName: 'valid host',
-                origin: 'valid origin'
+                refreshToken: 'valid refreshtoken'
             }
         };
 
         await sut.handle(httpRequest);
 
-        expect(generateAuthSpy).toBeCalledWith(
-            {
-                email: 'valid_email@email.com',
-                password: 'any password'
-            },
-            {
-                ip: 'valid ip',
-                userAgent: 'valid agent',
-                hostName: 'valid host',
-                origin: 'valid origin'
-            }
-        );
+        expect(generateRefreshAuthSpy).toBeCalledWith('valid refreshtoken');
     });
 
     test('should return 500 if GenerateAuth throws', async () => {
         const { sut, generateAuthStub } = makeSut();
 
-        jest.spyOn(generateAuthStub, 'auth').mockImplementation(async () => {
+        jest.spyOn(generateAuthStub, 'refreshAuth').mockImplementation(async () => {
             return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 
         const httpRequest = {
             body: {
-                email: 'invalid_email',
-                password: 'any password'
+                refreshToken: 'valid refreshtoken'
             }
         };
 
@@ -142,8 +128,7 @@ describe('SignIn Controller', () => {
 
         const httpRequest = {
             body: {
-                email: 'valid_email@email.com',
-                password: 'any password'
+                refreshToken: 'valid refreshtoken'
             }
         };
 
@@ -156,8 +141,7 @@ describe('SignIn Controller', () => {
 
         const httpRequest = {
             body: {
-                email: 'valid_email@email.com',
-                password: 'any password'
+                refreshToken: 'valid refreshtoken'
             }
         };
 
