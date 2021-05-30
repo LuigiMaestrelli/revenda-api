@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { TokenPayload, AuthenticationResult } from '@/domain/models/auth/authentication';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
-import { ITokenValidation } from '@/infra/protocols/tokenValidation';
 import { UnauthorizedError } from '@/shared/errors';
 
-export class JwtAdapter implements ITokenSigner, ITokenValidation {
+export class JwtAdapter implements ITokenSigner {
     constructor(
         private readonly secretTokenKey: string,
         private readonly secretRefreshTokenKey: string,

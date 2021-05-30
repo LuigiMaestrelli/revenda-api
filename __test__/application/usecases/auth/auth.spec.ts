@@ -7,12 +7,10 @@ import { UnauthorizedError } from '@/shared/errors';
 import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
 import { IAccessLogRepository } from '@/domain/repository/log/accessLog';
 import { CreateAccessLogAttributes, AccessLogAttributes } from '@/domain/models/log/accessLog';
-import { ITokenValidation } from 'infra/protocols/tokenValidation';
 
 type SutTypes = {
     sut: AuthenticationUseCase;
     tokenSignerStub: ITokenSigner;
-    tokenValidationStub: ITokenValidation;
     hasherStub: IHasher;
     userRepositoryStub: IUserRepository;
     accessLogRepositoryStub: IAccessLogRepository;
@@ -27,13 +25,7 @@ const makeTokenSigner = (): ITokenSigner => {
                 expiresIn: 10
             };
         }
-    }
 
-    return new TokenSignerStub();
-};
-
-const makeTokenValidation = (): ITokenValidation => {
-    class TokenValidationStub implements ITokenValidation {
         async validateToken(token: string): Promise<TokenPayload> {
             return {
                 userId: 'valid id'
@@ -47,7 +39,7 @@ const makeTokenValidation = (): ITokenValidation => {
         }
     }
 
-    return new TokenValidationStub();
+    return new TokenSignerStub();
 };
 
 const makeHasher = (): IHasher => {
@@ -98,26 +90,18 @@ const makeAccessLogRepository = (): IAccessLogRepository => {
 
 const makeSut = (): SutTypes => {
     const tokenSignerStub = makeTokenSigner();
-    const tokenValidationStub = makeTokenValidation();
     const hasherStub = makeHasher();
     const userRepositoryStub = makeUserRepositoryStub();
     const accessLogRepositoryStub = makeAccessLogRepository();
 
-    const sut = new AuthenticationUseCase(
-        tokenSignerStub,
-        tokenValidationStub,
-        hasherStub,
-        userRepositoryStub,
-        accessLogRepositoryStub
-    );
+    const sut = new AuthenticationUseCase(tokenSignerStub, hasherStub, userRepositoryStub, accessLogRepositoryStub);
 
     return {
         sut,
         tokenSignerStub,
         hasherStub,
         userRepositoryStub,
-        accessLogRepositoryStub,
-        tokenValidationStub
+        accessLogRepositoryStub
     };
 };
 
@@ -353,9 +337,9 @@ describe('Auth UseCase', () => {
 
     describe('refreshAuth', () => {
         test('should call tokenValidation with correct values', async () => {
-            const { sut, tokenValidationStub } = makeSut();
+            const { sut, tokenSignerStub } = makeSut();
 
-            const userRepositorySpy = jest.spyOn(tokenValidationStub, 'validateRefreshToken');
+            const userRepositorySpy = jest.spyOn(tokenSignerStub, 'validateRefreshToken');
 
             await sut.refreshAuth('valid refreshtoken');
 
@@ -363,9 +347,9 @@ describe('Auth UseCase', () => {
         });
 
         test('should throw if tokenValidation throws', async () => {
-            const { sut, tokenValidationStub } = makeSut();
+            const { sut, tokenSignerStub } = makeSut();
 
-            jest.spyOn(tokenValidationStub, 'validateRefreshToken').mockImplementationOnce(() => {
+            jest.spyOn(tokenSignerStub, 'validateRefreshToken').mockImplementationOnce(() => {
                 throw new Error('Test error');
             });
 

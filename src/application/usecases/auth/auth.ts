@@ -6,12 +6,10 @@ import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
 import { IHasher } from '@/infra/protocols/cryptography';
 import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 import { UnauthorizedError } from '@/shared/errors';
-import { ITokenValidation } from 'infra/protocols/tokenValidation';
 
 export class AuthenticationUseCase implements IGenerateAuthentication {
     constructor(
         private readonly tokenSigner: ITokenSigner,
-        private readonly tokenValidation: ITokenValidation,
         private readonly hasher: IHasher,
         private readonly userRepository: IUserRepository,
         private readonly accessLogRepository: IAccessLogRepository
@@ -61,7 +59,7 @@ export class AuthenticationUseCase implements IGenerateAuthentication {
     }
 
     async refreshAuth(refreshToken: string): Promise<AuthenticationResult> {
-        const tokenData = await this.tokenValidation.validateRefreshToken(refreshToken);
+        const tokenData = await this.tokenSigner.validateRefreshToken(refreshToken);
         const user = await this.userRepository.findById(tokenData.userId);
 
         if (!user) {

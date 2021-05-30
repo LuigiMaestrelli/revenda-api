@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { ITokenValidation } from '@/infra/protocols/tokenValidation';
+import { ITokenSigner } from '@/infra/protocols/tokenSigner';
 
 export class AuthenticationMiddleware {
-    constructor(private readonly tokenValidation: ITokenValidation) {}
+    constructor(private readonly tokenSigner: ITokenSigner) {}
 
     makeMiddleware(): Function {
         return async (req: Request, res: Response, next: NextFunction): Promise<any> => {
@@ -21,7 +21,7 @@ export class AuthenticationMiddleware {
                 }
 
                 /* @ts-expect-error */
-                req.auth = await this.tokenValidation.validateToken(token);
+                req.auth = await this.tokenSigner.validateToken(token);
 
                 return next();
             } catch (err) {
