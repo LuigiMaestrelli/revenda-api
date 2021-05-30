@@ -20,6 +20,10 @@
         "prepare": "husky install",
         "sonar": "node sonar-project.js"
     },
+    "_moduleAliases": {
+        "@": "src",
+        "@test": "__test__"
+    },
     "jestSonar": {
         "reportFile": "./coverage/sonar-test-reporter.xml",
         "indent": 4
