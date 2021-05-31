@@ -21,7 +21,9 @@ sonarqubeScanner(
             'sonar.exclusions': excludes.join(','),
             'sonar.test.inclusions': inclusions.join(','),
             'sonar.javascript.lcov.reportPaths': 'coverage/lcov.info',
-            'sonar.testExecutionReportPaths': 'coverage/sonar-test-reporter.xml'
+            'sonar.testExecutionReportPaths': 'coverage/sonar-test-reporter.xml',
+            'sonar.scm.provider': 'git',
+            'sonar.scm.forceReloadAll': 'true'
         }
     },
     // eslint-disable-next-line

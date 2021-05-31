@@ -45,7 +45,6 @@ describe('SignUpValidation Factory', () => {
         validations.push(new CompareFieldsValidation('password', 'passwordConfirmation'));
         validations.push(new EmailValidation('email', makeEmailValidator()));
         validations.push(new StrongPasswordValidation('password', makePasswordValidator()));
-
         expect(ValidationComposite).toHaveBeenCalledWith(validations);
     });
 });
