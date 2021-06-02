@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { BrandAttributes, CreateBrandAttributes } from 'domain/models/general/brand';
+import { BrandAttributes, CreateBrandAttributes } from '@/domain/models/brand/brand';
 import BaseModel from '../infra/basemodel';
 
 export default class BrandModel extends BaseModel<BrandAttributes, CreateBrandAttributes> implements BrandAttributes {

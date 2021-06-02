@@ -1,4 +1,4 @@
-import { BrandAttributes, CreateBrandAttributes, UpdateBrandAttributes } from '@/domain/models/general/brand';
+import { BrandAttributes, CreateBrandAttributes, UpdateBrandAttributes } from '@/domain/models/brand/brand';
 
 export interface IBrandRepository {
     add: (values: CreateBrandAttributes) => Promise<BrandAttributes>;

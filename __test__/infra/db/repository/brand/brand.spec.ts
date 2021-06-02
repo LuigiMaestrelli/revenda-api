@@ -1,6 +1,6 @@
 import { BrandRepository } from '@/infra/db/repository/general/brand';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
-import { BrandAttributes } from '@/domain/models/general/brand';
+import { BrandAttributes } from '@/domain/models/brand/brand';
 import BrandModel from '@/infra/db/model/general/brandModel';
 import { NotFoundError } from '@/shared/errors/notFoundError';
 
