@@ -18,15 +18,38 @@ export default class UserModel extends BaseModel<UserAttributes, CreateUserAttri
                 },
                 name: {
                     type: new DataTypes.STRING(200),
-                    allowNull: false
+                    allowNull: false,
+                    validate: {
+                        notNull: {
+                            msg: 'User`s name cannot be null'
+                        },
+                        len: {
+                            args: [1, 200],
+                            msg: 'User`s name cannot be bigger than 200 characters'
+                        }
+                    }
                 },
                 email: {
                     type: new DataTypes.STRING(200),
-                    allowNull: false
+                    allowNull: false,
+                    validate: {
+                        notNull: {
+                            msg: 'User`s e-mail cannot be null'
+                        },
+                        len: {
+                            args: [1, 200],
+                            msg: 'User`s e-mail cannot be bigger than 200 characters'
+                        }
+                    }
                 },
                 password: {
                     type: DataTypes.TEXT,
-                    allowNull: false
+                    allowNull: false,
+                    validate: {
+                        notNull: {
+                            msg: 'User`s password cannot be null'
+                        }
+                    }
                 },
                 active: {
                     type: DataTypes.BOOLEAN,

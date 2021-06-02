@@ -16,7 +16,16 @@ export default class BrandModel extends BaseModel<BrandAttributes, CreateBrandAt
                 },
                 description: {
                     type: new DataTypes.STRING(200),
-                    allowNull: false
+                    allowNull: false,
+                    validate: {
+                        notNull: {
+                            msg: 'Brand`s description cannot be null'
+                        },
+                        len: {
+                            args: [1, 200],
+                            msg: 'Brand`s description cannot be bigger than 200 characters'
+                        }
+                    }
                 },
                 active: {
                     type: DataTypes.BOOLEAN,
