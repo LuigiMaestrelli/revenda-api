@@ -1,4 +1,4 @@
-import { CreateUserImageAttributes, UserImageAttributes } from 'domain/models/user/userImage';
+import { CreateUserImageAttributes, UserImageAttributes } from '@/domain/models/user/userImage';
 import { IUserImageRepository } from '@/domain/repository/user/userImage';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { NotFoundError } from '@/shared/errors/notFoundError';

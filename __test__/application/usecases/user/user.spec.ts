@@ -1,6 +1,6 @@
 import { IHasher } from '@/infra/protocols/cryptography';
 import { UserUseCase } from '@/application/usecases/user/user';
-import { CreateUserAttributes } from 'domain/models/user/user';
+import { CreateUserAttributes } from '@/domain/models/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 import { ForbiddenError, InvalidParamError } from '@/shared/errors';
 import { IGenerateAuthentication } from '@/domain/usecases/auth/authentication';
@@ -73,6 +73,9 @@ const makeSut = (): SutTypes => {
         sut
     };
 };
+
+// TODO: Testes para o findById
+// TODO: Organizar nomes dos testes
 
 describe('User UseCase', () => {
     describe('Add user', () => {
@@ -154,33 +157,6 @@ describe('User UseCase', () => {
 
             const addPromise = sut.add(accountData, {});
             await expect(addPromise).rejects.toThrow();
-        });
-
-        test('should throw if FindUserByEmailRepository throws', async () => {
-            const { sut, userRepositoryStub } = makeSut();
-
-            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementation(() => {
-                throw new Error('Test throw');
-            });
-
-            const accountData = makeValidCreateUserAttributes();
-
-            const addPromise = sut.add(accountData, {});
-            await expect(addPromise).rejects.toThrow();
-        });
-
-        test('should call FindUserByEmailRepository with correct value', async () => {
-            const { sut, userRepositoryStub } = makeSut();
-
-            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
-
-            const findUserByEmailRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
-
-            const userData = makeValidCreateUserAttributes();
-
-            await sut.add(userData, {});
-
-            expect(findUserByEmailRepositorySpy).toHaveBeenCalledWith('valid e-mail');
         });
 
         test('should throw if e-mail already exists', async () => {
@@ -369,6 +345,35 @@ describe('User UseCase', () => {
             const updatePromise = sut.inactive('valid id');
 
             await expect(updatePromise).rejects.toThrow(new Error('Test throw'));
+        });
+    });
+
+    describe('findUserByEmail', () => {
+        test('should throw if FindUserByEmailRepository throws', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementation(() => {
+                throw new Error('Test throw');
+            });
+
+            const accountData = makeValidCreateUserAttributes();
+
+            const addPromise = sut.add(accountData, {});
+            await expect(addPromise).rejects.toThrow();
+        });
+
+        test('should call FindUserByEmailRepository with correct value', async () => {
+            const { sut, userRepositoryStub } = makeSut();
+
+            jest.spyOn(userRepositoryStub, 'findUserByEmail').mockImplementationOnce(null);
+
+            const findUserByEmailRepositorySpy = jest.spyOn(userRepositoryStub, 'findUserByEmail');
+
+            const userData = makeValidCreateUserAttributes();
+
+            await sut.add(userData, {});
+
+            expect(findUserByEmailRepositorySpy).toHaveBeenCalledWith('valid e-mail');
         });
     });
 

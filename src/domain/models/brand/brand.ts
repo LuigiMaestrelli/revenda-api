@@ -12,5 +12,6 @@ export interface CreateBrandAttributes {
 }
 
 export interface UpdateBrandAttributes {
-    description: string;
+    description?: string;
+    active?: boolean;
 }

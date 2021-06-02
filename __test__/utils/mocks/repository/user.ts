@@ -1,4 +1,4 @@
-import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from 'domain/models/user/user';
+import { CreateUserAttributes, UpdateUserAttributes, UserAttributes } from '@/domain/models/user/user';
 import { IUserRepository } from '@/domain/repository/user/user';
 
 export function makeUserRepositoryStub(): IUserRepository {

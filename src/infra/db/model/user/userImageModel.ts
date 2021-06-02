@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes } from 'sequelize';
-import { UserImageAttributes, CreateUserImageAttributes } from 'domain/models/user/userImage';
+import { UserImageAttributes, CreateUserImageAttributes } from '@/domain/models/user/userImage';
 import BaseModel from '../infra/basemodel';
 
 export default class UserImageModel

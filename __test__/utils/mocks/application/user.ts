@@ -4,7 +4,7 @@ import {
     UpdateUserPassword,
     UserAttributes,
     UserWithAuthAttributes
-} from 'domain/models/user/user';
+} from '@/domain/models/user/user';
 import { IUserUseCase } from '@/domain/usecases/user/user';
 
 export function makeUserUseCaseStub(): IUserUseCase {

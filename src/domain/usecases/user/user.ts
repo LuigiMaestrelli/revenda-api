@@ -5,7 +5,7 @@ import {
     UpdateUserAttributes,
     UserAttributes,
     UpdateUserPassword
-} from 'domain/models/user/user';
+} from '@/domain/models/user/user';
 
 export interface IUserUseCase {
     add: (userData: CreateUserAttributes, networkAccessInfo: NetworkAccessInfo) => Promise<UserWithAuthAttributes>;
