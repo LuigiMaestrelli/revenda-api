@@ -1,7 +1,7 @@
 #
 # Builder stage.
 #
-FROM node:16.3.0 AS builder
+FROM node:16.2.0 AS builder
 
 WORKDIR /usr/src/app
 
