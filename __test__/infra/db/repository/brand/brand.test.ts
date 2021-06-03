@@ -4,7 +4,7 @@ import { BrandRepository } from '@/infra/db/repository/brand/brand';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';
 import { NotFoundError } from '@/shared/errors/notFoundError';
-import BrandModel from '@/infra/db/model/general/brandModel';
+import BrandModel from '@/infra/db/model/brand/brandModel';
 
 type SutTypes = {
     sut: BrandRepository;

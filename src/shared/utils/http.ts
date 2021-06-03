@@ -1,7 +1,7 @@
 import { ForbiddenError, InvalidParamError, MissingParamError, ServerError, UnauthorizedError } from '@/shared/errors';
 import { HttpResponse, HttpResponseError } from '@/domain/models/infra/http';
 import { NotFoundError } from '../errors/notFoundError';
-import { isUploadError } from '@/main/middlewares/fileUpload';
+import { isSequelizeValidationError, isUploadError } from '@/shared/utils/error';
 
 export function makeBadRequestResponse(error: Error): HttpResponseError {
     return {
@@ -60,7 +60,7 @@ export function makeSuccessResponse(body?: any, headers?: any, contentType?: str
 }
 
 export function makeErrorResponse(error: Error): HttpResponseError {
-    if (error instanceof InvalidParamError || isUploadError(error)) {
+    if (error instanceof InvalidParamError || isUploadError(error) || isSequelizeValidationError(error)) {
         return makeBadRequestResponse(error);
     }
 

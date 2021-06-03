@@ -1,7 +1,7 @@
 import { BrandRepository } from '@/infra/db/repository/brand/brand';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { BrandAttributes } from '@/domain/models/brand/brand';
-import BrandModel from '@/infra/db/model/general/brandModel';
+import BrandModel from '@/infra/db/model/brand/brandModel';
 import { NotFoundError } from '@/shared/errors/notFoundError';
 
 type SutTypes = {
@@ -9,7 +9,7 @@ type SutTypes = {
     idGeneratorStub: IIdGenerator;
 };
 
-jest.mock('@/infra/db/model/general/brandModel', () => ({
+jest.mock('@/infra/db/model/brand/brandModel', () => ({
     async create(data: BrandAttributes): Promise<BrandAttributes> {
         return data;
     },

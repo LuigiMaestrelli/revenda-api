@@ -1,7 +1,7 @@
 import { IBrandRepository } from '@/domain/repository/brand/brand';
 import { BrandAttributes, CreateBrandAttributes, UpdateBrandAttributes } from '@/domain/models/brand/brand';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
-import BrandModel from '@/infra/db/model/general/brandModel';
+import BrandModel from '@/infra/db/model/brand/brandModel';
 import { NotFoundError } from '@/shared/errors/notFoundError';
 
 export class BrandRepository implements IBrandRepository {

@@ -19,7 +19,3 @@ export const imageUpload = multer({
     limits: { fileSize: MAXSIZE_30_MB },
     fileFilter: (req, file, callback) => imageFileFilter(file, callback)
 });
-
-export const isUploadError = (err: Error): boolean => {
-    return err instanceof multer.MulterError;
-};
