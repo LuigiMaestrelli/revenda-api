@@ -1,13 +1,13 @@
-import { GetUserByIdController } from '@/presentation/controllers/user/getUserById';
-import { IUserRepository } from '@/domain/repository/user/user';
+import { IBrandRepository } from '@/domain/repository/brand/brand';
+import { GetBrandByIdController } from '@/presentation/controllers/brand/getBrandById';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
-import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
+import { makeBrandRepositoryStub } from '@test/utils/mocks/repository/brand';
 
 type SutTypes = {
-    sut: GetUserByIdController;
+    sut: GetBrandByIdController;
     validationStub: IValidation;
-    userRepositoryStub: IUserRepository;
+    brandRepositoryStub: IBrandRepository;
 };
 
 const makeValidation = (): IValidation => {
@@ -20,17 +20,17 @@ const makeValidation = (): IValidation => {
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const userRepositoryStub = makeUserRepositoryStub();
-    const sut = new GetUserByIdController(validationStub, userRepositoryStub);
+    const brandRepositoryStub = makeBrandRepositoryStub();
+    const sut = new GetBrandByIdController(validationStub, brandRepositoryStub);
 
     return {
         sut,
-        userRepositoryStub,
+        brandRepositoryStub,
         validationStub
     };
 };
 
-describe('GetUserById Controller', () => {
+describe('GetBrandById Controller', () => {
     test('should call validation with correct values', async () => {
         const { sut, validationStub } = makeSut();
 
@@ -74,19 +74,19 @@ describe('GetUserById Controller', () => {
 
         const httpRequest = {
             params: {
-                id: 'xxxx-xxxx-xxxx'
+                id: 'valid id'
             }
         };
 
         const httpResponse = await sut.handle(httpRequest);
         expect(httpResponse.statusCode).toBe(200);
-        expect(httpResponse.body.id).toBe('xxxx-xxxx-xxxx');
+        expect(httpResponse.body.id).toBe('valid id');
     });
 
-    test('should call FindUserById with correct value', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    test('should call FindById with correct value', async () => {
+        const { sut, brandRepositoryStub } = makeSut();
 
-        const findByIdSpy = jest.spyOn(userRepositoryStub, 'findById');
+        const findByIdSpy = jest.spyOn(brandRepositoryStub, 'findById');
 
         const httpRequest = {
             params: {
@@ -98,10 +98,10 @@ describe('GetUserById Controller', () => {
         expect(findByIdSpy).toBeCalledWith('valid id');
     });
 
-    test('should return 404 if no user whas found', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    test('should return 404 if no brand whas found', async () => {
+        const { sut, brandRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepositoryStub, 'findById').mockReturnValueOnce(null);
+        jest.spyOn(brandRepositoryStub, 'findById').mockReturnValueOnce(null);
 
         const httpRequest = {
             params: {
@@ -113,10 +113,10 @@ describe('GetUserById Controller', () => {
         expect(response.statusCode).toBe(404);
     });
 
-    test('should return 500 if FindUserById throws', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    test('should return 500 if FindById throws', async () => {
+        const { sut, brandRepositoryStub } = makeSut();
 
-        jest.spyOn(userRepositoryStub, 'findById').mockImplementationOnce(() => {
+        jest.spyOn(brandRepositoryStub, 'findById').mockImplementationOnce(() => {
             throw new Error('Test throw');
         });
 

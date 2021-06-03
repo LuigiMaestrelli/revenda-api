@@ -21,10 +21,6 @@ export class BrandUseCase implements IBrandUseCase {
         await this.brandRepository.update(id, { active: false });
     }
 
-    async findById(id: string): Promise<BrandAttributes> {
-        return await this.brandRepository.findById(id);
-    }
-
     async delete(id: string): Promise<void> {
         await this.brandRepository.delete(id);
     }

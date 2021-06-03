@@ -1,4 +1,4 @@
-import { BrandRepository } from '@/infra/db/repository/general/brand';
+import { BrandRepository } from '@/infra/db/repository/brand/brand';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { BrandAttributes } from '@/domain/models/brand/brand';
 import BrandModel from '@/infra/db/model/general/brandModel';

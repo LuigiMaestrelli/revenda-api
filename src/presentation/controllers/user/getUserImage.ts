@@ -11,8 +11,8 @@ export class GetUserImageController implements IController {
             await this.validation.validate(httpRequest);
 
             const { params } = httpRequest;
-
             const imageData = await this.userImageUseCase.findById(params.id);
+
             return makeSuccessResponse(imageData.image, null, imageData.mimetype);
         } catch (ex) {
             return makeErrorResponse(ex);

@@ -13,10 +13,9 @@ export class UpdateUserController implements IController {
 
     async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
         try {
-            const { body, params } = httpRequest;
-
             await this.validation.validate(httpRequest);
 
+            const { body, params } = httpRequest;
             const filteredBody = this.objectManipulation.filterAllowedProps(body, ['name']);
             const user = await this.userUseCase.update(params.id, filteredBody);
 

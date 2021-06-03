@@ -146,37 +146,6 @@ describe('Brand UseCase', () => {
         });
     });
 
-    describe('FindById', () => {
-        test('should call findById with correct values', async () => {
-            const { sut, brandRepositoryStub } = makeSut();
-            const findByIdSpy = jest.spyOn(brandRepositoryStub, 'findById');
-
-            await sut.findById('valid id');
-            expect(findByIdSpy).toHaveBeenCalledWith('valid id');
-        });
-
-        test('should return brand values', async () => {
-            const { sut } = makeSut();
-
-            const brand = await sut.findById('valid id');
-            expect(brand).toEqual({
-                id: 'valid id',
-                description: 'valid description',
-                active: true
-            });
-        });
-
-        test('should throw if findById throws', async () => {
-            const { sut, brandRepositoryStub } = makeSut();
-            jest.spyOn(brandRepositoryStub, 'findById').mockImplementationOnce(() => {
-                throw new Error('Test throw');
-            });
-
-            const findByIdPromise = sut.findById('valid id');
-            await expect(findByIdPromise).rejects.toThrow(new Error('Test throw'));
-        });
-    });
-
     describe('Delete', () => {
         test('should call delete with correct values', async () => {
             const { sut, brandRepositoryStub } = makeSut();

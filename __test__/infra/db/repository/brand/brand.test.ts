@@ -1,6 +1,6 @@
 import faker from 'faker';
 import { truncate } from '@test/utils/database';
-import { BrandRepository } from '@/infra/db/repository/general/brand';
+import { BrandRepository } from '@/infra/db/repository/brand/brand';
 import { IIdGenerator } from '@/infra/protocols/idGenerator';
 import { UUIDAdapter } from '@/infra/adapters/uuid/uuidAdapter';
 import { NotFoundError } from '@/shared/errors/notFoundError';

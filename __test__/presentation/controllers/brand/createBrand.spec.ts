@@ -1,13 +1,13 @@
-import { makeUserUseCaseStub } from '@test/utils/mocks/application/user';
-import { IUserUseCase } from '@/domain/usecases/user/user';
-import { ActivateUserController } from '@/presentation/controllers/user/activateUser';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
+import { CreateBrandController } from '@/presentation/controllers/brand/createBrand';
+import { IBrandUseCase } from '@/domain/usecases/brand/brand';
+import { makeBrandUseCaseStub } from '@test/utils/mocks/application/brand';
 
 type SutTypes = {
-    sut: ActivateUserController;
+    sut: CreateBrandController;
     validationStub: IValidation;
-    userUseCaseStub: IUserUseCase;
+    brandUseCaseStub: IBrandUseCase;
 };
 
 const makeValidation = (): IValidation => {
@@ -20,33 +20,33 @@ const makeValidation = (): IValidation => {
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const userUseCaseStub = makeUserUseCaseStub();
-    const sut = new ActivateUserController(validationStub, userUseCaseStub);
+    const brandUseCaseStub = makeBrandUseCaseStub();
+    const sut = new CreateBrandController(validationStub, brandUseCaseStub);
 
     return {
         sut,
         validationStub,
-        userUseCaseStub
+        brandUseCaseStub
     };
 };
 
-describe('ActivateUser Controller', () => {
+describe('CreateBrand Controller', () => {
     test('should call validation with correct values', async () => {
         const { sut, validationStub } = makeSut();
 
         const validationSpy = jest.spyOn(validationStub, 'validate');
 
         const httpRequest = {
-            params: {
-                id: 'valid id'
+            body: {
+                description: 'valid description'
             }
         };
 
         await sut.handle(httpRequest);
 
         expect(validationSpy).toBeCalledWith({
-            params: {
-                id: 'valid id'
+            body: {
+                description: 'valid description'
             }
         });
     });
@@ -59,8 +59,8 @@ describe('ActivateUser Controller', () => {
         });
 
         const httpRequest = {
-            params: {
-                id: 'valid id'
+            body: {
+                description: 'invalid description'
             }
         };
 
@@ -73,8 +73,8 @@ describe('ActivateUser Controller', () => {
         const { sut } = makeSut();
 
         const httpRequest = {
-            params: {
-                id: 'valid id'
+            body: {
+                description: 'valid description'
             }
         };
 
@@ -82,31 +82,33 @@ describe('ActivateUser Controller', () => {
         expect(httpResponse.statusCode).toBe(200);
     });
 
-    test('should call ActiveUser with correct values', async () => {
-        const { sut, userUseCaseStub } = makeSut();
+    test('should call Add with correct values', async () => {
+        const { sut, brandUseCaseStub } = makeSut();
 
-        const activeSpy = jest.spyOn(userUseCaseStub, 'active');
+        const activeSpy = jest.spyOn(brandUseCaseStub, 'add');
 
         const httpRequest = {
-            params: {
-                id: 'valid id'
+            body: {
+                description: 'valid description'
             }
         };
 
         await sut.handle(httpRequest);
-        expect(activeSpy).toBeCalledWith('valid id');
+        expect(activeSpy).toBeCalledWith({
+            description: 'valid description'
+        });
     });
 
-    test('should return 500 if ActiveUser throws', async () => {
-        const { sut, userUseCaseStub } = makeSut();
+    test('should return 500 if Add throws', async () => {
+        const { sut, brandUseCaseStub } = makeSut();
 
-        jest.spyOn(userUseCaseStub, 'active').mockImplementation(async () => {
+        jest.spyOn(brandUseCaseStub, 'add').mockImplementation(async () => {
             return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 
         const httpRequest = {
-            params: {
-                id: 'valid id'
+            body: {
+                description: 'valid description'
             }
         };
 

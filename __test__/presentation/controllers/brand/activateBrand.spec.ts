@@ -1,13 +1,13 @@
-import { GetUserByIdController } from '@/presentation/controllers/user/getUserById';
-import { IUserRepository } from '@/domain/repository/user/user';
 import { IValidation } from '@/presentation/protocols';
 import { MissingParamError } from '@/shared/errors';
-import { makeUserRepositoryStub } from '@test/utils/mocks/repository/user';
+import { ActivateBrandController } from '@/presentation/controllers/brand/activateBrand';
+import { IBrandUseCase } from '@/domain/usecases/brand/brand';
+import { makeBrandUseCaseStub } from '@test/utils/mocks/application/brand';
 
 type SutTypes = {
-    sut: GetUserByIdController;
+    sut: ActivateBrandController;
     validationStub: IValidation;
-    userRepositoryStub: IUserRepository;
+    brandUseCaseStub: IBrandUseCase;
 };
 
 const makeValidation = (): IValidation => {
@@ -20,17 +20,17 @@ const makeValidation = (): IValidation => {
 
 const makeSut = (): SutTypes => {
     const validationStub = makeValidation();
-    const userRepositoryStub = makeUserRepositoryStub();
-    const sut = new GetUserByIdController(validationStub, userRepositoryStub);
+    const brandUseCaseStub = makeBrandUseCaseStub();
+    const sut = new ActivateBrandController(validationStub, brandUseCaseStub);
 
     return {
         sut,
-        userRepositoryStub,
-        validationStub
+        validationStub,
+        brandUseCaseStub
     };
 };
 
-describe('GetUserById Controller', () => {
+describe('ActivateBrand Controller', () => {
     test('should call validation with correct values', async () => {
         const { sut, validationStub } = makeSut();
 
@@ -69,24 +69,23 @@ describe('GetUserById Controller', () => {
         expect(httpResponse.body.message).toBe('Missing param: Test throw');
     });
 
-    test('should return 200 and valid user data', async () => {
+    test('should return 200 if valid data is sent', async () => {
         const { sut } = makeSut();
 
         const httpRequest = {
             params: {
-                id: 'xxxx-xxxx-xxxx'
+                id: 'valid id'
             }
         };
 
         const httpResponse = await sut.handle(httpRequest);
         expect(httpResponse.statusCode).toBe(200);
-        expect(httpResponse.body.id).toBe('xxxx-xxxx-xxxx');
     });
 
-    test('should call FindUserById with correct value', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    test('should call Active with correct values', async () => {
+        const { sut, brandUseCaseStub } = makeSut();
 
-        const findByIdSpy = jest.spyOn(userRepositoryStub, 'findById');
+        const activeSpy = jest.spyOn(brandUseCaseStub, 'active');
 
         const httpRequest = {
             params: {
@@ -95,29 +94,14 @@ describe('GetUserById Controller', () => {
         };
 
         await sut.handle(httpRequest);
-        expect(findByIdSpy).toBeCalledWith('valid id');
+        expect(activeSpy).toBeCalledWith('valid id');
     });
 
-    test('should return 404 if no user whas found', async () => {
-        const { sut, userRepositoryStub } = makeSut();
+    test('should return 500 if Active throws', async () => {
+        const { sut, brandUseCaseStub } = makeSut();
 
-        jest.spyOn(userRepositoryStub, 'findById').mockReturnValueOnce(null);
-
-        const httpRequest = {
-            params: {
-                id: 'valid id'
-            }
-        };
-
-        const response = await sut.handle(httpRequest);
-        expect(response.statusCode).toBe(404);
-    });
-
-    test('should return 500 if FindUserById throws', async () => {
-        const { sut, userRepositoryStub } = makeSut();
-
-        jest.spyOn(userRepositoryStub, 'findById').mockImplementationOnce(() => {
-            throw new Error('Test throw');
+        jest.spyOn(brandUseCaseStub, 'active').mockImplementation(async () => {
+            return await new Promise((resolve, reject) => reject(new Error('Test throw')));
         });
 
         const httpRequest = {
@@ -126,7 +110,8 @@ describe('GetUserById Controller', () => {
             }
         };
 
-        const response = await sut.handle(httpRequest);
-        expect(response.statusCode).toBe(500);
+        const httpResponse = await sut.handle(httpRequest);
+        expect(httpResponse.statusCode).toBe(500);
+        expect(httpResponse.body.message).toBe('Test throw');
     });
 });
