@@ -1,5 +1,6 @@
 import path from 'path';
 import moduleAlias from 'module-alias';
+
 moduleAlias.addAliases({
     '@': path.join(__dirname, '..')
 });
@@ -16,7 +17,10 @@ process.on('unhandledRejection', err => {
 console.log('Connecting to the database');
 
 // eslint-disable-next-line
+import config from '@/main/config';
+// eslint-disable-next-line
 import database from '@/infra/db';
+
 database
     .authenticate()
     .then(async (): Promise<void> => {
@@ -26,8 +30,9 @@ database
         console.log('Starting server');
         const app = (await import('./config/app')).default;
 
-        app.listen(process.env.PORT, () => {
-            console.log(`Server started at ${process.env.PORT ?? ''}`);
+        const portNumber = config.getSystemConfig().serverPort;
+        app.listen(portNumber, () => {
+            console.log(`Server started at ${portNumber ?? ''}`);
         });
     })
     .catch(console.error);

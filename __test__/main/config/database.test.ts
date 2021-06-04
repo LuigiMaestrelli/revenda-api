@@ -13,51 +13,103 @@ describe('Database config files', () => {
     });
 
     test('should throw exception when no port number is configured', () => {
-        config.load();
-
-        process.env.DB_PORT = '';
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: 'valid username',
+            password: 'valid password',
+            database: 'valid database',
+            host: 'valid host',
+            dialect: 'valid dialect',
+            port: null
+        });
 
         expect(databaseCfg.load).toThrow('Database port number not set');
     });
 
     test('should throw exception when no host is configured', () => {
-        config.load();
-
-        process.env.DB_HOST = '';
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: 'valid username',
+            password: 'valid password',
+            database: 'valid database',
+            host: null,
+            dialect: 'valid dialect',
+            port: 100
+        });
 
         expect(databaseCfg.load).toThrow('Database host not set');
     });
 
     test('should throw exception when no user is configured', () => {
-        config.load();
-
-        process.env.DB_USER = '';
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: null,
+            password: 'valid password',
+            database: 'valid database',
+            host: 'valid host',
+            dialect: 'valid dialect',
+            port: 10
+        });
 
         expect(databaseCfg.load).toThrow('Database user not set');
     });
 
-    test('should throw exception when no passwordr is configured', () => {
-        config.load();
-
-        process.env.DB_PASS = '';
+    test('should throw exception when no password is configured', () => {
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: 'valid username',
+            password: null,
+            database: 'valid database',
+            host: 'valid host',
+            dialect: 'valid dialect',
+            port: 10
+        });
 
         expect(databaseCfg.load).toThrow('Database password not set');
     });
 
+    test('should throw exception when no database is configured', () => {
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: 'valid username',
+            password: 'valid password',
+            database: null,
+            host: 'valid host',
+            dialect: 'valid dialect',
+            port: 10
+        });
+
+        expect(databaseCfg.load).toThrow('Database name not set');
+    });
+
+    test('should throw exception when no dialect is configured', () => {
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: 'valid username',
+            password: 'valid password',
+            database: 'valid database',
+            host: 'valid host',
+            dialect: null,
+            port: 10
+        });
+
+        expect(databaseCfg.load).toThrow('Database dialect not set');
+    });
+
     test('should create right config options', () => {
-        config.load();
+        jest.spyOn(config, 'getDatabaseConfig').mockReturnValueOnce({
+            username: 'valid username',
+            password: 'valid password',
+            database: 'valid database',
+            host: 'valid host',
+            dialect: 'valid dialect',
+            port: 10
+        });
 
         const dbConfig = databaseCfg.load();
 
-        expect(dbConfig.port).toEqual(parseInt(process.env.DB_PORT ?? '', 10));
-        expect(dbConfig.host).toEqual(process.env.DB_HOST);
-        expect(dbConfig.username).toEqual(process.env.DB_USER);
-        expect(dbConfig.password).toEqual(process.env.DB_PASS);
-        expect(dbConfig.database).toEqual(process.env.DB_NAME);
-        expect(dbConfig.dialect).toEqual('postgres');
+        expect(dbConfig.port).toEqual(10);
+        expect(dbConfig.host).toEqual('valid host');
+        expect(dbConfig.username).toEqual('valid username');
+        expect(dbConfig.password).toEqual('valid password');
+        expect(dbConfig.database).toEqual('valid database');
+        expect(dbConfig.dialect).toEqual('valid dialect');
         expect(dbConfig.timezone).toEqual('+00:00');
-
-        expect(dbConfig.define?.timestamps).toEqual(true);
-        expect(dbConfig.define?.charset).toEqual('utf8');
+        expect(dbConfig.define.timestamps).toEqual(true);
+        expect(dbConfig.define.charset).toEqual('utf8');
     });
 });

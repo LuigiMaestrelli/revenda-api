@@ -3,33 +3,39 @@ import config from '../config';
 
 export default {
     load: function (): Options {
-        config.load();
+        const configDatabase = config.getDatabaseConfig();
 
-        if (!process.env.DB_PORT) {
+        if (!configDatabase.port) {
             throw new Error('Database port number not set');
         }
 
-        if (!process.env.DB_HOST) {
+        if (!configDatabase.host) {
             throw new Error('Database host not set');
         }
 
-        if (!process.env.DB_USER) {
+        if (!configDatabase.username) {
             throw new Error('Database user not set');
         }
 
-        if (!process.env.DB_PASS) {
+        if (!configDatabase.password) {
             throw new Error('Database password not set');
         }
 
-        const portNumber = parseInt(process.env.DB_PORT, 10);
+        if (!configDatabase.database) {
+            throw new Error('Database name not set');
+        }
+
+        if (!configDatabase.dialect) {
+            throw new Error('Database dialect not set');
+        }
 
         return {
-            port: portNumber,
-            host: process.env.DB_HOST,
-            username: process.env.DB_USER,
-            password: process.env.DB_PASS,
-            database: process.env.DB_NAME,
-            dialect: 'postgres',
+            port: configDatabase.port,
+            host: configDatabase.host,
+            username: configDatabase.username,
+            password: configDatabase.password,
+            database: configDatabase.database,
+            dialect: configDatabase.dialect,
             logging: false,
             logQueryParameters: true,
             benchmark: true,
@@ -42,7 +48,8 @@ export default {
                 freezeTableName: true,
                 charset: 'utf8',
                 createdAt: 'createdAt',
-                updatedAt: 'updatedAt'
+                updatedAt: 'updatedAt',
+                deletedAt: 'deletedAt'
             },
             pool: {
                 max: 30,

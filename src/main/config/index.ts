@@ -1,14 +1,20 @@
-import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+
+import { DatabaseConfig, SystemConfig } from '@/domain/models/infra/config';
 
 export default {
-    load(): string {
-        const envFile = this.isTest() ? '.env.test' : '.env';
+    databaseConfig: null,
+    systemConfig: null,
 
-        dotenv.config({
-            path: envFile
-        });
+    load(): void {
+        const databaseFilePath = path.join(__dirname, '..', '..', '..', 'databaseConfig.json');
+        const databaseFileData = fs.readFileSync(databaseFilePath, 'utf8');
+        this.databaseConfig = JSON.parse(databaseFileData);
 
-        return envFile;
+        const systemFilePath = path.join(__dirname, '..', '..', '..', 'systemConfig.json');
+        const systemFileData = fs.readFileSync(systemFilePath, 'utf8');
+        this.systemConfig = JSON.parse(systemFileData);
     },
 
     isTest(): boolean {
@@ -20,18 +26,53 @@ export default {
     },
 
     isProduction(): boolean {
-        return process.env.NODE_ENV === 'production';
+        return process.env.NODE_ENV === 'production' || !process.env.NODE_ENV;
+    },
+
+    getDatabaseConfig(): DatabaseConfig {
+        if (!this.databaseConfig) {
+            this.load();
+        }
+
+        if (this.isDev()) {
+            return this.databaseConfig.development;
+        }
+
+        if (this.isTest()) {
+            return this.databaseConfig.test;
+        }
+
+        return this.databaseConfig.production;
+    },
+
+    getSystemConfig(): SystemConfig {
+        if (!this.systemConfig) {
+            this.load();
+        }
+
+        if (this.isDev()) {
+            return this.systemConfig.development;
+        }
+
+        if (this.isTest()) {
+            return this.systemConfig.test;
+        }
+
+        return this.systemConfig.production;
     },
 
     getTokenSecretTokenKey(): string {
-        return process.env.APP_SECRET ?? '';
+        const config = this.getSystemConfig();
+        return config.appSecret;
     },
 
     getTokenSecretRefreshTokenKey(): string {
-        return process.env.APP_SECRET_REFRESH ?? '';
+        const config = this.getSystemConfig();
+        return config.appSecretRefresh;
     },
 
     getTokenSecretExpires(): number {
-        return parseInt(process.env.APP_SECRET_EXPIRES ?? '1');
+        const config = this.getSystemConfig();
+        return config.appSecretExpires;
     }
 };
