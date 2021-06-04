@@ -2,22 +2,13 @@ import { QueryInterface } from 'sequelize';
 
 export default {
     up: async (queryInterface: QueryInterface, Sequelize: any) => {
-        await queryInterface.createTable('users', {
+        await queryInterface.createTable('brands', {
             id: {
-                type: Sequelize.UUIDV4,
-                primaryKey: true,
-                autoIncrement: false
+                type: Sequelize.UUID,
+                primaryKey: true
             },
-            name: {
-                type: Sequelize.STRING(200),
-                allowNull: false
-            },
-            email: {
-                type: Sequelize.STRING(200),
-                allowNull: false
-            },
-            password: {
-                type: Sequelize.TEXT,
+            description: {
+                type: new Sequelize.STRING(200),
                 allowNull: false
             },
             active: {
@@ -37,6 +28,6 @@ export default {
     },
 
     down: async (queryInterface: QueryInterface) => {
-        await queryInterface.dropTable('users');
+        await queryInterface.dropTable('brands');
     }
 };

@@ -45,7 +45,6 @@ export default class UserImageModel
                     type: DataTypes.DOUBLE,
                     allowNull: false
                 },
-
                 createdAt: {
                     type: DataTypes.DATE,
                     allowNull: false

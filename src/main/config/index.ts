@@ -8,11 +8,11 @@ export default {
     systemConfig: null,
 
     load(): void {
-        const databaseFilePath = path.join(__dirname, '..', '..', '..', 'databaseConfig.json');
+        const databaseFilePath = path.join(__dirname, '..', '..', '..', 'config', 'databaseConfig.json');
         const databaseFileData = fs.readFileSync(databaseFilePath, 'utf8');
         this.databaseConfig = JSON.parse(databaseFileData);
 
-        const systemFilePath = path.join(__dirname, '..', '..', '..', 'systemConfig.json');
+        const systemFilePath = path.join(__dirname, '..', '..', '..', 'config', 'systemConfig.json');
         const systemFileData = fs.readFileSync(systemFilePath, 'utf8');
         this.systemConfig = JSON.parse(systemFileData);
     },

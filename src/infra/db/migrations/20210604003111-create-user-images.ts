@@ -2,28 +2,35 @@ import { QueryInterface } from 'sequelize';
 
 export default {
     up: async (queryInterface: QueryInterface, Sequelize: any) => {
-        await queryInterface.createTable('users', {
+        await queryInterface.createTable('userImages', {
             id: {
                 type: Sequelize.UUIDV4,
                 primaryKey: true,
                 autoIncrement: false
             },
+            image: {
+                type: Sequelize.BLOB,
+                allowNull: false
+            },
+            miniature: {
+                type: Sequelize.BLOB,
+                allowNull: false
+            },
             name: {
-                type: Sequelize.STRING(200),
+                type: new Sequelize.STRING(500),
                 allowNull: false
             },
-            email: {
-                type: Sequelize.STRING(200),
+            mimetype: {
+                type: new Sequelize.STRING(200),
                 allowNull: false
             },
-            password: {
-                type: Sequelize.TEXT,
+            imageSize: {
+                type: Sequelize.DOUBLE,
                 allowNull: false
             },
-            active: {
-                type: Sequelize.BOOLEAN,
-                allowNull: false,
-                defaultValue: true
+            miniatureSize: {
+                type: Sequelize.DOUBLE,
+                allowNull: false
             },
             createdAt: {
                 type: Sequelize.DATE,
@@ -37,6 +44,6 @@ export default {
     },
 
     down: async (queryInterface: QueryInterface) => {
-        await queryInterface.dropTable('users');
+        await queryInterface.dropTable('userImages');
     }
 };

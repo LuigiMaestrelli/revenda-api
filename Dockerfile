@@ -24,8 +24,7 @@ ENV NODE_ENV=production
 COPY package*.json ./
 COPY yarn*.lock ./
 COPY tsconfig*.json ./
-COPY databaseConfig.json ./
-COPY systemConfig.json ./
+COPY ./config ./config
 RUN yarn install --prod
 
 COPY --from=builder /usr/src/app/dist ./dist
