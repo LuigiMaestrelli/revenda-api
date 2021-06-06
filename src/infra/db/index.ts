@@ -13,10 +13,8 @@ const config = dbConfig.load();
 const connection = new Sequelize(config);
 
 const modelPath = path.join(__dirname, './model');
-
-const modelClasses = getFileList(modelPath, ['index.ts', 'index.js', 'basemodel.ts', 'basemodel.js']).map(filePath =>
-    require(filePath)
-);
+const ignoreFiles = ['index.ts', 'index.js', 'basemodel.ts', 'basemodel.js'];
+const modelClasses = getFileList(modelPath, ignoreFiles).map(filePath => require(filePath));
 
 modelClasses.forEach(Model => Model.default.initialize(connection));
 modelClasses.filter(p => !!p.default.associate).forEach(Model => Model.default.associate(connection.models));
