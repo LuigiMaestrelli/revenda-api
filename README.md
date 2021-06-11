@@ -17,18 +17,6 @@ Pensando nisso, ele lhe contratou para desenvolver o sistema. Os pré-requisitos
 -   Criar a página que mostre a listagem de seus veículos, aonde ele possa editá-los;
 -   A última solicitação do João, para questão de um software terceiro que ele tem, seria necessário criar uma API que simplesmente tenha um método GET, passando o Id do anúncio. Esse método deve retornar o objeto do anúncio.
 
-# Criar usuário
-
--   Nome, email, senha
-
-# Fazer login
-
--   Validar autenticação
-
-# Criar cadastro de Marca
-
--   Codigo e descrição
-
 ## Comandos para o sequelize
 
 -   yarn sequelize db:create
